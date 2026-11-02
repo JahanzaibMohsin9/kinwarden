@@ -1,0 +1,13 @@
+import { defineConfig } from "vitest/config";
+import path from "node:path";
+
+export default defineConfig({
+  resolve: { alias: { "@": path.resolve(import.meta.dirname, "src") } },
+  test: {
+    environment: "node",
+    include: ["src/**/*.test.ts"],
+    testTimeout: 30000,
+    setupFiles: ["./vitest.setup.ts"],
+    env: { KINWARDEN_STEP_DELAY_MS: "0" },
+  },
+});

@@ -1,0 +1,18 @@
+# For a server that already runs other sites behind its own reverse proxy (nginx, Caddy, Traefik…).
+# Only Kinwarden runs here, on 127.0.0.1:3010, so it can't clash with ports 80/443 or other projects;
+# point your existing proxy at it (deploy/nginx-kinwarden.conf has an nginx example).
+#   cp .env.local.example .env.production   # keys; ANCHOR_* for on-chain anchors
+#   docker compose -f docker-compose.shared.yml up -d --build
+name: kinwarden
+services:
+  app:
+    build: .
+    env_file: .env.production
+    ports:
+      - "127.0.0.1:${KINWARDEN_PORT:-3010}:3000"
+    volumes:
+      - kinwarden-data:/data
+    restart: unless-stopped
+
+volumes:
+  kinwarden-data:

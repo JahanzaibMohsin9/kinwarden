@@ -1,0 +1,119 @@
+{
+  "contractName": "KinwardenAnchor",
+  "compiler": "solc 0.8.28+commit.7893614a.Emscripten.clang",
+  "settings": {
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "evmVersion": "paris",
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode.object"
+        ]
+      }
+    }
+  },
+  "abi": [
+    {
+      "inputs": [],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "index",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "head",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint64",
+          "name": "seq",
+          "type": "uint64"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "label",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "at",
+          "type": "uint256"
+        }
+      ],
+      "name": "Anchored",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "head",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint64",
+          "name": "seq",
+          "type": "uint64"
+        },
+        {
+          "internalType": "string",
+          "name": "label",
+          "type": "string"
+        }
+      ],
+      "name": "anchor",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "index",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "count",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x60a0604052348015600f57600080fd5b503360805260805161031161003460003960008181607a015260c101526103116000f3fe608060405234801561001057600080fd5b50600436106100415760003560e01c806306661abd14610046578063788c4531146100625780638da5cb5b14610075575b600080fd5b61004f60005481565b6040519081526020015b60405180910390f35b61004f6100703660046101d1565b6100b4565b61009c7f000000000000000000000000000000000000000000000000000000000000000081565b6040516001600160a01b039091168152602001610059565b6000336001600160a01b037f000000000000000000000000000000000000000000000000000000000000000016146101335760405162461bcd60e51b815260206004820181905260248201527f6f6e6c7920746865204b696e77617264656e20616e63686f722077616c6c657460448201526064015b60405180910390fd5b60608211156101755760405162461bcd60e51b815260206004820152600e60248201526d6c6162656c20746f6f206c6f6e6760901b604482015260640161012a565b6000805490806101848361026a565b91905055905084817fbfeb21ef85e61a7a7741db7540c6e9fc48491ff189a5e71e6ae77aa522ff755f868686426040516101c19493929190610291565b60405180910390a3949350505050565b600080600080606085870312156101e757600080fd5b84359350602085013567ffffffffffffffff8116811461020657600080fd5b9250604085013567ffffffffffffffff81111561022257600080fd5b8501601f8101871361023357600080fd5b803567ffffffffffffffff81111561024a57600080fd5b87602082840101111561025c57600080fd5b949793965060200194505050565b60006001820161028a57634e487b7160e01b600052601160045260246000fd5b5060010190565b67ffffffffffffffff85168152606060208201528260608201528284608083013760006080848301015260006080601f19601f86011683010190508260408301529594505050505056fea2646970667358221220e8b99edc57f0fa4ffab59aa64f121fbc8dc8a46cde4a13e6572cc978377a471d64736f6c634300081c0033"
+}

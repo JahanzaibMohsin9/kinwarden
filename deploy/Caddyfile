@@ -1,0 +1,16 @@
+# HTTPS for Kinwarden. Passkeys and the installable app (PWA) both need HTTPS.
+{$KINWARDEN_DOMAIN} {
+	reverse_proxy app:3000 {
+		# the activity feed is a server-sent event stream: pass each event on at once
+		flush_interval -1
+	}
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+	}
+}
+
+www.{$KINWARDEN_DOMAIN} {
+	redir https://{$KINWARDEN_DOMAIN}{uri} permanent
+}

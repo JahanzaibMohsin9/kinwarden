@@ -1,0 +1,227 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Kinwarden design tokens. Calm, trustworthy, human: deep teal on warm sand.
+   Colors are used by role, never ad hoc in components.
+--------------------------------------------------------------------------- */
+:root,
+[data-theme="light"] {
+  --bg: #f4f1ea;
+  --bg-deep: #ebe6dc;
+  --surface: #ffffff;
+  --surface-2: #faf8f4;
+  --surface-3: #f2eee7;
+  --ink: #12201e;
+  --ink-2: #48605b;
+  --ink-3: #5b6a66; /* 4.6:1 or more on bg, surfaces and brand-softer (AA for small text) */
+  --line: #e4ddd1;
+  --line-strong: #d3cabb;
+
+  --brand: #0e6b5c;
+  --brand-strong: #094d42;
+  --brand-ink: #ffffff;
+  --brand-soft: #e1efe9;
+  --brand-softer: #eff6f2;
+  --brand-track: #cfe3db;
+
+  --amber: #a8640a;
+  --amber-strong: #8a5207;
+  --amber-soft: #fbefd9;
+  --danger: #b42318;
+  --danger-soft: #fdeceb;
+  --success: #157949;
+  --success-soft: #e3f4ea;
+  --info: #2d5fa8;
+  --info-soft: #e8eef8;
+
+  --shadow-sm: 0 1px 2px rgb(18 32 30 / 0.06), 0 1px 1px rgb(18 32 30 / 0.04);
+  --shadow-md: 0 8px 24px -8px rgb(18 32 30 / 0.16), 0 2px 6px rgb(18 32 30 / 0.06);
+  --shadow-lg: 0 24px 60px -18px rgb(18 32 30 / 0.32), 0 6px 18px rgb(18 32 30 / 0.08);
+  --radius: 18px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0b1312;
+    --bg-deep: #070d0c;
+    --surface: #111b1a;
+    --surface-2: #142120;
+    --surface-3: #1a2928;
+    --ink: #e9f1ee;
+    --ink-2: #a6b8b3;
+    --ink-3: #85968f;
+    --line: #213230;
+    --line-strong: #2d4340;
+    --brand: #39b198;
+    --brand-strong: #5ccdb4;
+    --brand-ink: #04211b;
+    --brand-soft: #12312b;
+    --brand-softer: #0f2522;
+    --brand-track: #1d3d36;
+    --amber: #f0b44c;
+    --amber-strong: #f6c66f;
+    --amber-soft: #2f2511;
+    --danger: #f2827a;
+    --danger-soft: #361816;
+    --success: #4fd08f;
+    --success-soft: #11301f;
+    --info: #86aef0;
+    --info-soft: #172338;
+    --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+    --shadow-md: 0 8px 24px -8px rgb(0 0 0 / 0.6);
+    --shadow-lg: 0 24px 60px -18px rgb(0 0 0 / 0.7);
+  }
+}
+:root[data-theme="dark"],
+[data-theme="dark"] {
+  --bg: #0b1312;
+  --bg-deep: #070d0c;
+  --surface: #111b1a;
+  --surface-2: #142120;
+  --surface-3: #1a2928;
+  --ink: #e9f1ee;
+  --ink-2: #a6b8b3;
+  --ink-3: #85968f;
+  --line: #213230;
+  --line-strong: #2d4340;
+  --brand: #39b198;
+  --brand-strong: #5ccdb4;
+  --brand-ink: #04211b;
+  --brand-soft: #12312b;
+  --brand-softer: #0f2522;
+  --brand-track: #1d3d36;
+  --amber: #f0b44c;
+  --amber-strong: #f6c66f;
+  --amber-soft: #2f2511;
+  --danger: #f2827a;
+  --danger-soft: #361816;
+  --success: #4fd08f;
+  --success-soft: #11301f;
+  --info: #86aef0;
+  --info-soft: #172338;
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 8px 24px -8px rgb(0 0 0 / 0.6);
+  --shadow-lg: 0 24px 60px -18px rgb(0 0 0 / 0.7);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-deep: var(--bg-deep);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-softer: var(--brand-softer);
+  --color-brand-track: var(--brand-track);
+  --color-amber: var(--amber);
+  --color-amber-strong: var(--amber-strong);
+  --color-amber-soft: var(--amber-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, "Microsoft YaHei", "PingFang SC", sans-serif;
+  --font-mono: var(--font-jbmono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-urdu: var(--font-nastaliq), "Noto Nastaliq Urdu", serif;
+  --shadow-card: var(--shadow-sm);
+  --shadow-pop: var(--shadow-md);
+  --shadow-float: var(--shadow-lg);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-feature-settings: "cv11", "ss01";
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+[lang="ur"] .i18n,
+.urdu {
+  font-family: var(--font-urdu);
+  line-height: 2.1;
+}
+
+::selection {
+  background: var(--brand-soft);
+}
+
+/* one visible focus ring for keyboard users, in both themes; mouse and touch don't show it */
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* hatched fill for "not allowed" bars and in-flight segments: never color alone */
+.hatch {
+  background-image: repeating-linear-gradient(135deg, currentColor 0 2px, transparent 2px 7px);
+}
+
+.scroll-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+.shimmer {
+  background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--brand) 18%, transparent), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 1.8s linear infinite;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+.route-dash {
+  animation: dash 1s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* landing map: payments moving along the routes; still routes only for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .route-dot {
+    display: none;
+  }
+}

@@ -1,0 +1,167 @@
+{
+  "id": "cn-safe",
+  "jurisdiction": "CN",
+  "name": "China: State Administration of Foreign Exchange (SAFE)",
+  "homeCurrency": "CNY",
+  "version": "2026.10.14",
+  "notes": "Each rule records where it comes from. 'official' = regulator or bank publication, 'reported' = reputable press coverage, 'assumed' = sandbox assumption to verify with a bank.",
+  "rules": [
+    {
+      "id": "CN.FX.ANNUAL_QUOTA",
+      "title": "Annual foreign-exchange purchase quota per person (便利化额度)",
+      "kind": "limit",
+      "appliesTo": [
+        "bank_transfer"
+      ],
+      "values": {
+        "adultUSD": 50000
+      },
+      "scope": "person_year",
+      "requirement": "Within the quota a bank needs only the buyer's ID. The quota resets on 1 January and does not carry over.",
+      "status": "official",
+      "effectiveFrom": "2007-02-01",
+      "source": {
+        "title": "SAFE personal FX FAQ",
+        "url": "https://www.safe.gov.cn/beijing/file/file/20191127/b29df7fa63504266b9ccb23429185d40.pdf"
+      }
+    },
+    {
+      "id": "CN.FX.ABOVE_QUOTA_CURRENT",
+      "title": "Above the quota: tuition and medical bills are allowed with proof of the real expense",
+      "kind": "requirement",
+      "appliesTo": [
+        "bank_transfer"
+      ],
+      "purposes": [
+        "tuition",
+        "medical"
+      ],
+      "documents": [
+        "admission_letter",
+        "invoice"
+      ],
+      "documentLabels": {
+        "admission_letter": "Admission letter (录取通知书)",
+        "invoice": "Tuition statement or hospital bill (学费单 / 医疗费用单)"
+      },
+      "status": "official",
+      "effectiveFrom": "2017-01-01",
+      "source": {
+        "title": "HSBC China personal FX handling guide",
+        "url": "https://www.hsbc.com.cn/content/dam/hsbc/cn/docs/foreign-exchange/personal-foreign-exchange-business-handling-guide-en.pdf"
+      }
+    },
+    {
+      "id": "CN.FX.PURPOSE_DECLARATION",
+      "title": "Every purchase needs a signed purpose declaration (个人购汇申请书)",
+      "kind": "documents",
+      "appliesTo": [
+        "bank_transfer"
+      ],
+      "documents": [
+        "fx_purchase_application"
+      ],
+      "documentLabels": {
+        "fx_purchase_application": "Personal FX purchase application (个人购汇申请书)"
+      },
+      "status": "reported",
+      "effectiveFrom": "2017-01-01",
+      "source": {
+        "title": "Caixin: new procedures for buying foreign currency",
+        "url": "https://www.caixinglobal.com/2017-01-03/five-things-to-know-about-personal-forex-purchases-in-china-101032939.html"
+      }
+    },
+    {
+      "id": "CN.FX.PROHIBITED_PURPOSES",
+      "title": "Personal FX may not be used for overseas property, securities, life insurance or investment-linked insurance",
+      "kind": "forbidden",
+      "appliesTo": [
+        "bank_transfer"
+      ],
+      "purposes": [
+        "property",
+        "securities",
+        "insurance_investment"
+      ],
+      "status": "official",
+      "effectiveFrom": "2017-01-01",
+      "source": {
+        "title": "SAFE personal FX FAQ",
+        "url": "https://www.safe.gov.cn/beijing/file/file/20191127/b29df7fa63504266b9ccb23429185d40.pdf"
+      }
+    },
+    {
+      "id": "CN.FX.NO_SPLITTING",
+      "title": "Using relatives' quotas to split a purchase (蚂蚁搬家) is a violation",
+      "kind": "forbidden",
+      "appliesTo": [
+        "bank_transfer"
+      ],
+      "consequence": "Watch-list, no convenience quota for that year and the next two, administrative penalties, and a note on the personal credit record",
+      "status": "reported",
+      "effectiveFrom": "2017-01-01",
+      "source": {
+        "title": "Caixin: tighter scrutiny of using relatives' quotas",
+        "url": "https://www.caixinglobal.com/2017-01-03/five-things-to-know-about-personal-forex-purchases-in-china-101032939.html"
+      }
+    },
+    {
+      "id": "KINWARDEN.ADMISSION_VERIFIED_BEFORE_FEES",
+      "title": "No tuition is paid until the university itself has confirmed the admission",
+      "kind": "requirement",
+      "appliesTo": [
+        "bank_transfer",
+        "card_payment",
+        "atm_cash",
+        "carried_cash"
+      ],
+      "purposes": [
+        "tuition"
+      ],
+      "documents": [
+        "admission_letter"
+      ],
+      "documentLabels": {
+        "admission_letter": "Admission confirmed by the university itself (from its verified address)"
+      },
+      "status": "policy",
+      "effectiveFrom": "2026-10-17",
+      "source": {
+        "title": "Kinwarden safety policy (fake-admission fraud)",
+        "url": ""
+      }
+    },
+    {
+      "id": "KINWARDEN.VERIFIED_BENEFICIARY",
+      "title": "Money only goes to an institution account that has been independently verified",
+      "kind": "forbidden",
+      "appliesTo": [
+        "bank_transfer",
+        "card_payment"
+      ],
+      "status": "policy",
+      "effectiveFrom": "2026-10-14",
+      "source": {
+        "title": "Kinwarden safety policy",
+        "url": ""
+      }
+    },
+    {
+      "id": "KINWARDEN.VERIFIED_INSTITUTION",
+      "title": "No payment to an institution the bank has not verified",
+      "kind": "forbidden",
+      "appliesTo": [
+        "bank_transfer",
+        "card_payment",
+        "atm_cash",
+        "carried_cash"
+      ],
+      "status": "policy",
+      "effectiveFrom": "2026-10-15",
+      "source": {
+        "title": "Kinwarden safety policy (bills the family uploads)",
+        "url": ""
+      }
+    }
+  ]
+}

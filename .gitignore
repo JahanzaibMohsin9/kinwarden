@@ -1,0 +1,91 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+!.env.local.example
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# Kinwarden runtime data (world state, ledger, recordings)
+.data/
+.data-test/
+.data-redteam/
+.data-live/
+.data-dev.log
+
+# demo video build output (voice, frames, renders)
+/video/out/
+
+# internal notes and AI-tool settings: kept locally, not published
+/docs/internal/
+/CLAUDE.md
+/AGENTS.md
+/.claude/
+/.mimocode/
+
+# demo video files served from the live site (uploaded to the server, too large for git)
+/public/video/
+
+# Local planning, original references, and submission information
+/.internal/
+/HACKATHON.md
+/NEAR_HACKATHON_PLAN.md
+/.codex/
+/submission*.json
+
+# Local runtime state and generated evidence
+.data-*/
+/docs/pdf/
+/docs/evidence/*.json
+/docs/eval/*.jsonl
+/docs/eval/*.svg
+
+# Credentials and local NEAR sandbox state
+*.key
+*.p12
+*.pfx
+/credentials/
+/.near/
+/.near-credentials/
+/.near-workspaces/
+/.near-sandbox/
+/public/dev/family-sandbox-key.json
+
+# Rust build output (keep Cargo.lock for reproducible contract builds)
+/target/
+/contracts/**/target/

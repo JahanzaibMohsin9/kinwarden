@@ -1,0 +1,16 @@
+# Overlay for a server whose reverse proxy itself runs in Docker (e.g. another project's Caddy container):
+# Kinwarden joins that proxy's network as "kinwarden" and publishes no port at all.
+#   PROXY_NETWORK=<proxy network> docker compose -f docker-compose.shared.yml -f deploy/compose.join-proxy.yml up -d --build
+# Then in the proxy's Caddyfile:  <hostname> { reverse_proxy kinwarden:3000 { flush_interval -1 } }
+services:
+  app:
+    ports: !reset []
+    networks:
+      default:
+      proxy:
+        aliases: [kinwarden]
+
+networks:
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK:?set PROXY_NETWORK to the reverse proxy's Docker network}

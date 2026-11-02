@@ -1,0 +1,256 @@
+{
+  "id": "pk-sbp",
+  "jurisdiction": "PK",
+  "name": "Pakistan: State Bank of Pakistan & FBR",
+  "homeCurrency": "PKR",
+  "version": "2026.10.14",
+  "notes": "Each rule records where it comes from. 'official' = primary regulator text, 'reported' = reputable press coverage of the regulation, 'assumed' = sandbox assumption that must be checked with a bank before real use.",
+  "rules": [
+    {
+      "id": "PK.CASH.PER_VISIT",
+      "title": "Foreign cash an adult can carry out per visit",
+      "kind": "limit",
+      "appliesTo": [
+        "carried_cash"
+      ],
+      "values": {
+        "adultUSD": 5000,
+        "minorUSD": 2500
+      },
+      "scope": "person_visit",
+      "status": "reported",
+      "effectiveFrom": "2023-01-01",
+      "source": {
+        "title": "SBP limits on carrying foreign currency (Dawn)",
+        "url": "https://www.dawn.com/news/amp/1719862"
+      }
+    },
+    {
+      "id": "PK.CASH.ANNUAL",
+      "title": "Foreign cash an adult can carry out per year",
+      "kind": "limit",
+      "appliesTo": [
+        "carried_cash"
+      ],
+      "values": {
+        "adultUSD": 30000,
+        "minorUSD": 15000
+      },
+      "scope": "person_year",
+      "status": "reported",
+      "effectiveFrom": "2023-01-01",
+      "source": {
+        "title": "SBP foreign currency limits (Business Recorder)",
+        "url": "https://www.brecorder.com/news/amp/40207922"
+      }
+    },
+    {
+      "id": "PK.CARD.ANNUAL",
+      "title": "International card spending per person per year",
+      "kind": "limit",
+      "appliesTo": [
+        "card_payment",
+        "atm_cash"
+      ],
+      "values": {
+        "adultUSD": 30000
+      },
+      "scope": "person_year",
+      "status": "reported",
+      "effectiveFrom": "2023-01-01",
+      "source": {
+        "title": "SBP limits incl. card transactions (Dawn)",
+        "url": "https://www.dawn.com/news/amp/1719862"
+      }
+    },
+    {
+      "id": "PK.CARD.ADVANCE_TAX",
+      "title": "Advance tax on foreign card transactions",
+      "kind": "tax",
+      "appliesTo": [
+        "card_payment",
+        "atm_cash"
+      ],
+      "history": [
+        {
+          "effectiveFrom": "2023-07-01",
+          "rate": 0.05,
+          "note": "Filer rate after Finance Act 2023"
+        },
+        {
+          "effectiveFrom": "2026-07-01",
+          "rate": 0.005,
+          "note": "Cut from 5% to 0.5% in Finance Act 2026"
+        }
+      ],
+      "status": "reported",
+      "source": {
+        "title": "Budget 2026 cuts foreign card tax from 5% to 0.5% (Pakistan Observer)",
+        "url": "https://pakobserver.net/budget-2026-pakistan-slashes-foreign-card-tax-from-5-to-0-5/"
+      }
+    },
+    {
+      "id": "PK.MED.REMIT.CAP",
+      "title": "Medical treatment abroad: bank remittance allowance",
+      "kind": "limit",
+      "appliesTo": [
+        "bank_transfer"
+      ],
+      "purposes": [
+        "medical"
+      ],
+      "values": {
+        "perCaseUSD": 50000
+      },
+      "scope": "case",
+      "requirement": "Funds must go directly to the foreign hospital's account (SWIFT, TT or demand draft). Above the allowance the bank refers the case to SBP Foreign Exchange Operations Department.",
+      "status": "official",
+      "effectiveFrom": "2015-07-01",
+      "source": {
+        "title": "SBP FE Circular No. 8 of 2015",
+        "url": "https://www.sbp.org.pk/epd/2015/FEC8.htm"
+      }
+    },
+    {
+      "id": "PK.MED.REMIT.DOCS",
+      "title": "Documents the bank needs for a medical remittance",
+      "kind": "documents",
+      "appliesTo": [
+        "bank_transfer"
+      ],
+      "purposes": [
+        "medical"
+      ],
+      "documents": [
+        "remittance_application",
+        "invoice",
+        "self_declaration"
+      ],
+      "documentLabels": {
+        "remittance_application": "Application form (Appendix V-68, revised)",
+        "invoice": "Hospital invoice or estimate",
+        "self_declaration": "Self-declaration of the foreign exchange needed"
+      },
+      "status": "official",
+      "effectiveFrom": "2015-07-01",
+      "source": {
+        "title": "SBP FE Circular No. 8 of 2015",
+        "url": "https://www.sbp.org.pk/epd/2015/FEC8.htm"
+      }
+    },
+    {
+      "id": "PK.MED.DIRECT_TO_HOSPITAL",
+      "title": "Medical remittance must be paid to the hospital's own account",
+      "kind": "requirement",
+      "appliesTo": [
+        "bank_transfer"
+      ],
+      "purposes": [
+        "medical"
+      ],
+      "status": "official",
+      "effectiveFrom": "2015-07-01",
+      "source": {
+        "title": "SBP FE Circular No. 8 of 2015",
+        "url": "https://www.sbp.org.pk/epd/2015/FEC8.htm"
+      }
+    },
+    {
+      "id": "PK.EDU.REMIT",
+      "title": "Education fees abroad: paid directly to the institution against admission letter and fee voucher",
+      "kind": "requirement",
+      "appliesTo": [
+        "bank_transfer"
+      ],
+      "purposes": [
+        "tuition"
+      ],
+      "documents": [
+        "admission_letter",
+        "invoice",
+        "remittance_application"
+      ],
+      "status": "assumed",
+      "effectiveFrom": "2015-07-01",
+      "source": {
+        "title": "SBP FE Circular No. 8 of 2015 mentions studies abroad; confirm the education chapter with the bank",
+        "url": "https://www.sbp.org.pk/epd/2015/FEC8.htm"
+      }
+    },
+    {
+      "id": "KINWARDEN.NO_SPLITTING",
+      "title": "Never split one bill across family members to get around a per-person limit",
+      "kind": "forbidden",
+      "appliesTo": [
+        "bank_transfer",
+        "card_payment",
+        "atm_cash",
+        "carried_cash"
+      ],
+      "status": "policy",
+      "effectiveFrom": "2026-10-14",
+      "source": {
+        "title": "Kinwarden safety policy (anti-structuring)",
+        "url": ""
+      }
+    },
+    {
+      "id": "KINWARDEN.ADMISSION_VERIFIED_BEFORE_FEES",
+      "title": "No tuition is paid until the university itself has confirmed the admission",
+      "kind": "requirement",
+      "appliesTo": [
+        "bank_transfer",
+        "card_payment",
+        "atm_cash",
+        "carried_cash"
+      ],
+      "purposes": [
+        "tuition"
+      ],
+      "documents": [
+        "admission_letter"
+      ],
+      "documentLabels": {
+        "admission_letter": "Admission confirmed by the university itself (from its verified address)"
+      },
+      "status": "policy",
+      "effectiveFrom": "2026-10-17",
+      "source": {
+        "title": "Kinwarden safety policy (fake-admission fraud)",
+        "url": ""
+      }
+    },
+    {
+      "id": "KINWARDEN.VERIFIED_BENEFICIARY",
+      "title": "Money only goes to an institution account that has been independently verified",
+      "kind": "forbidden",
+      "appliesTo": [
+        "bank_transfer",
+        "card_payment"
+      ],
+      "status": "policy",
+      "effectiveFrom": "2026-10-14",
+      "source": {
+        "title": "Kinwarden safety policy",
+        "url": ""
+      }
+    },
+    {
+      "id": "KINWARDEN.VERIFIED_INSTITUTION",
+      "title": "No payment to an institution the bank has not verified",
+      "kind": "forbidden",
+      "appliesTo": [
+        "bank_transfer",
+        "card_payment",
+        "atm_cash",
+        "carried_cash"
+      ],
+      "status": "policy",
+      "effectiveFrom": "2026-10-15",
+      "source": {
+        "title": "Kinwarden safety policy (bills the family uploads)",
+        "url": ""
+      }
+    }
+  ]
+}
