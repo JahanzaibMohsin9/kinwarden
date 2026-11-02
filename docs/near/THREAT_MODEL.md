@@ -36,7 +36,7 @@ invoice, within the case's limits, after the family approves that exact payment.
 | T7 | Double settlement or double refund through duplicate/late callbacks | State moves to `SUBMITTED` before dispatch; callback finishes once, matched on proposal + attempt | Contract | K02 |
 | T8 | Same bill paid twice or split under limits | Canonical invoice ceiling; idempotent request IDs; rolling case and purpose-group caps | Contract + verifier | K04 |
 | T9 | Agent fills storage or locks the budget by spamming proposals or anchors | Bounds on active proposals, lifetime and anchors; expiry releases reservations | Contract | K07 |
-| T10 | Malicious or compromised app frontend shows one payment but requests another | Wallet shows recipient, token and amount; the family confirms there | **Wallet + person (residual)** | K05 |
+| T10 | Malicious or compromised app frontend shows one payment but requests another | Wallet shows recipient, token and amount (in Meteor, under "View Transaction Details"); the family confirms there | **Wallet + person (residual)** | K05 |
 | T11 | Malicious frontend asks the family to sign a different valid action | Not preventable by the contract; the wallet display is the defense | **Residual** | — |
 | T12 | Sensitive data leaks on chain or into public receipts | Opaque IDs only on chain; canary tests on chain arguments and receipts | Contract interface + tests | K10 |
 | T13 | Tampered activity log | Hash chain anchored on NEAR; verification fails on an edited entry | Anchor + verifier script | K08 |

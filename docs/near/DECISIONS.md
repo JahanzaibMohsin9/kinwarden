@@ -25,6 +25,11 @@ The NEAR sandbox runs only on Linux x86_64 and macOS ARM64, and building
 needs a Windows Perl). All NEAR tooling — builds, sandbox tests, CLI setup and
 deployment — therefore runs in [`contracts/near/dev.Dockerfile`](../../contracts/near/dev.Dockerfile)
 on Windows hosts, and directly on Linux/CI. The documented judge path is Linux.
+The sandbox node downloaded by `near-sandbox` (neard 2.14.0) needs glibc ≥ 2.39:
+Debian 13 / Ubuntu 24.04 or newer, or the dev image (Debian trixie). It fails to
+start on Debian 12 (glibc 2.36). The README states this requirement.
+On a supported Linux host, [`contracts/near/setup-ubuntu.sh`](../../contracts/near/setup-ubuntu.sh)
+installs the same toolchain without Docker.
 
 *Revisit if:* the pinned compiler is rejected by `cargo-near`'s protocol check or
 a dependency raises its MSRV.
@@ -64,8 +69,14 @@ on testnet. The app never generates, imports or stores a family private key.
 - **Family methods require exactly 1 yoctoNEAR.** NEAR function-call access keys
   cannot attach a deposit, so a limited key held anywhere can never approve, pause
   or change policy. Only a full-access key, which means a wallet confirmation, can
-  call them. A toolchain probe in a sandbox has to confirm this protocol behavior
-  before G1 relies on it.
+  call them. **Confirmed on 2–3 Nov 2026** with a throwaway probe contract on a local
+  NEAR sandbox (near-workspaces 0.24.0, neard sandbox 2.14.0, Ubuntu 24.04): the
+  account's full-access key called a 1-yoctoNEAR method successfully; a
+  function-call key on the same account, limited to that method, was rejected by
+  the protocol before execution with
+  `InvalidTransaction(InvalidAccessKeyError(DepositWithFunctionCall))`, and the
+  contract state was unchanged. G1 turns this into a permanent sandbox test against
+  the real vault methods.
 - **Testnet-capable wallets in the connector manifest** (2 Nov): Meteor, Intear,
   Ledger, Nightly, NEAR CLI, WalletConnect and others. We filter the connector to
   `features: { testnet: true, signAndSendTransaction: true }`.
@@ -76,11 +87,32 @@ on testnet. The app never generates, imports or stores a family private key.
   amount next to the commitment hash (D-04), so the wallet itself shows who is
   being paid what.
 
-**Open G0 check, needs a person:** confirm on testnet what Meteor actually shows
-for `approve_payment` (method, arguments, deposit) and capture a screenshot for
-`docs/near/`. That requires the user's own testnet wallet and signature; the
-agent cannot do it. If Meteor hides the arguments, use another listed wallet or
-NEAR CLI for the demo, never a browser-held key.
+**Meteor display check, 2 November 2026** (testnet, `@hot-labs/near-connect`
+0.12.0, sample `approve_payment` request with fictional values, rejected in the
+wallet; screenshots in [wallet-check/](wallet-check/)):
+
+| Observed | Result |
+|---|---|
+| Connect screen | States the app may know the address and balance, and that it does **not** allow calling methods or signing on the user's behalf. A read-only RPC query afterwards showed no key added to the account. |
+| Approval summary screen | Shows From, To (the receiver contract), deposit and fee. It does **not** show the method or arguments. |
+| "View Transaction Details" | Shows the method `approve_payment`, the contract, gas and **all arguments as readable JSON**, including `expected_recipient` and `expected_amount`. |
+| Deposit display | Both screens display the 1-yoctoNEAR deposit as **0** (`0.000000000000000 NEAR`, `0 Ⓝ`), which is rounding. |
+
+Consequences:
+
+- **Readable authorization is available, one tap deep.** Before opening the
+  wallet, the Kinwarden approval screen tells the family to open "View
+  Transaction Details" and check that the recipient and amount there match the
+  bill. The demo video shows that step.
+- **The summary "To" is the vault, not the hospital.** The family-facing
+  explanation says so, so nobody reads "To: vault" as the payee.
+- **Still to verify in G3:** that Meteor actually attaches the 1 yoctoNEAR it
+  displays as 0. If it dropped the deposit, `approve_payment` would refuse with
+  `E_ONE_YOCTO`. That fails safe but would block approvals, so G3 tests a real
+  testnet approval through Meteor before relying on it.
+
+Meteor stays the primary demo wallet. NEAR CLI remains the fallback that prints
+the full transaction, deposit included.
 
 The existing passkey flow remains a UX confirmation before the wallet opens. It
 is not payment authority.
