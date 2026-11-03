@@ -86,7 +86,7 @@ function seedThMedical(): World {
     id: "case_th",
     type: "medical",
     corridor: "PK-TH",
-    title: "Abbu's heart treatment",
+    title: "Dad's heart treatment",
     lang: "en",
     institutionId: "srh",
     openedAt: start,

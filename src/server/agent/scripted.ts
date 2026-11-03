@@ -88,7 +88,7 @@ const TH: ScriptedRun[] = [
         const p = paysFor(w, deposit1(w)).find((x) => x.status === "returned")!;
         return step("resubmit_payment", { payment_id: p.id, corrected_reference: `HN 66-014382 Deposit ${deposit1(w)!.number}`, narration: "Re-sending the same approved transfer with the hospital number in the reference" });
       },
-      () => step("message_family", { text: "Small hiccup, already fixed: the hospital's bank needs Abbu's hospital number on every payment. I've re-sent the same transfer with it. No action needed.", importance: "info", narration: "Letting you know it's fixed" }),
+      () => step("message_family", { text: "Small hiccup, already fixed: the hospital's bank needs your father's hospital number on every payment. I've re-sent the same transfer with it. No action needed.", importance: "info", narration: "Letting you know it's fixed" }),
     ],
   },
   {
@@ -112,7 +112,7 @@ const TH: ScriptedRun[] = [
           payer_id: "p_tariq",
           reference: `HN 66-014382 ${deposit2(w)!.number}`,
           beneficiary: ben("srh"),
-          rationale: `The procedure is at 08:00 and a bank transfer takes 2 days, so it would arrive too late. Paying by card at the hospital is instant. It costs about ${diff(w, "PK-TH", "srh", 160000, "bank_transfer", "card_payment")} more than a transfer would, but ${diff(w, "PK-TH", "srh", 160000, "card_payment", "atm_cash")} less than ATM cash, and stays within Abbu's yearly card allowance.`,
+          rationale: `The procedure is at 08:00 and a bank transfer takes 2 days, so it would arrive too late. Paying by card at the hospital is instant. It costs about ${diff(w, "PK-TH", "srh", 160000, "bank_transfer", "card_payment")} more than a transfer would, but ${diff(w, "PK-TH", "srh", 160000, "card_payment", "atm_cash")} less than ATM cash, and stays within your father's yearly card allowance.`,
           narration: "Asking you to approve paying the extra deposit by card",
         }),
       () => step("message_family", { text: "The hospital needs THB 160,000 before tomorrow's 08:00 procedure. A bank transfer would be too slow, so I've prepared a card payment. Please approve it.", importance: "action", narration: "Asking for your approval" }),
@@ -189,7 +189,7 @@ const TH: ScriptedRun[] = [
     steps: [
       () =>
         step("message_family", {
-          text: "All done. The hospital's THB 42,000 refund is back in Abbu's account. Every bill is paid, nothing is owed, and all receipts are in Documents. Wishing Abbu a smooth recovery. 🤍",
+          text: "All done. The hospital's THB 42,000 refund is back in your father's account. Every bill is paid, nothing is owed, and all receipts are in Documents. Wishing your father a smooth recovery. 🤍",
           importance: "good_news",
           narration: "Closing the case with good news",
         }),
