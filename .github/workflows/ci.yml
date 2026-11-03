@@ -40,3 +40,34 @@ jobs:
       # No API keys: the live eval (npm run eval:live) stays a manual run.
       - name: Eval (replay)
         run: npm run eval:replay
+
+  # NEAR vault and test token. The sandbox node needs Linux with glibc >= 2.39 (Ubuntu 24.04).
+  # rust-toolchain.toml pins Rust 1.95.0 and the wasm target; rustup installs them on first use.
+  contracts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: contracts/near
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: contracts/near
+
+      - name: Toolchain
+        run: rustup show active-toolchain || rustup toolchain install
+
+      - name: Format
+        run: cargo fmt --all -- --check
+
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
+      - name: Unit tests
+        run: cargo test -p kinwarden-vault -p kinwarden-tusdc
+
+      # Deploys both contracts to a local NEAR node; no wallet, testnet account or API key.
+      - name: Sandbox tests
+        run: cargo test -p kinwarden-near-tests

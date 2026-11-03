@@ -1,27 +1,48 @@
 # Kinwarden NEAR: payment state, reservations and approval encoding
 
-> **Status: design (G0), not implemented.** G1-G2 implement this specification;
-> tests must cite the section they cover. See [DECISIONS.md](DECISIONS.md).
+> **Status:** §1 records, §6 encoding (with test vectors) and the G1 parts of
+> §3 (per-case deposits) and §7 are **implemented** in
+> [`contracts/near/vault`](../../contracts/near/vault). Proposals, approval,
+> reservations, caps enforcement and settlement (§2–§5) are **G2, not yet
+> implemented**. Tests must cite the section they cover.
+> See [DECISIONS.md](DECISIONS.md).
 
 All amounts are integer token units (`u128`, JSON string). tUSDC has 6
 decimals, so `"250000000"` is 250 tUSDC. All times are contract block time in
-nanoseconds (`env::block_timestamp()`); browser or simulator time is never used.
+nanoseconds (`env::block_timestamp()`, JSON string); browser or simulator time
+is never used.
+
+A vault is configured once at initialization with **one** token, one verifier
+account, one agent account and a network label (`sandbox` | `testnet` |
+`mainnet`). The four role accounts and the vault must all differ.
+
+**Identifiers** (`case_id`, `payee_id`, `invoice_id`) are opaque: 1–64
+characters of `a-z`, `0-9` and `-`, starting with a letter or digit. Free text,
+names and record numbers with spaces or capitals are rejected (`E_ID_FORMAT`).
 
 ## 1. Stored records
 
-**Case** — `case_id`, `owner` (family account), `status` (`Active` | `Paused`),
-`policy_version: u64`, caps (§4), accounting (§3).
+**Case** — `case_id`, `owner` (the family account that created it),
+`status` (`Active` | `Paused`), `agent_enabled`, `policy_version: u64` (starts
+at 1), `limits` (§4), and accounting `balance`, `reserved`, `in_flight`,
+`paid` (§3). The creator attaches NEAR for the case's storage; the excess is
+refunded (`E_STORAGE_DEPOSIT` if too little).
 
 **Payee** (verifier-enrolled) — `payee_id`, `account` (token receiver),
-`token`, `payee_version: u64`, `status` (`Active` | `Revoked`), `purpose_group`
-(verifier-defined enum, e.g. `Hospital`, `Tuition`), `provenance` (opaque
-verification reference).
+`payee_version: u64`, `status`, `purpose_group` (`Hospital` | `Tuition`),
+`provenance` (SHA-256 hex of the off-chain verification record, never the
+record). Status starts `PendingRegistration`; the vault asks the token contract
+for the account's storage registration and the callback sets `Active` or
+`Rejected`. The verifier can set `Revoked`. Every status change increments
+`payee_version`. One account maps to at most one pending or active payee; the
+vault, token, agent and verifier accounts cannot be payees.
 
-**Invoice** (verifier-authorized) — `invoice_id` (canonical, unique per vault),
-`case_id`, `payee_id`, `token`, `ceiling`, `paid`, `reserved`, `status`
-(`Authorized` | `Revoked`). The verifier rejects a duplicate canonical
-`invoice_id` at enrollment. Recognizing that two different scans describe the
-same bill is the verifier's job; hashing does not do it.
+**Invoice** (verifier-authorized) — `invoice_id` (canonical, unique per vault,
+never reused even after revocation), `case_id`, `payee_id`, `ceiling`, `paid`,
+`reserved`, `in_flight`, `status` (`Authorized` | `Revoked`). Authorization
+requires an existing case and an `Active` payee. Recognizing that two
+different scans describe the same bill is the verifier's job; hashing does not
+do it.
 
 **Proposal** — `proposal_id: u64` (vault-wide counter), `case_id`,
 `invoice_id`, `attempt: u32`, `request_id` (agent-supplied, case-scoped),
@@ -69,8 +90,14 @@ call, or a call for a proposal in any other state, changes no accounting.
 
 ## 3. Reservations and liquidity
 
-Per token, the vault tracks `balance` (credited through `ft_on_transfer` from
-the token contract), `reserved` and `in_flight`.
+Funds are held **per case**, so one family's balance can never pay another
+family's bill. Each case tracks `balance`, `reserved` and `in_flight`.
+
+**Deposits (implemented in G1).** Anyone, for example a relative, funds a case
+with `ft_transfer_call` on the configured token, `msg` = `case_id`. The vault's
+`ft_on_transfer` accepts calls only from that token (`E_WRONG_TOKEN`); a
+lookalike token is refunded by its own contract. Tokens sent for an unknown
+case are returned in full.
 
 ```text
 available = balance - reserved - in_flight
@@ -138,10 +165,15 @@ struct ApprovalCommitmentV1 {
 ```
 
 Field order is part of the format. Any change creates a new `domain` version.
-G1 publishes shared test vectors: a JSON file of inputs plus the expected hex
-hash, checked by both the Rust unit tests and the TypeScript client tests. Every
-field changed on its own must produce a different hash and a refused approval
-(K01).
+Test vectors are in
+[`contracts/near/vault/test-vectors/approval_commitment_v1.json`](../../contracts/near/vault/test-vectors/approval_commitment_v1.json):
+a base vector, one vector per field with only that field changed, maximum
+integer values and a sandbox-network case, each with its Borsh bytes and
+SHA-256. They are generated by an independent Python encoder
+(`approval_commitment_v1.py`, no NEAR or Borsh library) and checked by the
+vault's Rust unit tests; the TypeScript client (G3) checks the same file. Every
+field changed on its own produces a different hash; G2 adds the refused
+approval for each (K01).
 
 The hash binds the approval to exact stored state. It does not prove that an
 invoice is genuine; that is the verifier's enrollment decision.
@@ -153,5 +185,13 @@ Refusals panic with a stable code prefix that tests assert, e.g.
 `E_INVOICE_UNAUTHORIZED`, `E_INVOICE_CEILING`, `E_CAP_PAYMENT`,
 `E_CAP_ROLLING`, `E_CAP_LIFETIME`, `E_CAP_GROUP`, `E_LIQUIDITY`, `E_EXPIRED`,
 `E_STALE_POLICY`, `E_COMMITMENT_MISMATCH`, `E_FIELD_MISMATCH`, `E_BAD_STATE`,
-`E_REQUEST_ID_CONFLICT`, `E_BOUND_ACTIVE`, `E_ONE_YOCTO`. The final list is
-fixed in G1.
+`E_REQUEST_ID_CONFLICT`, `E_BOUND_ACTIVE`, `E_ONE_YOCTO`.
+
+Implemented in G1 ([`vault/src/errors.rs`](../../contracts/near/vault/src/errors.rs)):
+`E_ONE_YOCTO`, `E_STORAGE_DEPOSIT`, `E_NOT_OWNER`, `E_NOT_VERIFIER`,
+`E_ROLE_CONFLICT`, `E_BAD_NETWORK`, `E_ID_FORMAT`, `E_PROVENANCE_FORMAT`,
+`E_CASE_EXISTS`, `E_CASE_NOT_FOUND`, `E_LIMITS_INVALID`, `E_LIMITS_NOT_LOWER`,
+`E_PAYEE_EXISTS`, `E_PAYEE_NOT_FOUND`, `E_PAYEE_ACCOUNT_IN_USE`,
+`E_PAYEE_FORBIDDEN_ACCOUNT`, `E_PAYEE_NOT_ACTIVE`, `E_INVOICE_EXISTS`,
+`E_INVOICE_NOT_FOUND`, `E_INVOICE_UNAUTHORIZED`, `E_AMOUNT`,
+`E_AMOUNT_OVERFLOW`, `E_WRONG_TOKEN`. G2 adds the proposal and settlement codes.

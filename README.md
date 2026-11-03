@@ -39,7 +39,11 @@ The unit suite includes safety, privacy, passkey, scenario and red-team checks. 
 
 This repository starts from pre-existing, team-developed application code, imported with fresh Git history and renamed to Kinwarden. The `pre-hackathon` tag marks this application baseline before NEAR implementation. Existing agent tools, simulated payment rails, safety rules, passkey flow and optional Conflux testnet log anchoring belong to the baseline.
 
-The planned NEAR work is a spending-policy vault, a test stablecoin, restricted agent keys, payment approval signed by the family through an independently controlled NEAR wallet, and on-chain log anchoring. The application server is planned to hold only the restricted agent key, never a family signing key. **These features are not implemented yet.** Current sandbox payments do not settle on NEAR.
+The NEAR work is a spending-policy vault, a test stablecoin, restricted agent keys, payment approval signed by the family through an independently controlled NEAR wallet, and on-chain log anchoring. The application server is planned to hold only the restricted agent key, never a family signing key.
+
+**Implemented so far** ([`contracts/near`](contracts/near)): the vault's cases, verifier-enrolled institutions and invoices, per-case test-token deposits and the approval-commitment encoding, plus the tUSDC test token. Unit tests and sandbox tests on a local NEAR node cover them; each claim and its test are listed in [docs/near/CLAIMS.md](docs/near/CLAIMS.md).
+
+**Not implemented yet:** payment proposals, family approval, spending caps at payment time, settlement, restricted agent keys in the app, the wallet integration and NEAR log anchoring. Current app payments do not settle on NEAR.
 
 Only changes after `pre-hackathon` are intended for the NEAR submission. Inspect work in progress with `git diff pre-hackathon..HEAD`. At submission, create `hackathon-submission` and add a public compare link for `pre-hackathon...hackathon-submission`.
 

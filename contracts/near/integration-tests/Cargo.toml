@@ -1,0 +1,13 @@
+[package]
+name = "kinwarden-near-tests"
+version = "0.1.0"
+description = "Sandbox integration tests for the Kinwarden vault and test token"
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dev-dependencies]
+anyhow = "1"
+near-workspaces = { version = "0.24.0", features = ["unstable"] }
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }

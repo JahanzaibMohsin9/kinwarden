@@ -1,0 +1,342 @@
+{
+  "format": "kinwarden approval commitment v1: sha256(borsh(fields in order))",
+  "spec": "docs/near/STATE_AND_ENCODING.md section 6",
+  "fields": [
+    "domain:string",
+    "network:string",
+    "vault:string",
+    "case_id:string",
+    "invoice_id:string",
+    "proposal_id:u64",
+    "attempt:u32",
+    "token:string",
+    "recipient:string",
+    "amount:u128",
+    "expires_at:u64",
+    "policy_version:u64",
+    "payee_version:u64"
+  ],
+  "note": "Integers are decimal strings in JSON. Fictional accounts; not real institutions.",
+  "vectors": [
+    {
+      "name": "base",
+      "input": {
+        "domain": "kinwarden.approval.v1",
+        "network": "testnet",
+        "vault": "vault.kinwarden-demo.testnet",
+        "case_id": "case-th-hosp-001",
+        "invoice_id": "inv-bih-2026-0042",
+        "proposal_id": "7",
+        "attempt": "1",
+        "token": "tusdc.kinwarden-demo.testnet",
+        "recipient": "bangkok-intl-hospital.kinwarden-demo.testnet",
+        "amount": "250000000",
+        "expires_at": "1794067200000000000",
+        "policy_version": "3",
+        "payee_version": "2"
+      },
+      "borsh_hex": "150000006b696e77617264656e2e617070726f76616c2e763107000000746573746e65741c0000007661756c742e6b696e77617264656e2d64656d6f2e746573746e657410000000636173652d74682d686f73702d30303111000000696e762d6269682d323032362d303034320700000000000000010000001c00000074757364632e6b696e77617264656e2d64656d6f2e746573746e65742c00000062616e676b6f6b2d696e746c2d686f73706974616c2e6b696e77617264656e2d64656d6f2e746573746e657480b2e60e00000000000000000000000000002eef9ccee51803000000000000000200000000000000",
+      "sha256_hex": "3944815f64619bf966e918947677e9614cc08ded724f11f7eccea975609701f8"
+    },
+    {
+      "name": "changed_domain",
+      "input": {
+        "domain": "kinwarden.approval.v2",
+        "network": "testnet",
+        "vault": "vault.kinwarden-demo.testnet",
+        "case_id": "case-th-hosp-001",
+        "invoice_id": "inv-bih-2026-0042",
+        "proposal_id": "7",
+        "attempt": "1",
+        "token": "tusdc.kinwarden-demo.testnet",
+        "recipient": "bangkok-intl-hospital.kinwarden-demo.testnet",
+        "amount": "250000000",
+        "expires_at": "1794067200000000000",
+        "policy_version": "3",
+        "payee_version": "2"
+      },
+      "borsh_hex": "150000006b696e77617264656e2e617070726f76616c2e763207000000746573746e65741c0000007661756c742e6b696e77617264656e2d64656d6f2e746573746e657410000000636173652d74682d686f73702d30303111000000696e762d6269682d323032362d303034320700000000000000010000001c00000074757364632e6b696e77617264656e2d64656d6f2e746573746e65742c00000062616e676b6f6b2d696e746c2d686f73706974616c2e6b696e77617264656e2d64656d6f2e746573746e657480b2e60e00000000000000000000000000002eef9ccee51803000000000000000200000000000000",
+      "sha256_hex": "1719bc7362d2c369fef33a658c664823895faa7146bd15464b1b57937ad89acd"
+    },
+    {
+      "name": "changed_network",
+      "input": {
+        "domain": "kinwarden.approval.v1",
+        "network": "mainnet",
+        "vault": "vault.kinwarden-demo.testnet",
+        "case_id": "case-th-hosp-001",
+        "invoice_id": "inv-bih-2026-0042",
+        "proposal_id": "7",
+        "attempt": "1",
+        "token": "tusdc.kinwarden-demo.testnet",
+        "recipient": "bangkok-intl-hospital.kinwarden-demo.testnet",
+        "amount": "250000000",
+        "expires_at": "1794067200000000000",
+        "policy_version": "3",
+        "payee_version": "2"
+      },
+      "borsh_hex": "150000006b696e77617264656e2e617070726f76616c2e7631070000006d61696e6e65741c0000007661756c742e6b696e77617264656e2d64656d6f2e746573746e657410000000636173652d74682d686f73702d30303111000000696e762d6269682d323032362d303034320700000000000000010000001c00000074757364632e6b696e77617264656e2d64656d6f2e746573746e65742c00000062616e676b6f6b2d696e746c2d686f73706974616c2e6b696e77617264656e2d64656d6f2e746573746e657480b2e60e00000000000000000000000000002eef9ccee51803000000000000000200000000000000",
+      "sha256_hex": "4bba1dacefa5ca2badaa312d2d7f027cd75825b22aa82774567b24008900c69b"
+    },
+    {
+      "name": "changed_vault",
+      "input": {
+        "domain": "kinwarden.approval.v1",
+        "network": "testnet",
+        "vault": "vault2.kinwarden-demo.testnet",
+        "case_id": "case-th-hosp-001",
+        "invoice_id": "inv-bih-2026-0042",
+        "proposal_id": "7",
+        "attempt": "1",
+        "token": "tusdc.kinwarden-demo.testnet",
+        "recipient": "bangkok-intl-hospital.kinwarden-demo.testnet",
+        "amount": "250000000",
+        "expires_at": "1794067200000000000",
+        "policy_version": "3",
+        "payee_version": "2"
+      },
+      "borsh_hex": "150000006b696e77617264656e2e617070726f76616c2e763107000000746573746e65741d0000007661756c74322e6b696e77617264656e2d64656d6f2e746573746e657410000000636173652d74682d686f73702d30303111000000696e762d6269682d323032362d303034320700000000000000010000001c00000074757364632e6b696e77617264656e2d64656d6f2e746573746e65742c00000062616e676b6f6b2d696e746c2d686f73706974616c2e6b696e77617264656e2d64656d6f2e746573746e657480b2e60e00000000000000000000000000002eef9ccee51803000000000000000200000000000000",
+      "sha256_hex": "ad77cfdfc85cdf94b5d56be63d9ad443923d5a0e18970095aa65e4d9b525be85"
+    },
+    {
+      "name": "changed_case_id",
+      "input": {
+        "domain": "kinwarden.approval.v1",
+        "network": "testnet",
+        "vault": "vault.kinwarden-demo.testnet",
+        "case_id": "case-th-hosp-002",
+        "invoice_id": "inv-bih-2026-0042",
+        "proposal_id": "7",
+        "attempt": "1",
+        "token": "tusdc.kinwarden-demo.testnet",
+        "recipient": "bangkok-intl-hospital.kinwarden-demo.testnet",
+        "amount": "250000000",
+        "expires_at": "1794067200000000000",
+        "policy_version": "3",
+        "payee_version": "2"
+      },
+      "borsh_hex": "150000006b696e77617264656e2e617070726f76616c2e763107000000746573746e65741c0000007661756c742e6b696e77617264656e2d64656d6f2e746573746e657410000000636173652d74682d686f73702d30303211000000696e762d6269682d323032362d303034320700000000000000010000001c00000074757364632e6b696e77617264656e2d64656d6f2e746573746e65742c00000062616e676b6f6b2d696e746c2d686f73706974616c2e6b696e77617264656e2d64656d6f2e746573746e657480b2e60e00000000000000000000000000002eef9ccee51803000000000000000200000000000000",
+      "sha256_hex": "8c52324f119861bd0fe27e62c1aca24e47592a294dfa9d4603f9d468eb3c8a6a"
+    },
+    {
+      "name": "changed_invoice_id",
+      "input": {
+        "domain": "kinwarden.approval.v1",
+        "network": "testnet",
+        "vault": "vault.kinwarden-demo.testnet",
+        "case_id": "case-th-hosp-001",
+        "invoice_id": "inv-bih-2026-0043",
+        "proposal_id": "7",
+        "attempt": "1",
+        "token": "tusdc.kinwarden-demo.testnet",
+        "recipient": "bangkok-intl-hospital.kinwarden-demo.testnet",
+        "amount": "250000000",
+        "expires_at": "1794067200000000000",
+        "policy_version": "3",
+        "payee_version": "2"
+      },
+      "borsh_hex": "150000006b696e77617264656e2e617070726f76616c2e763107000000746573746e65741c0000007661756c742e6b696e77617264656e2d64656d6f2e746573746e657410000000636173652d74682d686f73702d30303111000000696e762d6269682d323032362d303034330700000000000000010000001c00000074757364632e6b696e77617264656e2d64656d6f2e746573746e65742c00000062616e676b6f6b2d696e746c2d686f73706974616c2e6b696e77617264656e2d64656d6f2e746573746e657480b2e60e00000000000000000000000000002eef9ccee51803000000000000000200000000000000",
+      "sha256_hex": "3513f88a7f44bee9240cc20169ef6b820f9af9d97595e93e5d7510ca146d5fa0"
+    },
+    {
+      "name": "changed_proposal_id",
+      "input": {
+        "domain": "kinwarden.approval.v1",
+        "network": "testnet",
+        "vault": "vault.kinwarden-demo.testnet",
+        "case_id": "case-th-hosp-001",
+        "invoice_id": "inv-bih-2026-0042",
+        "proposal_id": "8",
+        "attempt": "1",
+        "token": "tusdc.kinwarden-demo.testnet",
+        "recipient": "bangkok-intl-hospital.kinwarden-demo.testnet",
+        "amount": "250000000",
+        "expires_at": "1794067200000000000",
+        "policy_version": "3",
+        "payee_version": "2"
+      },
+      "borsh_hex": "150000006b696e77617264656e2e617070726f76616c2e763107000000746573746e65741c0000007661756c742e6b696e77617264656e2d64656d6f2e746573746e657410000000636173652d74682d686f73702d30303111000000696e762d6269682d323032362d303034320800000000000000010000001c00000074757364632e6b696e77617264656e2d64656d6f2e746573746e65742c00000062616e676b6f6b2d696e746c2d686f73706974616c2e6b696e77617264656e2d64656d6f2e746573746e657480b2e60e00000000000000000000000000002eef9ccee51803000000000000000200000000000000",
+      "sha256_hex": "2e00dba01b2b4119a8dc1b26bdce4c2578e2491221ccb9ca54b1483b2c51ab82"
+    },
+    {
+      "name": "changed_attempt",
+      "input": {
+        "domain": "kinwarden.approval.v1",
+        "network": "testnet",
+        "vault": "vault.kinwarden-demo.testnet",
+        "case_id": "case-th-hosp-001",
+        "invoice_id": "inv-bih-2026-0042",
+        "proposal_id": "7",
+        "attempt": "2",
+        "token": "tusdc.kinwarden-demo.testnet",
+        "recipient": "bangkok-intl-hospital.kinwarden-demo.testnet",
+        "amount": "250000000",
+        "expires_at": "1794067200000000000",
+        "policy_version": "3",
+        "payee_version": "2"
+      },
+      "borsh_hex": "150000006b696e77617264656e2e617070726f76616c2e763107000000746573746e65741c0000007661756c742e6b696e77617264656e2d64656d6f2e746573746e657410000000636173652d74682d686f73702d30303111000000696e762d6269682d323032362d303034320700000000000000020000001c00000074757364632e6b696e77617264656e2d64656d6f2e746573746e65742c00000062616e676b6f6b2d696e746c2d686f73706974616c2e6b696e77617264656e2d64656d6f2e746573746e657480b2e60e00000000000000000000000000002eef9ccee51803000000000000000200000000000000",
+      "sha256_hex": "8045bae98bc81a729349ab223620a632ecab57e2da99c43145076110add94bc6"
+    },
+    {
+      "name": "changed_token",
+      "input": {
+        "domain": "kinwarden.approval.v1",
+        "network": "testnet",
+        "vault": "vault.kinwarden-demo.testnet",
+        "case_id": "case-th-hosp-001",
+        "invoice_id": "inv-bih-2026-0042",
+        "proposal_id": "7",
+        "attempt": "1",
+        "token": "tusdc2.kinwarden-demo.testnet",
+        "recipient": "bangkok-intl-hospital.kinwarden-demo.testnet",
+        "amount": "250000000",
+        "expires_at": "1794067200000000000",
+        "policy_version": "3",
+        "payee_version": "2"
+      },
+      "borsh_hex": "150000006b696e77617264656e2e617070726f76616c2e763107000000746573746e65741c0000007661756c742e6b696e77617264656e2d64656d6f2e746573746e657410000000636173652d74682d686f73702d30303111000000696e762d6269682d323032362d303034320700000000000000010000001d0000007475736463322e6b696e77617264656e2d64656d6f2e746573746e65742c00000062616e676b6f6b2d696e746c2d686f73706974616c2e6b696e77617264656e2d64656d6f2e746573746e657480b2e60e00000000000000000000000000002eef9ccee51803000000000000000200000000000000",
+      "sha256_hex": "d5f5534c0978d82053524ff89d4bc693e0df7be82124f5ad82e7c54a78d1bd84"
+    },
+    {
+      "name": "changed_recipient",
+      "input": {
+        "domain": "kinwarden.approval.v1",
+        "network": "testnet",
+        "vault": "vault.kinwarden-demo.testnet",
+        "case_id": "case-th-hosp-001",
+        "invoice_id": "inv-bih-2026-0042",
+        "proposal_id": "7",
+        "attempt": "1",
+        "token": "tusdc.kinwarden-demo.testnet",
+        "recipient": "bangkok-intl-hospita1.kinwarden-demo.testnet",
+        "amount": "250000000",
+        "expires_at": "1794067200000000000",
+        "policy_version": "3",
+        "payee_version": "2"
+      },
+      "borsh_hex": "150000006b696e77617264656e2e617070726f76616c2e763107000000746573746e65741c0000007661756c742e6b696e77617264656e2d64656d6f2e746573746e657410000000636173652d74682d686f73702d30303111000000696e762d6269682d323032362d303034320700000000000000010000001c00000074757364632e6b696e77617264656e2d64656d6f2e746573746e65742c00000062616e676b6f6b2d696e746c2d686f7370697461312e6b696e77617264656e2d64656d6f2e746573746e657480b2e60e00000000000000000000000000002eef9ccee51803000000000000000200000000000000",
+      "sha256_hex": "bbcf81df3b998d6a701435def7f6fc6c326a799ef8d60f2251d40686d922b54d"
+    },
+    {
+      "name": "changed_amount",
+      "input": {
+        "domain": "kinwarden.approval.v1",
+        "network": "testnet",
+        "vault": "vault.kinwarden-demo.testnet",
+        "case_id": "case-th-hosp-001",
+        "invoice_id": "inv-bih-2026-0042",
+        "proposal_id": "7",
+        "attempt": "1",
+        "token": "tusdc.kinwarden-demo.testnet",
+        "recipient": "bangkok-intl-hospital.kinwarden-demo.testnet",
+        "amount": "250000001",
+        "expires_at": "1794067200000000000",
+        "policy_version": "3",
+        "payee_version": "2"
+      },
+      "borsh_hex": "150000006b696e77617264656e2e617070726f76616c2e763107000000746573746e65741c0000007661756c742e6b696e77617264656e2d64656d6f2e746573746e657410000000636173652d74682d686f73702d30303111000000696e762d6269682d323032362d303034320700000000000000010000001c00000074757364632e6b696e77617264656e2d64656d6f2e746573746e65742c00000062616e676b6f6b2d696e746c2d686f73706974616c2e6b696e77617264656e2d64656d6f2e746573746e657481b2e60e00000000000000000000000000002eef9ccee51803000000000000000200000000000000",
+      "sha256_hex": "5cb1ba35837ff5632b2b0a488b0e890542f098ced28d358cd5eb16a7c35c9dcc"
+    },
+    {
+      "name": "changed_expires_at",
+      "input": {
+        "domain": "kinwarden.approval.v1",
+        "network": "testnet",
+        "vault": "vault.kinwarden-demo.testnet",
+        "case_id": "case-th-hosp-001",
+        "invoice_id": "inv-bih-2026-0042",
+        "proposal_id": "7",
+        "attempt": "1",
+        "token": "tusdc.kinwarden-demo.testnet",
+        "recipient": "bangkok-intl-hospital.kinwarden-demo.testnet",
+        "amount": "250000000",
+        "expires_at": "1794067200000000001",
+        "policy_version": "3",
+        "payee_version": "2"
+      },
+      "borsh_hex": "150000006b696e77617264656e2e617070726f76616c2e763107000000746573746e65741c0000007661756c742e6b696e77617264656e2d64656d6f2e746573746e657410000000636173652d74682d686f73702d30303111000000696e762d6269682d323032362d303034320700000000000000010000001c00000074757364632e6b696e77617264656e2d64656d6f2e746573746e65742c00000062616e676b6f6b2d696e746c2d686f73706974616c2e6b696e77617264656e2d64656d6f2e746573746e657480b2e60e00000000000000000000000001002eef9ccee51803000000000000000200000000000000",
+      "sha256_hex": "23ec095f78534ceecae2ef07946ca08fc196da32a785104fa692b7186be3a148"
+    },
+    {
+      "name": "changed_policy_version",
+      "input": {
+        "domain": "kinwarden.approval.v1",
+        "network": "testnet",
+        "vault": "vault.kinwarden-demo.testnet",
+        "case_id": "case-th-hosp-001",
+        "invoice_id": "inv-bih-2026-0042",
+        "proposal_id": "7",
+        "attempt": "1",
+        "token": "tusdc.kinwarden-demo.testnet",
+        "recipient": "bangkok-intl-hospital.kinwarden-demo.testnet",
+        "amount": "250000000",
+        "expires_at": "1794067200000000000",
+        "policy_version": "4",
+        "payee_version": "2"
+      },
+      "borsh_hex": "150000006b696e77617264656e2e617070726f76616c2e763107000000746573746e65741c0000007661756c742e6b696e77617264656e2d64656d6f2e746573746e657410000000636173652d74682d686f73702d30303111000000696e762d6269682d323032362d303034320700000000000000010000001c00000074757364632e6b696e77617264656e2d64656d6f2e746573746e65742c00000062616e676b6f6b2d696e746c2d686f73706974616c2e6b696e77617264656e2d64656d6f2e746573746e657480b2e60e00000000000000000000000000002eef9ccee51804000000000000000200000000000000",
+      "sha256_hex": "fc72d77100b14d62e5bf0c88e227e32ab95630f342ea8a3aa0494fd4c40a435d"
+    },
+    {
+      "name": "changed_payee_version",
+      "input": {
+        "domain": "kinwarden.approval.v1",
+        "network": "testnet",
+        "vault": "vault.kinwarden-demo.testnet",
+        "case_id": "case-th-hosp-001",
+        "invoice_id": "inv-bih-2026-0042",
+        "proposal_id": "7",
+        "attempt": "1",
+        "token": "tusdc.kinwarden-demo.testnet",
+        "recipient": "bangkok-intl-hospital.kinwarden-demo.testnet",
+        "amount": "250000000",
+        "expires_at": "1794067200000000000",
+        "policy_version": "3",
+        "payee_version": "3"
+      },
+      "borsh_hex": "150000006b696e77617264656e2e617070726f76616c2e763107000000746573746e65741c0000007661756c742e6b696e77617264656e2d64656d6f2e746573746e657410000000636173652d74682d686f73702d30303111000000696e762d6269682d323032362d303034320700000000000000010000001c00000074757364632e6b696e77617264656e2d64656d6f2e746573746e65742c00000062616e676b6f6b2d696e746c2d686f73706974616c2e6b696e77617264656e2d64656d6f2e746573746e657480b2e60e00000000000000000000000000002eef9ccee51803000000000000000300000000000000",
+      "sha256_hex": "62b6be41e33840fba1b74ae4e82a514071afc9bbcaa0bc087ee30bc10d4bbdd1"
+    },
+    {
+      "name": "max_integers",
+      "input": {
+        "domain": "kinwarden.approval.v1",
+        "network": "testnet",
+        "vault": "vault.kinwarden-demo.testnet",
+        "case_id": "case-th-hosp-001",
+        "invoice_id": "inv-bih-2026-0042",
+        "proposal_id": "18446744073709551615",
+        "attempt": "4294967295",
+        "token": "tusdc.kinwarden-demo.testnet",
+        "recipient": "bangkok-intl-hospital.kinwarden-demo.testnet",
+        "amount": "340282366920938463463374607431768211455",
+        "expires_at": "18446744073709551615",
+        "policy_version": "18446744073709551615",
+        "payee_version": "18446744073709551615"
+      },
+      "borsh_hex": "150000006b696e77617264656e2e617070726f76616c2e763107000000746573746e65741c0000007661756c742e6b696e77617264656e2d64656d6f2e746573746e657410000000636173652d74682d686f73702d30303111000000696e762d6269682d323032362d30303432ffffffffffffffffffffffff1c00000074757364632e6b696e77617264656e2d64656d6f2e746573746e65742c00000062616e676b6f6b2d696e746c2d686f73706974616c2e6b696e77617264656e2d64656d6f2e746573746e6574ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "sha256_hex": "fb92aae66e695302dc44bb9313256c75449a79897553702fcf0b6f37fda3a220"
+    },
+    {
+      "name": "sandbox_network",
+      "input": {
+        "domain": "kinwarden.approval.v1",
+        "network": "sandbox",
+        "vault": "vault.test.near",
+        "case_id": "case-th-hosp-001",
+        "invoice_id": "inv-bih-2026-0042",
+        "proposal_id": "7",
+        "attempt": "1",
+        "token": "tusdc.test.near",
+        "recipient": "bangkok-intl-hospital.kinwarden-demo.testnet",
+        "amount": "250000000",
+        "expires_at": "1794067200000000000",
+        "policy_version": "3",
+        "payee_version": "2"
+      },
+      "borsh_hex": "150000006b696e77617264656e2e617070726f76616c2e76310700000073616e64626f780f0000007661756c742e746573742e6e65617210000000636173652d74682d686f73702d30303111000000696e762d6269682d323032362d303034320700000000000000010000000f00000074757364632e746573742e6e6561722c00000062616e676b6f6b2d696e746c2d686f73706974616c2e6b696e77617264656e2d64656d6f2e746573746e657480b2e60e00000000000000000000000000002eef9ccee51803000000000000000200000000000000",
+      "sha256_hex": "1a19319d0d1137fc3163e564c7ca9fb9f9aab3d3ad512004c0b04e31fab58b40"
+    }
+  ]
+}
