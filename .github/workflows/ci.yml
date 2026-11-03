@@ -59,6 +59,19 @@ jobs:
       - name: Toolchain
         run: rustup show active-toolchain || rustup toolchain install
 
+      # The sandbox tests build the contracts with the cargo-near CLI. Official release
+      # binary, checked against the SHA-256 recorded when this version was adopted.
+      - name: Install cargo-near 0.22.0
+        working-directory: ${{ runner.temp }}
+        run: |
+          set -euo pipefail
+          file=cargo-near-x86_64-unknown-linux-gnu.tar.gz
+          curl -fsSLO "https://github.com/near/cargo-near/releases/download/cargo-near-v0.22.0/$file"
+          echo "9429064e30a427e96523f539cb255f3688d2345e5000d7d4e4873a8247247d1a *$file" | sha256sum -c -
+          tar -xzf "$file"
+          install -m 755 cargo-near-x86_64-unknown-linux-gnu/cargo-near "$HOME/.cargo/bin/cargo-near"
+          cargo near --version
+
       - name: Format
         run: cargo fmt --all -- --check
 

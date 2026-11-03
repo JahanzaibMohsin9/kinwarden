@@ -30,8 +30,10 @@ cargo test -p kinwarden-near-tests                   # sandbox tests; first run 
 (cd tusdc && cargo near build non-reproducible-wasm) # target/near/kinwarden_tusdc/kinwarden_tusdc.wasm
 ```
 
-The sandbox tests need no wallet, testnet account or API key. The first run
-compiles the NEAR test harness, which takes several minutes.
+The sandbox tests need no wallet, testnet account or API key, but they do need
+the `cargo-near` CLI on `PATH`: they build both contracts with it before
+deploying them. The first run compiles the NEAR test harness, which takes
+several minutes.
 
 Approval-commitment test vectors are regenerated with
 `python vault/test-vectors/approval_commitment_v1.py`.
