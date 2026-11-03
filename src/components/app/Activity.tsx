@@ -10,6 +10,7 @@ import {
   Fingerprint,
   HeartPulse,
   Landmark,
+  Link2,
   Mail,
   PenLine,
   SendHorizontal,
@@ -275,5 +276,6 @@ function EventIcon({ actor, type }: { actor: string; type: string }) {
   if (actor === "hospital") return <HeartPulse size={14} />;
   if (actor === "card") return <CreditCard size={14} />;
   if (actor === "bank") return <Landmark size={14} />;
+  if (actor === "near") return <Link2 size={14} />;
   return <Mail size={14} />;
 }

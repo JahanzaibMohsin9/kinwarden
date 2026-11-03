@@ -621,6 +621,9 @@ export const TOOLS = [
     run: (i, ctx) => {
       const p = ctx.store.world.payments[i.payment_id];
       if (!p || p.caseId !== ctx.caseId) return { decision: "error", result: { error: `No payment ${i.payment_id}` } };
+      if (p.near) {
+        return { decision: "error", result: { error: "This payment settles through the NEAR vault. A failed transfer needs a new propose_payment and a new approval in the family's wallet; it cannot be resent." } };
+      }
       if (p.status !== "returned") return { decision: "error", result: { error: `Payment is ${p.status}, only returned payments can be resubmitted.` } };
       const ben = checkBeneficiary(ctx.store.world, p.institutionId, { account_name: p.beneficiary.accountName, account_number: p.beneficiary.accountNumber, swift: p.beneficiary.swift });
       if (!ben.verified) return { decision: "blocked", ruleIds: ["KINWARDEN.VERIFIED_BENEFICIARY"], result: { error: "BLOCKED: beneficiary no longer verified" } };

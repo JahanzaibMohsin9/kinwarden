@@ -9,7 +9,7 @@ export type CorridorId = "PK-TH" | "CN-GB" | "PK-GB" | `${"PK" | "CN"}-${string}
 
 export type Route = "bank_transfer" | "card_payment" | "atm_cash" | "carried_cash";
 
-export type Actor = "family" | "agent" | "hospital" | "university" | "bank" | "card" | "system" | "director" | "gateway";
+export type Actor = "family" | "agent" | "hospital" | "university" | "bank" | "card" | "near" | "system" | "director" | "gateway";
 
 export interface Person {
   id: string;
@@ -155,6 +155,30 @@ export interface Payment {
   completedAt?: string;
   returnReason?: string;
   attempts: number;
+  /** Set when this payment settles in test stablecoin through the NEAR vault (src/server/near). */
+  near?: NearPaymentLink;
+}
+
+/**
+ * A payment's counterpart on the NEAR vault. The app server only proposes (restricted agent key)
+ * and observes; the family approves in their own wallet.
+ */
+export interface NearPaymentLink {
+  network: string;
+  vault: string;
+  vaultCaseId: string;
+  vaultInvoiceId: string;
+  requestId: string;
+  /** tUSDC base units (6 decimals), as a decimal string */
+  amountUnits: string;
+  /** vault proposal id once the proposal exists */
+  proposalId?: string;
+  /** last vault proposal status seen, or the bridge's own state before a proposal exists */
+  state: "proposing" | "waiting_for_verifier" | "PendingApproval" | "Submitted" | "Settled" | "Failed" | "Rejected" | "Expired" | "Invalidated" | "error";
+  reason?: string;
+  /** the family's approve_payment transaction, when the wallet reported it */
+  approvalTx?: string;
+  updatedAt: string;
 }
 
 export interface Approval {
@@ -164,7 +188,7 @@ export interface Approval {
   requestedAt: string;
   decidedAt?: string;
   decision?: "approved" | "declined";
-  method?: "passkey" | "hold";
+  method?: "passkey" | "hold" | "near_wallet";
   summary: string;
 }
 
@@ -315,6 +339,8 @@ export interface World {
   counters: Record<string, number>;
   /** scenario "upload": the family's own bill */
   upload?: UploadedBill;
+  /** NEAR vault link for this world: on-chain ids are never reused, so each world run gets its own tag */
+  near?: { runId: string };
 }
 
 /** One hash-chained entry in the tamper-evident activity log. */

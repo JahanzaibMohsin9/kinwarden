@@ -84,3 +84,21 @@ jobs:
       # Deploys both contracts to a local NEAR node; no wallet, testnet account or API key.
       - name: Sandbox tests
         run: cargo test -p kinwarden-near-tests
+
+      # The app end to end on a local NEAR node: agent proposal, verifier, family approval
+      # (test-only harness key), hospital paid, receipt. Uses the release wasm built here.
+      - name: Build contract wasm
+        run: |
+          (cd vault && cargo near build non-reproducible-wasm)
+          (cd tusdc && cargo near build non-reproducible-wasm)
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: App end-to-end on NEAR sandbox
+        working-directory: .
+        run: |
+          npm ci
+          npm run test:near

@@ -13,6 +13,7 @@ import { ROUTE_SHORT } from "@/domain/corridors";
 import { compareRoutes, evaluateRoute, findRule } from "@/domain/rules/engine";
 import { Badge, Sheet } from "../ui";
 import { RuleChip } from "../RuleChip";
+import { NearApproval } from "./NearApproval";
 
 export function ApprovalSheet({ approvalId, onClose }: { approvalId: string | null; onClose: () => void }) {
   const { state } = useCarry();
@@ -218,6 +219,10 @@ export function ApprovalSheet({ approvalId, onClose }: { approvalId: string | nu
 
         {error && <p className="rounded-xl bg-danger-soft px-3 py-2 text-[13px] text-danger">{error}</p>}
 
+        {p.near ? (
+          // Settles through the NEAR vault: only the family's wallet can approve or reject it.
+          <NearApproval paymentId={p.id} onDone={onClose} />
+        ) : (
         <div className="sticky bottom-0 -mx-5 space-y-1.5 border-t border-line/60 bg-surface px-5 pb-1 pt-3">
           {notPayer && payer ? (
             <div className="space-y-2 rounded-2xl bg-info-soft p-3 text-[13px] text-info">
@@ -255,6 +260,7 @@ export function ApprovalSheet({ approvalId, onClose }: { approvalId: string | nu
             )}
           </div>
         </div>
+        )}
       </div>
     </Sheet>
   );

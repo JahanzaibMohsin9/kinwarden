@@ -362,10 +362,13 @@ export function submitPayment(store: Store, payment: Payment) {
   }
 }
 
-function settlePayment(store: Store, paymentId: string) {
+/** The institution received the money (also used when the NEAR vault reports a settled transfer). */
+export function settlePayment(store: Store, paymentId: string) {
   const p = store.world.payments[paymentId];
   if (!p || p.status === "completed") return;
   const inst = store.world.institutions[p.institutionId];
+  const rail = p.near ? "near" : p.route === "bank_transfer" ? "bank" : "card";
+  const method = p.near ? "Test stablecoin (tUSDC) through the NEAR vault" : p.route === "bank_transfer" ? "International bank transfer" : "Card";
   setPaymentStatus(store, paymentId, "completed", `Received by ${inst.name}`);
   store.mutate((w) => {
     const inv = w.invoices[p.invoiceId];
@@ -374,7 +377,7 @@ function settlePayment(store: Store, paymentId: string) {
       if (paid >= inv.amountDue - 0.01) inv.status = "paid";
     }
   });
-  store.log({ actor: p.route === "bank_transfer" ? "bank" : "card", type: "payment.completed", caseId: p.caseId, narration: `${inst.name} received ${p.currency} ${p.amount.toLocaleString()}`, data: { paymentId } });
+  store.log({ actor: rail, type: "payment.completed", caseId: p.caseId, narration: `${inst.name} received ${p.currency} ${p.amount.toLocaleString()}`, data: { paymentId, ...(p.near ? { proposalId: p.near.proposalId, amountUnits: p.near.amountUnits } : {}) } });
   if (inst.origin === "uploaded_bill") {
     // a real institution outside the sandbox: no auto-reply; the confirmation comes from the payment rail
     const conf = addDoc(store, {
@@ -392,7 +395,7 @@ function settlePayment(store: Store, paymentId: string) {
     caseId: p.caseId,
     kind: "receipt",
     title: `Receipt: ${p.currency} ${p.amount.toLocaleString()}`,
-    text: `${inst.name}\nOFFICIAL RECEIPT\nReceived with thanks ${p.currency} ${p.amount.toLocaleString("en-US", { minimumFractionDigits: 2 })}\nReference: ${p.reference}\nMethod: ${p.route === "bank_transfer" ? "International bank transfer" : "Card"}`,
+    text: `${inst.name}\nOFFICIAL RECEIPT\nReceived with thanks ${p.currency} ${p.amount.toLocaleString("en-US", { minimumFractionDigits: 2 })}\nReference: ${p.reference}\nMethod: ${method}`,
     fields: { amount: p.amount, currency: p.currency, reference: p.reference },
     origin: "institution",
   });

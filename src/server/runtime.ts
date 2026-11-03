@@ -12,6 +12,8 @@ import { AnchorService, milestoneOf } from "./anchor/service";
 import { ANCHOR_CHAIN, anchorConfig, explorerAddress, viemPublisher, type ChainPublisher } from "./anchor/chain";
 import { DEFAULT_SESSION } from "./session";
 import { answerFamily } from "./agent/answer";
+import { nearConfig } from "./near/config";
+import { NearBridge } from "./near/bridge";
 
 interface Runtime {
   id: string;
@@ -21,6 +23,9 @@ interface Runtime {
   runnerClass: typeof AgentRunner;
   /** on-chain anchoring, when the testnet key and contract are configured */
   anchors?: AnchorService;
+  /** NEAR vault settlement for the main world, when a deployment and the agent key are configured */
+  near?: NearBridge;
+  nearTimer?: NodeJS.Timeout;
   lastSeen?: number;
 }
 
@@ -67,11 +72,23 @@ function create(id: string): Runtime {
     });
     rt.anchors = anchors;
   }
+  // One family case on chain belongs to one world: per-visitor sandbox copies stay on simulated rails.
+  const near = id === DEFAULT_SESSION ? nearConfig() : null;
+  if (near) {
+    const bridge = new NearBridge(store, near);
+    store.on("logged", (e) => bridge.onLogged(e));
+    rt.near = bridge;
+    rt.nearTimer = setInterval(() => {
+      if (bridge.hasOpenLinks()) void bridge.sync();
+    }, 4000);
+    void bridge.ready();
+  }
   return rt;
 }
 
 function dispose(rt: Runtime) {
   clearInterval(rt.autoplayTimer);
+  if (rt.nearTimer) clearInterval(rt.nearTimer);
   rt.runner.dispose();
   rt.anchors?.dispose();
   rt.store.removeAllListeners();
@@ -136,12 +153,25 @@ function autoplayTick(store: Store, runner: AgentRunner) {
 }
 
 export function publicState(sid?: string) {
-  const { store, runner } = runtime(sid);
+  const { store, runner, near } = runtime(sid);
   const next = nextScheduled(store);
   return {
     world: store.world,
     ledger: store.ledger,
     anchors: store.anchors,
+    near: near
+      ? {
+          network: near.deployment.network,
+          rpcUrl: near.deployment.rpcUrl,
+          vault: near.deployment.vault,
+          token: near.deployment.token,
+          tokenSymbol: near.deployment.tokenSymbol,
+          tokenDecimals: near.deployment.tokenDecimals,
+          explorerTx: near.deployment.explorerTx ?? null,
+          cases: near.deployment.cases,
+          agentKey: near.keyCheck ? (near.keyCheck.ok ? { ok: true as const } : { ok: false as const, reason: near.keyCheck.reason }) : null,
+        }
+      : null,
     anchoring: anchorConfig()
       ? { chain: ANCHOR_CHAIN.name, chainId: ANCHOR_CHAIN.id, contract: anchorConfig()!.contract, contractUrl: explorerAddress(anchorConfig()!.contract) }
       : null,
@@ -196,6 +226,10 @@ export function checkApprover(store: Store, approvalId: string, decision: "appro
 export function decideApprovalIn(store: Store, approvalId: string, decision: "approved" | "declined", method: "passkey" | "hold", evidence?: Record<string, unknown>, actingPersonId?: string) {
   const a = store.world.approvals[approvalId];
   if (!a || a.decision) throw new Error("This approval is no longer pending.");
+  if (store.world.payments[a.paymentId]?.near) {
+    // Only the family's own wallet can approve or reject a NEAR payment; the server only observes it.
+    throw new Error("This payment settles through the NEAR vault: approve or reject it in your NEAR wallet.");
+  }
   checkApprover(store, approvalId, decision, actingPersonId);
   const p = store.world.payments[a.paymentId];
   store.mutate((w) => {
