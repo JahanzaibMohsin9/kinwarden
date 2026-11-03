@@ -1,12 +1,13 @@
 "use client";
 
-import { FileDown, Link2, Loader2, PauseCircle, PlayCircle, Wallet } from "lucide-react";
+import { FileText, Link2, Loader2, PauseCircle, PlayCircle, Wallet } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useCarry } from "@/lib/client";
 import { cn } from "@/lib/format";
 import { nearView, tusdc } from "@/near/rpc";
 import { callWithWallet, connectWallet, connectedAccount } from "@/near/wallet";
 import { Card, SectionTitle } from "../ui";
+import { NearOutcomeNote, NearReceiptView } from "./NearReceipt";
 
 interface VaultCase {
   owner: string;
@@ -39,6 +40,7 @@ export function NearCaseCard({ caseId }: { caseId: string }) {
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [reload, setReload] = useState(0);
+  const [open, setOpen] = useState<string | null>(null);
 
   const rpcUrl = near?.rpcUrl;
   const vault = near?.vault;
@@ -66,7 +68,7 @@ export function NearCaseCard({ caseId }: { caseId: string }) {
 
   if (!near || !link || !state) return null;
   const isOwner = account === link.owner;
-  const receipts = Object.values(state.world.payments).filter((p) => p.caseId === caseId && p.near?.state === "Settled");
+  const vaultPayments = Object.values(state.world.payments).filter((p) => p.caseId === caseId && p.near?.proposalId);
 
   const act = async (label: string, call: Parameters<typeof callWithWallet>[1]) => {
     if (!walletNet) return;
@@ -175,12 +177,25 @@ export function NearCaseCard({ caseId }: { caseId: string }) {
 
         {error && <p className="rounded-xl bg-danger-soft px-2.5 py-2 text-[12px] text-danger">{error}</p>}
 
-        {receipts.length > 0 && (
-          <div className="flex flex-wrap gap-2 border-t border-line pt-3">
-            {receipts.map((p) => (
-              <a key={p.id} href={`/api/near/receipt/${p.id}`} className="inline-flex items-center gap-1 rounded-full bg-surface-2 px-3 py-1.5 text-[12.5px] font-semibold text-brand">
-                <FileDown size={13} /> Receipt {state.world.invoices[p.invoiceId]?.number}
-              </a>
+        {vaultPayments.length > 0 && (
+          <div className="space-y-3 border-t border-line pt-3">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-3">Payments through the vault</p>
+            {vaultPayments.map((p) => (
+              <div key={p.id} className="space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="font-semibold">
+                    {state.world.invoices[p.invoiceId]?.number} · {tusdc(p.near!.amountUnits)} {near.tokenSymbol}
+                  </p>
+                  <button
+                    onClick={() => setOpen(open === p.id ? null : p.id)}
+                    className="inline-flex items-center gap-1 rounded-full bg-surface-2 px-3 py-1.5 text-[12.5px] font-semibold text-brand"
+                  >
+                    <FileText size={13} /> {open === p.id ? "Hide receipt" : "Receipt"}
+                  </button>
+                </div>
+                <NearOutcomeNote state={p.near!.state} reason={p.near!.reason} />
+                {open === p.id && <NearReceiptView paymentId={p.id} version={`${p.near!.state}:${p.near!.approvalTx ?? ""}`} />}
+              </div>
             ))}
           </div>
         )}

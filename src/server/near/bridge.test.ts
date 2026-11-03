@@ -3,8 +3,12 @@ import { Store } from "../store";
 import { seedScenario } from "../scenarios";
 import { executeTool } from "../agent/tools";
 import { decideApprovalIn } from "../runtime";
-import { formatTusdc, opaqueId, tusdcUnits } from "./bridge";
-import type { Payment } from "@/domain/types";
+import { sha256 } from "@noble/hashes/sha2";
+import { bytesToHex } from "@noble/hashes/utils";
+import { stableStringify } from "@/lib/canonical";
+import type { VaultProposal } from "@/near/commitment";
+import { buildReceipt, evidenceFromTx, formatTusdc, opaqueId, tusdcUnits, type FinalTx } from "./bridge";
+import type { NearPaymentLink, Payment } from "@/domain/types";
 
 describe("on-chain identifiers and amounts", () => {
   it("makes opaque vault ids from app ids", () => {
@@ -65,5 +69,115 @@ describe("NEAR payments stay under the family's wallet", () => {
     const out = JSON.parse(executeTool("resubmit_payment", { payment_id: "pay_1", corrected_reference: "Deposit again", narration: "Resending the deposit" }, { store, caseId: "case_th" }));
     expect(out.error).toMatch(/new propose_payment and a new approval/);
     expect(store.world.payments.pay_1.status).toBe("returned");
+  });
+});
+
+describe("case receipt evidence", () => {
+  const d = {
+    network: "testnet" as const,
+    rpcUrl: "https://rpc.testnet.near.org",
+    explorerTx: "https://testnet.nearblocks.io/txns/",
+    vault: "vault.demo.testnet",
+    token: "tusdc.demo.testnet",
+    tokenSymbol: "tUSDC",
+    tokenDecimals: 6,
+    verifier: "verifier.demo.testnet",
+    agent: "agent.demo.testnet",
+    caseLimits: { per_payment_max: "1", rolling_24h_cap: "1", lifetime_cap: "1", group_caps: [] },
+    cases: { case_th: { vaultCaseId: "case-th", owner: "family.testnet" } },
+    payees: { srh: { payeeId: "srh", account: "srh.demo.testnet" } },
+  };
+  const proposal = (status: VaultProposal["status"]): VaultProposal => ({
+    proposal_id: "3",
+    case_id: "case-th",
+    invoice_id: "run-srh-dep-0001",
+    request_id: "run-pay-1",
+    attempt: 1,
+    payee_id: "srh",
+    recipient: "srh.demo.testnet",
+    token: "tusdc.demo.testnet",
+    amount: "7142860000",
+    purpose_group: "Hospital",
+    ttl_seconds: 43200,
+    created_at: "1793700000000000000",
+    expires_at: "1793743200000000000",
+    policy_version: 1,
+    payee_version: 2,
+    status,
+    status_reason: status === "Failed" ? "E_TRANSFER_FAILED" : null,
+    updated_at: "1793700060000000000",
+  });
+  const b64 = (s: string) => Buffer.from(s).toString("base64");
+  const transferEvent = (to: string) =>
+    `EVENT_JSON:${JSON.stringify({ standard: "nep141", version: "1.0.0", event: "ft_transfer", data: [{ old_owner_id: d.vault, new_owner_id: to, amount: "7142860000" }] })}`;
+  const finalTx = (transferOk: boolean, to = "srh.demo.testnet"): FinalTx => ({
+    status: { SuccessValue: b64(transferOk ? '"Settled"' : '"Failed"') },
+    transaction: { signer_id: "family.testnet", receiver_id: d.vault, actions: [] },
+    receipts_outcome: [
+      { id: "R1", block_hash: "B1", outcome: { executor_id: d.vault, logs: [], status: { SuccessReceiptId: "R3" } } },
+      transferOk
+        ? { id: "R2", block_hash: "B2", outcome: { executor_id: d.token, logs: [transferEvent(to)], status: { SuccessValue: "" } } }
+        : { id: "R2", block_hash: "B2", outcome: { executor_id: d.token, logs: [], status: { Failure: { ActionError: {} } } } },
+      { id: "R3", block_hash: "B3", outcome: { executor_id: d.vault, logs: [`proposal_finished 3 status=${transferOk ? "Settled" : "Failed"}`], status: { SuccessValue: b64(transferOk ? '"Settled"' : '"Failed"') } } },
+    ],
+  });
+  const times = { B1: "2026-11-03T10:00:00.000Z", B2: "2026-11-03T10:00:01.000Z", B3: "2026-11-03T10:00:02.000Z" };
+  const payment = { id: "pay_1", status: "completed" } as unknown as Payment;
+  const link = (state: NearPaymentLink["state"], extra: Partial<NearPaymentLink> = {}): NearPaymentLink => ({
+    network: "testnet",
+    vault: d.vault,
+    vaultCaseId: "case-th",
+    vaultInvoiceId: "run-srh-dep-0001",
+    requestId: "run-pay-1",
+    amountUnits: "7142860000",
+    proposalId: "3",
+    state,
+    updatedAt: "",
+    ...extra,
+  });
+  const receipt = (status: VaultProposal["status"], l: NearPaymentLink) =>
+    buildReceipt({ deployment: d, payment, link: l, proposal: proposal(status), invoiceNumber: "SRH-DEP-0001", institution: "Siam Riverside Hospital" });
+
+  it("reads approval, token transfer and vault callback as separate steps", () => {
+    const ev = evidenceFromTx(finalTx(true), d, times);
+    expect(ev.approval).toEqual({ receiptId: "R1", blockHash: "B1", at: times.B1, ok: true, signer: "family.testnet" });
+    expect(ev.tokenTransfer).toMatchObject({ receiptId: "R2", at: times.B2, ok: true, from: d.vault, to: "srh.demo.testnet", amount: "7142860000" });
+    expect(ev.vaultCallback).toMatchObject({ receiptId: "R3", at: times.B3, result: "Settled" });
+  });
+
+  it("a delivered receipt shows the exact recipient, token and amount, with approval and settlement apart", () => {
+    const r = receipt("Settled", link("Settled", { approvalTx: "TxHash1", evidence: evidenceFromTx(finalTx(true), d, times), institutionAck: { docId: "doc_9", mailId: "mail_4", at: "2026-03-02T10:00:00.000Z" } }));
+    expect(r.paid_to).toEqual({ institution: "Siam Riverside Hospital", account: "srh.demo.testnet" });
+    expect(r.token).toEqual({ contract: d.token, symbol: "tUSDC", decimals: 6 });
+    expect(r.amount).toEqual({ units: "7142860000", display: "7,142.86 tUSDC" });
+    expect(r.outcome).toMatchObject({ delivery: "delivered", vault_status: "Settled" });
+    expect(r.approval).toMatchObject({ by: "family.testnet", approved_at: times.B1, tx_url: "https://testnet.nearblocks.io/txns/TxHash1" });
+    expect(r.settlement?.token_transfer).toMatchObject({ succeeded: true, observed_at: times.B2, matches_proposal: true });
+    expect(r.settlement?.vault_callback).toMatchObject({ result: "Settled", observed_at: times.B3 });
+    expect(r.institution_acknowledgement).toMatchObject({ simulated: true, document_id: "doc_9" });
+    const { receipt_hash, ...body } = r;
+    expect(receipt_hash).toBe(bytesToHex(sha256(new TextEncoder().encode(stableStringify(body)))));
+  });
+
+  it("a transfer to another account is flagged, not counted as matching", () => {
+    const r = receipt("Settled", link("Settled", { approvalTx: "TxHash1", evidence: evidenceFromTx(finalTx(true, "someone.testnet"), d, times) }));
+    expect(r.settlement?.token_transfer.matches_proposal).toBe(false);
+  });
+
+  it("a failed transfer says the money is back in the case and what to do next", () => {
+    const r = receipt("Failed", link("Failed", { approvalTx: "TxHash2", evidence: evidenceFromTx(finalTx(false), d, times) }));
+    expect(r.outcome).toMatchObject({ delivery: "failed", status_reason: "E_TRANSFER_FAILED" });
+    expect(r.outcome.reserved_funds).toMatch(/back in the case/);
+    expect(r.outcome.next_step).toMatch(/new approval/);
+    expect(r.settlement?.token_transfer).toMatchObject({ succeeded: false, from: null, matches_proposal: false });
+    expect(r.settlement?.vault_callback?.result).toBe("Failed");
+    expect(r.institution_acknowledgement).toBeNull();
+  });
+
+  it("an approved but unconfirmed payment is unknown, with no settlement claimed", () => {
+    const r = receipt("Submitted", link("Submitted", { approvalTx: "TxHash3" }));
+    expect(r.outcome).toMatchObject({ delivery: "unknown", recorded_by_vault_at: null });
+    expect(r.outcome.reserved_funds).toMatch(/in flight/);
+    expect(r.settlement).toBeNull();
   });
 });

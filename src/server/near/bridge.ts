@@ -4,10 +4,11 @@
 // own wallet, and the vault's proposal status drives the payment here. Nothing in this file can
 // approve a payment or move tokens.
 import crypto from "node:crypto";
-import type { LedgerEntry, NearPaymentLink, Payment } from "@/domain/types";
+import type { LedgerEntry, NearEvidence, NearPaymentLink, Payment } from "@/domain/types";
 import { toUSD } from "@/domain/market";
 import { stableStringify } from "@/lib/canonical";
 import { commitmentForProposal, commitmentHash, type VaultProposal } from "@/near/commitment";
+import { nearOutcome } from "@/near/outcome";
 import { sha256 } from "@noble/hashes/sha2";
 import { bytesToHex } from "@noble/hashes/utils";
 import type { Store } from "../store";
@@ -203,7 +204,8 @@ export class NearBridge {
       this.store.log({ actor: "near", type: "payment.submitted", caseId: p.caseId, narration: `The NEAR vault sent ${formatTusdc(link.amountUnits)}`, data: { paymentId, proposalId: link.proposalId } });
     }
     if (proposal.status === "Settled") {
-      settlePayment(this.store, paymentId);
+      const ack = settlePayment(this.store, paymentId);
+      if (ack) this.update(paymentId, { institutionAck: { ...ack, at: this.store.world.now } });
     } else if (proposal.status === "Failed") {
       const reason = "The NEAR transfer failed; the vault kept the funds in the case. A new proposal and a new approval are needed.";
       setPaymentStatus(this.store, paymentId, "returned", reason);
@@ -243,17 +245,15 @@ export class NearBridge {
 
   /**
    * The wallet reported an approval transaction. Keep it only if the chain shows the case owner
-   * calling approve_payment on the vault for this proposal, successfully.
+   * calling approve_payment on the vault for this proposal, successfully. The transaction's later
+   * steps (the token transfer and the vault's callback) are kept as settlement evidence.
    */
   async recordApprovalTx(paymentId: string, txHash: string): Promise<{ ok: boolean; reason?: string }> {
     const link = this.store.world.payments[paymentId]?.near;
     if (!link?.proposalId) return { ok: false, reason: "No NEAR proposal for this payment." };
     const owner = Object.values(this.deployment.cases).find((c) => c.vaultCaseId === link.vaultCaseId)?.owner;
     if (!owner) return { ok: false, reason: "Unknown case owner." };
-    const tx = (await this.client.provider.viewTransactionStatus({ txHash, accountId: owner, waitUntil: "FINAL" })) as unknown as {
-      status: Record<string, unknown>;
-      transaction: { signer_id: string; receiver_id: string; actions: { FunctionCall?: { method_name: string; args: string } }[] };
-    };
+    const tx = (await this.client.provider.viewTransactionStatus({ txHash, accountId: owner, waitUntil: "FINAL" })) as unknown as FinalTx;
     const call = tx.transaction.actions.find((x) => x.FunctionCall)?.FunctionCall;
     const args = call ? (JSON.parse(Buffer.from(call.args, "base64").toString("utf8")) as { proposal_id?: string }) : {};
     const ok =
@@ -263,15 +263,27 @@ export class NearBridge {
       args.proposal_id === link.proposalId &&
       "SuccessValue" in tx.status;
     if (!ok) return { ok: false, reason: "That transaction is not a successful approval of this payment by the case owner." };
-    this.update(paymentId, { approvalTx: txHash });
+    const times = await this.blockTimes(tx.receipts_outcome.map((r) => r.block_hash));
+    this.update(paymentId, { approvalTx: txHash, evidence: evidenceFromTx(tx, this.deployment, times) });
     await this.sync();
     return { ok: true };
   }
 
+  private async blockTimes(hashes: string[]): Promise<Record<string, string>> {
+    const out: Record<string, string> = {};
+    for (const h of new Set(hashes)) {
+      const block = await this.client.provider.viewBlock({ blockId: h });
+      out[h] = nsToIso(block.header.timestamp_nanosec);
+    }
+    return out;
+  }
+
   /**
-   * A receipt binding the invoice, the stored proposal, its commitment hash, the family's approval
-   * transaction and the settled status. `receipt_hash` covers everything else in the receipt; it shows
-   * the receipt was not edited, not that the bill itself was genuine.
+   * The case receipt: what was paid to whom, the family's approval and the settlement as separate
+   * on-chain observations, whether delivery is confirmed, failed or unknown, where the reserved money
+   * is and what to do next, and the institution's own acknowledgement as a separate event.
+   * `receipt_hash` covers everything else in the receipt; it shows the receipt was not edited, not
+   * that the bill itself was genuine.
    */
   async receipt(paymentId: string) {
     const p = this.store.world.payments[paymentId];
@@ -279,21 +291,111 @@ export class NearBridge {
     if (!link?.proposalId) return null;
     const proposal = await this.client.getProposal(link.proposalId);
     if (!proposal) return null;
-    const inv = this.store.world.invoices[p.invoiceId];
-    const body = {
-      kind: "kinwarden.near.receipt.v1",
-      network: this.deployment.network,
-      vault: this.deployment.vault,
-      token: this.deployment.token,
-      invoice: { number: inv.number, vault_invoice_id: link.vaultInvoiceId, institution: this.store.world.institutions[p.institutionId].name },
+    return buildReceipt({
+      deployment: this.deployment,
+      payment: p,
+      link,
       proposal,
-      commitment_hash: commitmentHash(commitmentForProposal(proposal, this.deployment.network, this.deployment.vault)),
-      approval_tx: link.approvalTx ?? null,
-      approval_tx_url: link.approvalTx ? explorerTx(this.deployment, link.approvalTx) ?? null : null,
-      settled: proposal.status === "Settled",
-      amount: formatTusdc(proposal.amount),
-      note: "Test stablecoin on a test network. The hash shows this receipt was not edited; it does not prove the bill itself was genuine.",
-    };
-    return { ...body, receipt_hash: bytesToHex(sha256(new TextEncoder().encode(stableStringify(body)))) };
+      invoiceNumber: this.store.world.invoices[p.invoiceId].number,
+      institution: this.store.world.institutions[p.institutionId].name,
+    });
   }
 }
+
+/** The parts of a final transaction status the bridge reads. */
+export interface FinalTx {
+  status: Record<string, unknown>;
+  transaction: { signer_id: string; receiver_id: string; actions: { FunctionCall?: { method_name: string; args: string } }[] };
+  receipts_outcome: { id: string; block_hash: string; outcome: { executor_id: string; logs: string[]; status: Record<string, unknown> } }[];
+}
+
+function nsToIso(ns: string | number): string {
+  return new Date(Number(BigInt(ns) / BigInt(1_000_000))).toISOString();
+}
+
+type Nep141Event = { standard?: string; event?: string; data?: { old_owner_id: string; new_owner_id: string; amount: string }[] };
+
+/**
+ * Settlement evidence from a final approve_payment transaction: the vault's approval step, the token
+ * contract's transfer step (with its NEP-141 event, if it succeeded) and the vault's callback.
+ */
+export function evidenceFromTx(tx: FinalTx, d: { vault: string; token: string }, times: Record<string, string>): NearEvidence {
+  const step = (r: FinalTx["receipts_outcome"][number]) => ({ receiptId: r.id, blockHash: r.block_hash, at: times[r.block_hash] ?? "", ok: !("Failure" in r.outcome.status) });
+  const approval = tx.receipts_outcome.find((r) => r.outcome.executor_id === d.vault)!;
+  const evidence: NearEvidence = { approval: { ...step(approval), signer: tx.transaction.signer_id } };
+  const transfer = tx.receipts_outcome.find((r) => r.outcome.executor_id === d.token);
+  if (transfer) {
+    const event = transfer.outcome.logs
+      .filter((l) => l.startsWith("EVENT_JSON:"))
+      .map((l) => JSON.parse(l.slice("EVENT_JSON:".length)) as Nep141Event)
+      .find((e) => e.standard === "nep141" && e.event === "ft_transfer")?.data?.[0];
+    evidence.tokenTransfer = { ...step(transfer), token: d.token, ...(event ? { from: event.old_owner_id, to: event.new_owner_id, amount: event.amount } : {}) };
+  }
+  const callback = tx.receipts_outcome.find((r) => r.outcome.executor_id === d.vault && r.outcome.logs.some((l) => l.startsWith("proposal_finished")));
+  if (callback) {
+    const value = callback.outcome.status.SuccessValue;
+    const result = typeof value === "string" && value ? (JSON.parse(Buffer.from(value, "base64").toString("utf8")) as string) : undefined;
+    evidence.vaultCallback = { ...step(callback), ...(result ? { result } : {}) };
+  }
+  return evidence;
+}
+
+export function buildReceipt(input: { deployment: NearConfig["deployment"]; payment: Payment; link: NearPaymentLink; proposal: VaultProposal; invoiceNumber: string; institution: string }) {
+  const { deployment: d, payment: p, link, proposal } = input;
+  const ev = link.evidence;
+  const outcome = nearOutcome(proposal.status);
+  const txUrl = (hash?: string) => (hash ? (explorerTx(d, hash) ?? null) : null);
+  const t = ev?.tokenTransfer;
+  const finished = proposal.status === "Settled" || proposal.status === "Failed";
+  const body = {
+    kind: "kinwarden.near.receipt.v1",
+    network: d.network,
+    vault: d.vault,
+    paid_to: { institution: input.institution, account: proposal.recipient },
+    token: { contract: proposal.token, symbol: d.tokenSymbol, decimals: d.tokenDecimals },
+    amount: { units: proposal.amount, display: formatTusdc(proposal.amount) },
+    invoice: { number: input.invoiceNumber, vault_invoice_id: link.vaultInvoiceId },
+    outcome: {
+      delivery: outcome.delivery,
+      vault_status: proposal.status,
+      status_reason: proposal.status_reason ?? null,
+      reserved_funds: outcome.funds,
+      next_step: outcome.next,
+      recorded_by_vault_at: finished ? nsToIso(proposal.updated_at) : null,
+    },
+    approval: link.approvalTx
+      ? { by: ev?.approval.signer ?? null, approved_at: ev?.approval.at ?? null, tx: link.approvalTx, tx_url: txUrl(link.approvalTx), receipt_id: ev?.approval.receiptId ?? null }
+      : null,
+    settlement: t
+      ? {
+          token_transfer: {
+            succeeded: t.ok,
+            observed_at: t.at,
+            receipt_id: t.receiptId,
+            from: t.from ?? null,
+            to: t.to ?? null,
+            amount_units: t.amount ?? null,
+            matches_proposal: t.ok && t.from === d.vault && t.to === proposal.recipient && t.amount === proposal.amount && t.token === proposal.token,
+          },
+          vault_callback: ev?.vaultCallback ? { result: ev.vaultCallback.result ?? null, observed_at: ev.vaultCallback.at, receipt_id: ev.vaultCallback.receiptId } : null,
+          tx_url: txUrl(link.approvalTx),
+        }
+      : null,
+    institution_acknowledgement: link.institutionAck
+      ? {
+          simulated: true,
+          document_id: link.institutionAck.docId,
+          mail_id: link.institutionAck.mailId ?? null,
+          sandbox_time: link.institutionAck.at,
+          note: "Sent by the simulated hospital after the vault settled: a separate event from the on-chain transfer.",
+        }
+      : null,
+    proposal,
+    commitment_hash: commitmentHash(commitmentForProposal(proposal, d.network, d.vault)),
+    app_payment_status: p.status,
+    note: "Test stablecoin on a test network. Delivery follows the vault's record: an approval or a submitted transaction alone does not confirm delivery. The hash shows this receipt was not edited; it does not prove the bill itself was genuine.",
+  };
+  return { ...body, receipt_hash: bytesToHex(sha256(new TextEncoder().encode(stableStringify(body)))) };
+}
+
+export type NearReceipt = ReturnType<typeof buildReceipt>;

@@ -1,12 +1,13 @@
 "use client";
 
-import { ExternalLink, FileDown, Link2, Loader2, ShieldCheck, TriangleAlert, Wallet } from "lucide-react";
+import { Link2, Loader2, ShieldCheck, TriangleAlert, Wallet } from "lucide-react";
 import { useEffect, useState } from "react";
 import { post, useCarry } from "@/lib/client";
 import { cn } from "@/lib/format";
 import { commitmentForProposal, commitmentHash, type VaultProposal } from "@/near/commitment";
 import { nearView, tusdc } from "@/near/rpc";
 import { callWithWallet, connectWallet, connectedAccount } from "@/near/wallet";
+import { NearOutcomeNote, NearReceiptView } from "./NearReceipt";
 
 interface Preview {
   proposal: VaultProposal;
@@ -72,7 +73,6 @@ export function NearApproval({ paymentId, onDone }: { paymentId: string; onDone:
   const pending = proposal?.status === "PendingApproval";
   const rightAccount = account !== null && account === owner;
   const canDecide = Boolean(pending && hashOk && preview && !preview.blockers.length && walletNet && rightAccount);
-  const txUrl = link.approvalTx && near.explorerTx ? `${near.explorerTx}${link.approvalTx}` : null;
 
   const run = async (kind: "approve" | "reject") => {
     if (!proposal || !walletNet || !localHash) return;
@@ -143,8 +143,9 @@ export function NearApproval({ paymentId, onDone }: { paymentId: string; onDone:
             <Field k="Invoice" v={proposal.invoice_id} />
             <Field k="Expires" v={new Date(Number(BigInt(proposal.expires_at) / BigInt(1_000_000))).toLocaleString()} />
             <Field k="Left after this" v={`case ${tusdc(BigInt(preview.case_available))} · 24h ${tusdc(BigInt(preview.rolling_24h_remaining))} · lifetime ${tusdc(BigInt(preview.lifetime_remaining))}`} />
-            <Field k="Status" v={proposal.status + (proposal.status_reason ? ` (${proposal.status_reason})` : "")} />
           </dl>
+
+          <NearOutcomeNote state={proposal.status} reason={proposal.status_reason} />
 
           <p className={cn("flex items-start gap-1.5 rounded-xl px-2.5 py-2 text-[12px]", hashOk ? "bg-success-soft text-success" : "bg-danger-soft text-danger")}>
             <ShieldCheck size={14} className="mt-px shrink-0" />
@@ -197,20 +198,7 @@ export function NearApproval({ paymentId, onDone }: { paymentId: string; onDone:
         </div>
       )}
 
-      {(link.approvalTx || link.state === "Settled") && (
-        <div className="flex flex-wrap gap-2 text-[12.5px]">
-          {txUrl && (
-            <a href={txUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-full bg-surface px-3 py-1.5 font-semibold text-brand">
-              <ExternalLink size={13} /> Approval on the explorer
-            </a>
-          )}
-          {link.state === "Settled" && (
-            <a href={`/api/near/receipt/${paymentId}`} className="inline-flex items-center gap-1 rounded-full bg-surface px-3 py-1.5 font-semibold text-brand">
-              <FileDown size={13} /> Download receipt
-            </a>
-          )}
-        </div>
-      )}
+      {proposal && !pending && <NearReceiptView paymentId={paymentId} version={`${link.state}:${link.approvalTx ?? ""}`} />}
     </div>
   );
 }

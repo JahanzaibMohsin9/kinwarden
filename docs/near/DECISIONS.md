@@ -208,6 +208,17 @@ and say who holds it.
 - **The browser checks the chain, not the server.** The approval screen reads
   the proposal and preview from NEAR RPC and recomputes the commitment hash
   before asking the wallet to sign.
+- **Evidence of delivery.** The case receipt (JSON download, also shown readably
+  in the app) names the recipient, token contract and exact amount, and keeps
+  the family's approval and the settlement apart: the approval step, the token
+  contract's NEP-141 transfer event and the vault's callback, each with its block
+  time, read once from the final approval transaction and stored, because RPC
+  nodes drop old transactions. Delivery follows the vault's record: `Settled` is
+  delivered, `Failed` is a confirmed failure (the tokens never left the vault; the
+  amount and its 24-hour budget return to the case), and `Submitted` is unknown
+  (the amount stays in flight; nothing is refunded or resent). Every state comes
+  with where the reserved money is and the family's next step. The simulated
+  hospital's acknowledgement is a separate entry.
 - **One world, one case.** NEAR runs for the main demo world only. Per-visitor
   sandbox copies stay on simulated rails, because each family case on chain
   belongs to one family. Each world run gets a random tag, so on-chain request

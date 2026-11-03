@@ -142,12 +142,24 @@ describe("hospital deposit through the NEAR vault", () => {
     expect(w().invoices[payment.invoiceId].status).toBe("paid");
     expect(store.ledger.some((e) => e.type === "payment.completed" && e.actor === "near")).toBe(true);
 
-    // The receipt binds the proposal, its hash, the approval transaction and settlement.
+    // The receipt binds the proposal, its hash, the approval and the settlement, observed separately.
     const receipt = (await bridge.receipt(payment.id))!;
     const { receipt_hash, ...body } = receipt;
     expect(receipt_hash).toBe(bytesToHex(sha256(new TextEncoder().encode(stableStringify(body)))));
-    expect(receipt).toMatchObject({ settled: true, approval_tx: txHash, commitment_hash: preview.commitment_hash });
-    const edited = { ...body, amount: "1.00 tUSDC" };
+    expect(receipt).toMatchObject({
+      paid_to: { account: deployment.payees.srh.account },
+      token: { contract: deployment.token },
+      amount: { units: link.amountUnits },
+      commitment_hash: preview.commitment_hash,
+      outcome: { delivery: "delivered", vault_status: "Settled" },
+      approval: { tx: txHash, by: family.accountId },
+      settlement: { token_transfer: { succeeded: true, from: deployment.vault, to: deployment.payees.srh.account, matches_proposal: true }, vault_callback: { result: "Settled" } },
+      institution_acknowledgement: { simulated: true },
+    });
+    // The transfer the receipt reports is the balance change the hospital actually got.
+    expect(BigInt(receipt.settlement!.token_transfer.amount_units!)).toBe(after - before);
+    expect(Date.parse(receipt.settlement!.token_transfer.observed_at)).toBeGreaterThanOrEqual(Date.parse(receipt.approval!.approved_at!));
+    const edited = { ...body, amount: { ...body.amount, display: "1.00 tUSDC" } };
     expect(bytesToHex(sha256(new TextEncoder().encode(stableStringify(edited))))).not.toBe(receipt_hash);
   });
 });

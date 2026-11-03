@@ -363,7 +363,8 @@ export function submitPayment(store: Store, payment: Payment) {
 }
 
 /** The institution received the money (also used when the NEAR vault reports a settled transfer). */
-export function settlePayment(store: Store, paymentId: string) {
+/** Completes a payment. Returns the institution's acknowledgement (receipt document and mail), if it sends one. */
+export function settlePayment(store: Store, paymentId: string): { docId: string; mailId: string } | undefined {
   const p = store.world.payments[paymentId];
   if (!p || p.status === "completed") return;
   const inst = store.world.institutions[p.institutionId];
@@ -410,6 +411,7 @@ export function settlePayment(store: Store, paymentId: string) {
     attachments: [receipt.id],
   });
   store.trigger({ caseId: p.caseId, reason: "payment_completed", detail: `${p.id} received; mail ${m.id}` });
+  return { docId: receipt.id, mailId: m.id };
 }
 
 function returnPayment(store: Store, paymentId: string, reason: string) {

@@ -178,7 +178,28 @@ export interface NearPaymentLink {
   reason?: string;
   /** the family's approve_payment transaction, when the wallet reported it */
   approvalTx?: string;
+  /** read from that transaction once it was final; kept because RPC nodes drop old transactions */
+  evidence?: NearEvidence;
+  /** the institution's own acknowledgement, a separate (simulated) event */
+  institutionAck?: { docId: string; mailId?: string; at: string };
   updatedAt: string;
+}
+
+/** One receipt (execution step) of a NEAR transaction, as observed on chain. */
+export interface NearReceiptOutcome {
+  receiptId: string;
+  blockHash: string;
+  /** block time, ISO */
+  at: string;
+  ok: boolean;
+}
+
+export interface NearEvidence {
+  approval: NearReceiptOutcome & { signer: string };
+  /** the token contract's step; from/to/amount come from its NEP-141 transfer event, absent if it failed */
+  tokenTransfer?: NearReceiptOutcome & { token: string; from?: string; to?: string; amount?: string };
+  /** the vault's callback that recorded the transfer's result */
+  vaultCallback?: NearReceiptOutcome & { result?: string };
 }
 
 export interface Approval {
