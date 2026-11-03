@@ -41,9 +41,9 @@ This repository starts from pre-existing, team-developed application code, impor
 
 The NEAR work is a spending-policy vault, a test stablecoin, restricted agent keys, payment approval signed by the family through an independently controlled NEAR wallet, and on-chain log anchoring. The application server is planned to hold only the restricted agent key, never a family signing key.
 
-**Implemented so far** ([`contracts/near`](contracts/near)): the vault's cases, verifier-enrolled institutions and invoices, per-case test-token deposits and the approval-commitment encoding, plus the tUSDC test token. Unit tests and sandbox tests on a local NEAR node cover them; each claim and its test are listed in [docs/near/CLAIMS.md](docs/near/CLAIMS.md).
+**Implemented in the contracts** ([`contracts/near`](contracts/near)): the tUSDC test token and the vault. In the vault, a family opens a case and funds it; a verifier enrolls institutions and authorizes invoices; the agent proposes a payment against an authorized invoice (it cannot choose the recipient); the amount is reserved against per-payment, invoice, rolling 24-hour, purpose-group and lifetime limits; the family approves the exact recipient, token, amount and commitment hash; and the vault pays the institution, recovering the funds if the transfer fails. Unit tests and sandbox tests on a local NEAR node cover this; each claim and its tests are in [docs/near/CLAIMS.md](docs/near/CLAIMS.md).
 
-**Not implemented yet:** payment proposals, family approval, spending caps at payment time, settlement, restricted agent keys in the app, the wallet integration and NEAR log anchoring. Current app payments do not settle on NEAR.
+**Not implemented yet:** the app using the vault (restricted agent key on the server, family approval through the wallet), testnet deployment and NEAR log anchoring. Current app payments do not settle on NEAR.
 
 Only changes after `pre-hackathon` are intended for the NEAR submission. Inspect work in progress with `git diff pre-hackathon..HEAD`. At submission, create `hackathon-submission` and add a public compare link for `pre-hackathon...hackathon-submission`.
 

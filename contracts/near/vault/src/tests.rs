@@ -6,29 +6,39 @@ use super::*;
 use near_sdk::test_utils::VMContextBuilder;
 use near_sdk::testing_env;
 
-const VAULT: &str = "vault.test.near";
-const TOKEN: &str = "tusdc.test.near";
-const VERIFIER: &str = "verifier.test.near";
-const AGENT: &str = "agent.test.near";
-const FAMILY: &str = "family.test.near";
-const HOSPITAL: &str = "hospital.test.near";
-const STRANGER: &str = "stranger.test.near";
-const CASE: &str = "case-th-hosp-001";
-const PROVENANCE: &str = "4f6c1a0e2b9d8c7f6e5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e";
+pub(crate) const VAULT: &str = "vault.test.near";
+pub(crate) const TOKEN: &str = "tusdc.test.near";
+pub(crate) const VERIFIER: &str = "verifier.test.near";
+pub(crate) const AGENT: &str = "agent.test.near";
+pub(crate) const FAMILY: &str = "family.test.near";
+pub(crate) const HOSPITAL: &str = "hospital.test.near";
+pub(crate) const STRANGER: &str = "stranger.test.near";
+pub(crate) const CASE: &str = "case-th-hosp-001";
+pub(crate) const PROVENANCE: &str =
+    "4f6c1a0e2b9d8c7f6e5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e";
 
-fn acct(s: &str) -> AccountId {
+pub(crate) fn acct(s: &str) -> AccountId {
     s.parse().unwrap()
 }
 
-fn as_caller(caller: &str, deposit: NearToken) {
+/// Block time used by tests unless they move the clock.
+pub(crate) const T0: u64 = 1_800_000_000_000_000_000;
+
+pub(crate) fn as_caller(caller: &str, deposit: NearToken) {
+    as_caller_at(caller, deposit, T0);
+}
+
+pub(crate) fn as_caller_at(caller: &str, deposit: NearToken, block_timestamp: u64) {
     testing_env!(VMContextBuilder::new()
         .current_account_id(acct(VAULT))
         .predecessor_account_id(acct(caller))
         .attached_deposit(deposit)
+        .block_timestamp(block_timestamp)
+        .prepaid_gas(Gas::from_tgas(300))
         .build());
 }
 
-fn limits() -> Limits {
+pub(crate) fn limits() -> Limits {
     Limits {
         per_payment_max: U128(300_000_000),
         rolling_24h_cap: U128(500_000_000),
@@ -40,19 +50,19 @@ fn limits() -> Limits {
     }
 }
 
-fn vault() -> Vault {
+pub(crate) fn vault() -> Vault {
     as_caller(VAULT, NearToken::from_yoctonear(0));
     Vault::new(acct(TOKEN), acct(VERIFIER), acct(AGENT), "sandbox".into())
 }
 
-fn vault_with_case() -> Vault {
+pub(crate) fn vault_with_case() -> Vault {
     let mut v = vault();
     as_caller(FAMILY, NearToken::from_millinear(100));
     v.create_case(CASE.into(), limits());
     v
 }
 
-fn vault_with_active_payee() -> Vault {
+pub(crate) fn vault_with_active_payee() -> Vault {
     let mut v = vault_with_case();
     as_caller(VERIFIER, ONE_YOCTO);
     let _ = v.enroll_payee(

@@ -1,9 +1,10 @@
 # Kinwarden NEAR: threat model
 
-> **Status: design (G0), not implemented.** Each claim below becomes a row in
-> the claim → enforcement → test → demo map during G1-G4. Until a test exists,
-> it is a goal, not a property. The baseline application's own threat model is
-> in [../SECURITY.md](../SECURITY.md).
+> **Status:** the contract controls for T1–T9 and the on-chain part of T12 are
+> implemented and tested; each is a row in [CLAIMS.md](CLAIMS.md). T10–T11 are
+> wallet-and-person residuals. T13 (NEAR anchoring) and T14 (app restart) are
+> G3–G4 work and remain goals until tested. The baseline application's own
+> threat model is in [../SECURITY.md](../SECURITY.md).
 
 ## What we protect
 

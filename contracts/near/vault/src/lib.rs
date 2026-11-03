@@ -2,13 +2,14 @@
 //! only verifier-enrolled institutions against verifier-authorized invoices,
 //! after the family approves the exact payment in their own wallet.
 //!
-//! G1 scope (this file): configuration, cases, payee and invoice enrollment,
-//! deposits and views. Proposals, approval and settlement arrive in G2.
+//! This file: configuration, cases, payee and invoice enrollment, deposits and
+//! views. `payments.rs`: proposals, approval, settlement and withdrawal.
 //! Design: docs/near/DECISIONS.md, STATE_AND_ENCODING.md, THREAT_MODEL.md.
 
 pub mod commitment;
 pub mod errors;
 pub mod ids;
+mod payments;
 pub mod types;
 
 use near_contract_standards::fungible_token::receiver::FungibleTokenReceiver;
@@ -40,6 +41,8 @@ enum StorageKey {
     Payees,
     PayeeByAccount,
     Invoices,
+    Proposals,
+    Requests,
 }
 
 #[near(contract_state)]
@@ -51,6 +54,10 @@ pub struct Vault {
     /// Account -> payee id, for pending and active payees only.
     payee_by_account: LookupMap<AccountId, String>,
     invoices: LookupMap<String, Invoice>,
+    proposals: LookupMap<u64, Proposal>,
+    /// "case_id/request_id" -> proposal id, for idempotent requests.
+    requests: LookupMap<String, u64>,
+    next_proposal_id: u64,
 }
 
 fn assert_one_yocto() {
@@ -59,6 +66,10 @@ fn assert_one_yocto() {
 
 fn now() -> U64 {
     U64(env::block_timestamp())
+}
+
+fn request_key(case_id: &str, request_id: &str) -> String {
+    format!("{case_id}/{request_id}")
 }
 
 #[near]
@@ -82,6 +93,9 @@ impl Vault {
             payees: LookupMap::new(StorageKey::Payees),
             payee_by_account: LookupMap::new(StorageKey::PayeeByAccount),
             invoices: LookupMap::new(StorageKey::Invoices),
+            proposals: LookupMap::new(StorageKey::Proposals),
+            requests: LookupMap::new(StorageKey::Requests),
+            next_proposal_id: 1,
         }
     }
 
@@ -109,6 +123,8 @@ impl Vault {
             in_flight: U128(0),
             paid: U128(0),
             created_at: now(),
+            pending: Vec::new(),
+            window: Vec::new(),
         };
         let before = env::storage_usage();
         self.cases.insert(case_id.clone(), case.clone());
@@ -128,13 +144,15 @@ impl Vault {
         case
     }
 
+    /// Pausing blocks new proposals and approvals, and invalidates every
+    /// proposal awaiting approval, releasing its reservation.
     #[payable]
     pub fn pause(&mut self, case_id: String) -> Case {
         assert_one_yocto();
-        let case = self.owned_case_mut(&case_id);
-        case.status = CaseStatus::Paused;
+        self.owned_case_mut(&case_id).status = CaseStatus::Paused;
         log!("case_paused {case_id}");
-        case.clone()
+        self.sweep_case(&case_id);
+        self.case_snapshot(&case_id)
     }
 
     #[payable]
@@ -146,14 +164,15 @@ impl Vault {
         case.clone()
     }
 
-    /// Stops the configured agent from acting on this case.
+    /// Stops the configured agent from acting on this case and invalidates its
+    /// proposals awaiting approval.
     #[payable]
     pub fn revoke_agent(&mut self, case_id: String) -> Case {
         assert_one_yocto();
-        let case = self.owned_case_mut(&case_id);
-        case.agent_enabled = false;
+        self.owned_case_mut(&case_id).agent_enabled = false;
         log!("agent_revoked {case_id}");
-        case.clone()
+        self.sweep_case(&case_id);
+        self.case_snapshot(&case_id)
     }
 
     #[payable]
@@ -182,7 +201,9 @@ impl Vault {
             "limits_lowered {case_id} policy_version={}",
             case.policy_version
         );
-        case.clone()
+        // Proposals made under the old policy can no longer be approved.
+        self.sweep_case(&case_id);
+        self.case_snapshot(&case_id)
     }
 
     // ----- Verifier --------------------------------------------------------
@@ -340,6 +361,7 @@ impl Vault {
             in_flight: U128(0),
             status: InvoiceStatus::Authorized,
             authorized_at: now(),
+            attempts: 0,
         };
         self.invoices.insert(invoice_id.clone(), invoice.clone());
         log!("invoice_authorized {invoice_id}");
@@ -359,8 +381,11 @@ impl Vault {
             errors::INVOICE_NOT_AUTHORIZED
         );
         invoice.status = InvoiceStatus::Revoked;
+        let snapshot = invoice.clone();
         log!("invoice_revoked {invoice_id}");
-        invoice.clone()
+        // Proposals for this invoice can no longer be approved.
+        self.sweep_case(&snapshot.case_id);
+        snapshot
     }
 
     // ----- Views -----------------------------------------------------------
@@ -383,6 +408,26 @@ impl Vault {
 
     pub fn get_invoice(&self, invoice_id: String) -> Option<Invoice> {
         self.invoices.get(&invoice_id).cloned()
+    }
+
+    pub fn get_proposal(&self, proposal_id: U64) -> Option<Proposal> {
+        self.proposals.get(&proposal_id.0).cloned()
+    }
+
+    pub fn get_proposal_by_request(&self, case_id: String, request_id: String) -> Option<Proposal> {
+        let id = self.requests.get(&request_key(&case_id, &request_id))?;
+        self.proposals.get(id).cloned()
+    }
+
+    /// Proposals awaiting approval. Some may already be stale; `sweep` or any
+    /// state-changing call on the case releases them.
+    pub fn get_pending(&self, case_id: String) -> Vec<Proposal> {
+        self.cases.get(&case_id).map_or_else(Vec::new, |c| {
+            c.pending
+                .iter()
+                .filter_map(|id| self.proposals.get(id).cloned())
+                .collect()
+        })
     }
 
     // ----- Internal ----------------------------------------------------------
@@ -451,3 +496,6 @@ impl FungibleTokenReceiver for Vault {
 
 #[cfg(test)]
 mod tests;
+
+#[cfg(test)]
+mod tests_payments;

@@ -142,6 +142,25 @@ See [STATE_AND_ENCODING.md](STATE_AND_ENCODING.md) for the encoding.
 
 Family approval cannot waive a hard rule.
 
+**Implemented in G2** with the arguments above (`proposal_id` is a JSON string,
+as for all u64 values). The commitment hash for a proposal comes from the
+`approval_preview` view, which also lists any blockers and the remaining
+budgets; the wallet request is built from that view, and the contract
+recomputes the hash itself rather than trusting the preview. Owner-side
+companions: `reject_payment(case_id, proposal_id)` and
+`withdraw(case_id, amount)`, both 1 yoctoNEAR.
+
+## D-09 Pause invalidates, the agent cannot pick the payee
+
+Decided in G2. Pausing a case, lowering its limits, switching its agent off or
+revoking an invoice invalidates the affected pending proposals immediately and
+releases their reservations; after unpausing, the agent must propose again and
+the family approve again. A payee revocation can touch many cases, so the
+proposals it affects are released lazily by the next action on each case or by
+a public `sweep(case_id)`, which only ever releases. `propose_payment` takes an
+invoice id, not a recipient: the vault reads the recipient, token and purpose
+from the verifier's records.
+
 ## D-05 Test token
 
 A standard NEP-141 token built with `near-contract-standards`, named

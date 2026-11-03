@@ -99,15 +99,82 @@ pub struct Case {
     /// Incremented on every policy change; old approvals then fail.
     pub policy_version: u64,
     pub limits: Limits,
-    /// Tokens held for this case (credited by deposits).
+    /// Tokens held for this case, including reserved and in-flight amounts.
     pub balance: U128,
-    /// Reserved by pending proposals (G2).
+    /// Reserved by pending proposals.
     pub reserved: U128,
-    /// Dispatched, awaiting the transfer outcome (G2).
+    /// Dispatched, awaiting the transfer outcome.
     pub in_flight: U128,
-    /// Settled to payees (G2).
+    /// Settled to payees.
     pub paid: U128,
     pub created_at: U64,
+    /// Proposal ids awaiting approval (bounded, STATE_AND_ENCODING §5).
+    pub pending: Vec<u64>,
+    /// Proposals created in the last 24 hours, for the rolling caps and the
+    /// proposal rate bound. Pruned on write.
+    pub window: Vec<WindowEntry>,
+}
+
+impl Case {
+    /// Tokens not reserved, in flight or otherwise committed.
+    pub fn available(&self) -> u128 {
+        self.balance
+            .0
+            .saturating_sub(self.reserved.0)
+            .saturating_sub(self.in_flight.0)
+    }
+}
+
+/// One proposal's charge against the rolling windows. `counted` is cleared
+/// when the proposal is released or its transfer fails; the entry still
+/// counts toward the proposal rate bound until it ages out.
+#[near(serializers = [borsh, json])]
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct WindowEntry {
+    pub proposal_id: u64,
+    pub at: U64,
+    pub amount: U128,
+    pub group: PurposeGroup,
+    pub counted: bool,
+}
+
+#[near(serializers = [borsh, json])]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ProposalStatus {
+    PendingApproval,
+    Submitted,
+    Settled,
+    Failed,
+    Rejected,
+    Expired,
+    Invalidated,
+}
+
+/// A payment the agent asked for. The recipient, token and purpose come from
+/// the verifier's records, never from the agent.
+#[near(serializers = [borsh, json])]
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Proposal {
+    pub proposal_id: U64,
+    pub case_id: String,
+    pub invoice_id: String,
+    pub request_id: String,
+    /// 1 for the invoice's first proposal, then 2, 3, … for retries.
+    pub attempt: u32,
+    pub payee_id: String,
+    pub recipient: AccountId,
+    pub token: AccountId,
+    pub amount: U128,
+    pub purpose_group: PurposeGroup,
+    pub ttl_seconds: u32,
+    pub created_at: U64,
+    pub expires_at: U64,
+    pub policy_version: u64,
+    pub payee_version: u64,
+    pub status: ProposalStatus,
+    /// Refusal or invalidation code for terminal states other than Settled.
+    pub status_reason: Option<String>,
+    pub updated_at: U64,
 }
 
 #[near(serializers = [borsh, json])]
@@ -152,6 +219,24 @@ pub struct Invoice {
     pub in_flight: U128,
     pub status: InvoiceStatus,
     pub authorized_at: U64,
+    /// Proposals created for this invoice so far.
+    pub attempts: u32,
+}
+
+/// Read-only preview of an approval, computed by the same checks
+/// `approve_payment` runs. Advisory: approval rechecks everything.
+#[near(serializers = [json])]
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ApprovalPreview {
+    pub proposal: Proposal,
+    pub commitment_hash: String,
+    /// Empty when the proposal can be approved right now.
+    pub blockers: Vec<String>,
+    pub case_available: U128,
+    pub invoice_remaining: U128,
+    pub rolling_24h_remaining: U128,
+    pub group_24h_remaining: U128,
+    pub lifetime_remaining: U128,
 }
 
 #[cfg(test)]
