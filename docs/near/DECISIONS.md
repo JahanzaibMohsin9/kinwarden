@@ -106,10 +106,10 @@ Consequences:
   bill. The demo video shows that step.
 - **The summary "To" is the vault, not the hospital.** The family-facing
   explanation says so, so nobody reads "To: vault" as the payee.
-- **Still to verify in G3:** that Meteor actually attaches the 1 yoctoNEAR it
-  displays as 0. If it dropped the deposit, `approve_payment` would refuse with
-  `E_ONE_YOCTO`. That fails safe but would block approvals, so G3 tests a real
-  testnet approval through Meteor before relying on it.
+- **Verified on testnet, 3 Nov 2026:** Meteor attaches the 1 yoctoNEAR it
+  displays as 0. The family's `approve_payment` transaction
+  [Ej6saHJe…](https://testnet.nearblocks.io/txns/Ej6saHJebcSFZQQ18XxQQp9TSJ6E1xmbLukV76LWRSJZ)
+  carries `deposit: 1` and settled the hospital deposit.
 
 Meteor stays the primary demo wallet. NEAR CLI remains the fallback that prints
 the full transaction, deposit included.
@@ -227,3 +227,9 @@ and say who holds it.
   the JS `near-sandbox` default (2.13.4) rejects them with a link error, so
   scripts and tests pin sandbox 2.14.0. Testnet ran 2.14.0-rc.5 (protocol 88)
   on 3 Nov 2026.
+- **Testnet RPC.** `rpc.testnet.near.org` answered 429 "endpoint is deprecated"
+  on 3 Nov 2026. The deployment and `setup.mjs` use dRPC
+  (`https://near-testnet.drpc.org`, a published free-tier limit, browser CORS
+  allowed). FastNEAR (`https://test.rpc.fastnear.com`) also works but
+  rate-limited a short burst in our tests. The RPC is a setting in
+  `.near/deployment.json`, read by the server, the verifier and the browser.

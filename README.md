@@ -47,7 +47,9 @@ The NEAR work is a spending-policy vault, a test stablecoin, restricted agent ke
 
 Each claim and its tests are in [docs/near/CLAIMS.md](docs/near/CLAIMS.md); design in [docs/near](docs/near).
 
-**Not implemented yet:** a public testnet deployment, NEAR log anchoring and the NEAR AI model provider.
+**On NEAR testnet (3 Nov 2026):** the contracts are deployed under `kinwarden-demo.testnet` (vault `vault.kinwarden-demo.testnet`, token `tusdc.kinwarden-demo.testnet`). The hospital deposit ran end to end with a real Meteor wallet: the agent proposed it, the verifier authorized the invoice, the family approved in Meteor ([approval and settlement transaction](https://testnet.nearblocks.io/txns/Ej6saHJebcSFZQQ18XxQQp9TSJ6E1xmbLukV76LWRSJZ)), and the fictional hospital account received exactly 7,625.45 tUSDC. The case receipt from that run is in [docs/near/evidence](docs/near/evidence/2026-11-03-testnet-receipt.json). Testnet tokens have no value.
+
+**Not implemented yet:** NEAR log anchoring and the NEAR AI model provider.
 
 ### Try the NEAR flow on a local node (no wallet, no API key)
 

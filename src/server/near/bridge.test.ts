@@ -75,7 +75,7 @@ describe("NEAR payments stay under the family's wallet", () => {
 describe("case receipt evidence", () => {
   const d = {
     network: "testnet" as const,
-    rpcUrl: "https://rpc.testnet.near.org",
+    rpcUrl: "https://near-testnet.drpc.org",
     explorerTx: "https://testnet.nearblocks.io/txns/",
     vault: "vault.demo.testnet",
     token: "tusdc.demo.testnet",

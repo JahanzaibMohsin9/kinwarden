@@ -59,6 +59,14 @@ end to end on a local NEAR node: `src/server/near/e2e.sandbox.ts`
 | C41 | The institution's acknowledgement is a separate event in the receipt, marked as coming from the simulated hospital | `NearBridge.apply`, `buildReceipt` | app unit `bridge.test.ts`; e2e |
 | C38 | A failed NEAR transfer cannot be resent without a new proposal and a new wallet approval | App: `resubmit_payment` guard; vault attempts | app unit `bridge.test.ts`; contract `failed_transfer_restores_funds_once_and_allows_a_retry` |
 
+**Testnet run, 3 Nov 2026.** C31–C37 and C39–C41 were also observed on NEAR
+testnet with the family's own Meteor wallet: the agent key check, the
+verifier's authorization, the browser-side hash, the wallet approval
+([transaction](https://testnet.nearblocks.io/txns/Ej6saHJebcSFZQQ18XxQQp9TSJ6E1xmbLukV76LWRSJZ),
+1 yoctoNEAR attached), the hospital's balance rising by exactly 7,625.45 tUSDC,
+and the receipt ([evidence/2026-11-03-testnet-receipt.json](evidence/2026-11-03-testnet-receipt.json),
+its hash recomputes). A failed or unknown outcome was not exercised on testnet.
+
 What these tests do **not** show:
 
 - That an enrolled account really belongs to a hospital. That is the

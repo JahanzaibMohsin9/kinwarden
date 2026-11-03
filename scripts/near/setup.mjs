@@ -17,7 +17,9 @@ const arg = (name, fallback) => {
 
 const network = arg("network", "testnet");
 if (network !== "testnet") throw new Error("setup.mjs deploys to testnet only. Use scripts/near/sandbox.mjs for a local sandbox.");
-const rpc = arg("rpc", "https://rpc.testnet.near.org");
+// rpc.testnet.near.org is deprecated and rate-limited (429) since Nov 2026. dRPC publishes a free-tier
+// limit; FastNEAR (https://test.rpc.fastnear.com) also works but limited short bursts in our tests.
+const rpc = arg("rpc", "https://near-testnet.drpc.org");
 const rootId = arg("root");
 const familyId = arg("family");
 const rootKey = process.env.NEAR_ROOT_KEY;
