@@ -39,11 +39,28 @@ The unit suite includes safety, privacy, passkey, scenario and red-team checks. 
 
 This repository starts from pre-existing, team-developed application code, imported with fresh Git history and renamed to Kinwarden. The `pre-hackathon` tag marks this application baseline before NEAR implementation. Existing agent tools, simulated payment rails, safety rules, passkey flow and optional Conflux testnet log anchoring belong to the baseline.
 
-The NEAR work is a spending-policy vault, a test stablecoin, restricted agent keys, payment approval signed by the family through an independently controlled NEAR wallet, and on-chain log anchoring. The application server is planned to hold only the restricted agent key, never a family signing key.
+The NEAR work is a spending-policy vault, a test stablecoin, restricted agent keys, payment approval signed by the family through an independently controlled NEAR wallet, and on-chain log anchoring.
 
-**Implemented in the contracts** ([`contracts/near`](contracts/near)): the tUSDC test token and the vault. In the vault, a family opens a case and funds it; a verifier enrolls institutions and authorizes invoices; the agent proposes a payment against an authorized invoice (it cannot choose the recipient); the amount is reserved against per-payment, invoice, rolling 24-hour, purpose-group and lifetime limits; the family approves the exact recipient, token, amount and commitment hash; and the vault pays the institution, recovering the funds if the transfer fails. Unit tests and sandbox tests on a local NEAR node cover this; each claim and its tests are in [docs/near/CLAIMS.md](docs/near/CLAIMS.md).
+**Implemented in the contracts** ([`contracts/near`](contracts/near)): the tUSDC test token and the vault. In the vault, a family opens a case and funds it; a verifier enrolls institutions and authorizes invoices; the agent proposes a payment against an authorized invoice (it cannot choose the recipient); the amount is reserved against per-payment, invoice, rolling 24-hour, purpose-group and lifetime limits; the family approves the exact recipient, token, amount and commitment hash; and the vault pays the institution, recovering the funds if the transfer fails.
 
-**Not implemented yet:** the app using the vault (restricted agent key on the server, family approval through the wallet), testnet deployment and NEAR log anchoring. Current app payments do not settle on NEAR.
+**Implemented in the app:** when a NEAR deployment and the agent key are configured, the hospital case's bank transfers settle in tUSDC through the vault. The app server holds only a function-call key for `propose_payment` and `sweep`, and checks that on chain before use. A separate verifier process authorizes invoices. The approval screen reads the proposal from NEAR, recomputes its hash in the browser and asks the family's wallet to sign. Settlement, failure and a downloadable case receipt follow from the vault's state. Without a deployment the app runs on its simulated rails as before.
+
+Each claim and its tests are in [docs/near/CLAIMS.md](docs/near/CLAIMS.md); design in [docs/near](docs/near).
+
+**Not implemented yet:** a public testnet deployment, NEAR log anchoring and the NEAR AI model provider.
+
+### Try the NEAR flow on a local node (no wallet, no API key)
+
+Linux x86_64 with glibc ≥ 2.39 (Ubuntu 24.04+) or macOS ARM64, with Node 24 and the Rust toolchain from [`contracts/near/README.md`](contracts/near/README.md):
+
+```bash
+(cd contracts/near/vault && cargo near build non-reproducible-wasm)
+(cd contracts/near/tusdc && cargo near build non-reproducible-wasm)
+npm ci
+npm run test:near          # the whole flow as one end-to-end test
+```
+
+To click through it: run `node scripts/near/sandbox.mjs` (keeps a local node running and writes `.near/deployment.json` and `NEAR_AGENT_KEY`), then `npm run dev` and `node scripts/near/verifier.mjs` in two more terminals. Open the app, play the hospital scenario in Scripted mode until the deposit approval appears, and approve it with the test-only family key: `node scripts/near/family.mjs approve <paymentId>` (the approval sheet shows the command). The Money tab shows the vault case and, after settlement, the receipt. On testnet, `scripts/near/setup.mjs` deploys instead and the family uses its own wallet in the app.
 
 Only changes after `pre-hackathon` are intended for the NEAR submission. Inspect work in progress with `git diff pre-hackathon..HEAD`. At submission, create `hackathon-submission` and add a public compare link for `pre-hackathon...hackathon-submission`.
 

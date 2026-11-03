@@ -9,6 +9,7 @@ import { ROUTE_SHORT } from "@/domain/corridors";
 import type { Invoice, Payment, PaymentStatus } from "@/domain/types";
 import { Badge, Card, Empty, SectionTitle } from "../ui";
 import { CurrencyCard } from "./CurrencyCard";
+import { NearCaseCard } from "./NearCaseCard";
 
 const INV_LABEL: Record<Invoice["kind"], string> = {
   estimate: "Estimate",
@@ -33,6 +34,7 @@ export function MoneyTab() {
   return (
     <div className="space-y-6 px-4 pb-10 pt-4">
       <CurrencyCard w={w} c={c} payments={payments} />
+      {state.near?.cases[c.id] && <NearCaseCard caseId={c.id} />}
       <section>
         <SectionTitle>
           <span className={cn(urdu && "urdu normal-case tracking-normal")}>{t("payments")}</span>

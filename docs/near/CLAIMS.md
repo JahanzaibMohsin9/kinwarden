@@ -6,11 +6,13 @@ is not made in the README. Unit tests: `contracts/near/vault/src/`. Sandbox
 tests (real NEAR node, deployed contracts, real keys):
 `contracts/near/integration-tests/tests/`.
 
-Status: **G1 (C1–C14) and G2 (C15–C30).** The app, wallet integration,
-testnet deployment and log anchoring (G3–G4) are not implemented and have no
-rows. Unit tests: `vault/src/tests.rs`, `tests_payments.rs`, `types.rs`,
-`ids.rs`, `commitment.rs`. Sandbox tests: `integration-tests/tests/g1.rs`,
-`g2.rs`.
+Status: **G1 (C1–C14), G2 (C15–C30) and G3 app integration (C31–C38).**
+Testnet deployment and log anchoring (G4) have no rows yet. Contract unit tests:
+`vault/src/tests.rs`, `tests_payments.rs`, `types.rs`, `ids.rs`,
+`commitment.rs`. Contract sandbox tests: `integration-tests/tests/g1.rs`,
+`g2.rs`. App tests: `src/near/*.test.ts`, `src/server/near/*.test.ts`; app
+end to end on a local NEAR node: `src/server/near/e2e.sandbox.ts`
+(`npm run test:near`).
 
 | # | Claim | Enforced by | Tests |
 |---|---|---|---|
@@ -45,6 +47,15 @@ rows. Unit tests: `vault/src/tests.rs`, `tests_payments.rs`, `types.rs`,
 | C29 | The approval preview runs the same checks as the approval and shows the remaining budgets | Vault: `approval_preview` uses `blockers` | unit `preview_matches_what_approval_checks`; sandbox `g2::*` approve with preview values |
 | C30 | Only the owner can withdraw, and only unreserved funds | Vault: `withdraw` | sandbox `g2::owner_withdraws_unreserved_funds_only`; unit `owner_withdraws_only_unreserved_funds`, `reserved_funds_cannot_be_withdrawn`, `only_the_owner_withdraws` |
 
+| C31 | The app server holds only a function-call key limited to `propose_payment` and `sweep`, checked on chain before use; a full-access key, another receiver, extra methods or no allowance disables NEAR | App: `VaultClient.checkAgentKey` | app unit `vault.test.ts` (7 cases); e2e `ready()` |
+| C32 | The app cannot approve or reject a NEAR payment: HTTP decisions are refused and its own key is blocked by the protocol | App: `decideApprovalIn`; NEAR protocol | app unit `bridge.test.ts`; e2e (HTTP refusal and `DepositWithFunctionCall` with the app's key) |
+| C33 | A payment is proposed only after the separate verifier authorizes its invoice on chain; until then the vault refuses | Vault + `scripts/near/verifier.mjs` (own key) | e2e (`waiting_for_verifier`, then proposed) |
+| C34 | The approval screen reads the proposal from NEAR and recomputes the commitment hash in the browser; it must match the vault's | Browser: `NearApproval`, `src/near/commitment.ts` | app unit `commitment.test.ts` (16 shared vectors); e2e (browser-side hash equals the vault's) |
+| C35 | A wallet-reported approval is recorded only if the chain shows the case owner's successful `approve_payment` for that proposal | App: `NearBridge.recordApprovalTx` | e2e (an unrelated transaction is refused, the real one accepted) |
+| C36 | When the vault settles, the hospital's token balance rises by exactly the proposed amount and the app marks the payment completed, the approval as made in the wallet, and the invoice paid | Vault + `NearBridge.apply` | e2e |
+| C37 | The case receipt binds invoice, proposal, commitment hash, approval transaction and settlement; any edit changes its hash | App: `NearBridge.receipt` | e2e (hash recomputed; an edited copy differs) |
+| C38 | A failed NEAR transfer cannot be resent without a new proposal and a new wallet approval | App: `resubmit_payment` guard; vault attempts | app unit `bridge.test.ts`; contract `failed_transfer_restores_funds_once_and_allows_a_retry` |
+
 What these tests do **not** show:
 
 - That an enrolled account really belongs to a hospital. That is the
@@ -52,4 +63,7 @@ What these tests do **not** show:
 - Recovery when a settlement callback never runs. The proposal stays
   `Submitted` with its funds held; no recovery path exists, and this case is
   not tested.
-- Anything about the app, the family's wallet or testnet. Those are G3 work.
+- That a real wallet shows the approval readably. That was checked by hand
+  with Meteor on testnet (DECISIONS.md D-03); the end-to-end test signs with a
+  test-only harness key instead of a wallet.
+- Anything on testnet. The end-to-end test runs on a local NEAR node.

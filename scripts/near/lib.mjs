@@ -107,6 +107,7 @@ export async function deploy({ rpc, network, rootId, rootKey, familyId, wasmDir 
     tokenDecimals: 6,
     verifier: verifier.id,
     agent: agent.id,
+    caseLimits: DEMO_LIMITS,
     cases: {},
     payees: { srh: { payeeId: "srh", account: hospital.id } },
   };

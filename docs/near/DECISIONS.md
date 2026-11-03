@@ -188,3 +188,31 @@ During development the vault account keeps a deployer full-access key, so the
 contract **is upgradeable** and is never described as immutable. Before the
 final testnet demo, we either remove that key and document the lock, or keep it
 and say who holds it.
+
+## D-10 How the app uses the vault (G3)
+
+- **Bridge, not a new rail.** The agent's `propose_payment` tool and the app's
+  safety gateway are unchanged and run first. For the case linked in
+  `.near/deployment.json`, a bank transfer to an enrolled institution that the
+  gateway accepts is also proposed to the vault in tUSDC (the USD value at the
+  invoice's issue-date sandbox rate, to the cent). From then on the server only
+  observes the vault: the proposal's status drives approval, settlement,
+  failure and release through the app's existing code paths.
+- **Who holds which key.** The app server: only the agent's function-call key,
+  checked on chain before use. The verifier: `scripts/near/verifier.mjs`, a
+  separate process that authorizes each new hospital invoice. In the demo it
+  trusts the app's simulated hospital; a real operator would confirm the bill
+  with the institution. The family: its own wallet (testnet), or a TEST-ONLY
+  harness key on the local sandbox. Setup and deployer keys: `.near/keys.json`,
+  used only by the scripts and excluded from Git, Docker and Next output.
+- **The browser checks the chain, not the server.** The approval screen reads
+  the proposal and preview from NEAR RPC and recomputes the commitment hash
+  before asking the wallet to sign.
+- **One world, one case.** NEAR runs for the main demo world only. Per-visitor
+  sandbox copies stay on simulated rails, because each family case on chain
+  belongs to one family. Each world run gets a random tag, so on-chain request
+  and invoice ids are never reused after a reset.
+- **Node versions.** Contracts built with near-sdk 5.30 need nearcore 2.14:
+  the JS `near-sandbox` default (2.13.4) rejects them with a link error, so
+  scripts and tests pin sandbox 2.14.0. Testnet ran 2.14.0-rc.5 (protocol 88)
+  on 3 Nov 2026.

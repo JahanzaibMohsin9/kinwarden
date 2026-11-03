@@ -15,6 +15,8 @@ export interface NearDeployment {
   tokenDecimals: number;
   verifier: string;
   agent: string;
+  /** limits the family's wallet sets when it opens the case (can only be lowered later) */
+  caseLimits: { per_payment_max: string; rolling_24h_cap: string; lifetime_cap: string; group_caps: { group: string; rolling_24h_cap: string }[] };
   /** world case id → the family's vault case */
   cases: Record<string, { vaultCaseId: string; owner: string }>;
   /** world institution id → its verifier-enrolled payee */
@@ -36,8 +38,9 @@ export function deploymentFile(): string {
 export function nearConfig(): NearConfig | null {
   const file = deploymentFile();
   const agentKey = process.env.NEAR_AGENT_KEY;
-  if (!agentKey || !fs.existsSync(file)) return null;
-  const deployment = JSON.parse(fs.readFileSync(file, "utf8")) as NearDeployment;
+  // Read at runtime, never bundled: .near/ is excluded from deployment output (next.config.ts).
+  if (!agentKey || !fs.existsSync(/*turbopackIgnore: true*/ file)) return null;
+  const deployment = JSON.parse(fs.readFileSync(/*turbopackIgnore: true*/ file, "utf8")) as NearDeployment;
   return { deployment, agentKey };
 }
 

@@ -169,6 +169,7 @@ export function publicState(sid?: string) {
           tokenDecimals: near.deployment.tokenDecimals,
           explorerTx: near.deployment.explorerTx ?? null,
           cases: near.deployment.cases,
+          caseLimits: near.deployment.caseLimits,
           agentKey: near.keyCheck ? (near.keyCheck.ok ? { ok: true as const } : { ok: false as const, reason: near.keyCheck.reason }) : null,
         }
       : null,
