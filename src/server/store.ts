@@ -26,7 +26,7 @@ export interface Anchor {
 }
 
 export interface OnChainAnchor {
-  chainId: number;
+  chainId: number | string;
   contract: string;
   status: "pending" | "confirmed" | "failed";
   txHash?: string;

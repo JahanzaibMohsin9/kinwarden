@@ -8,7 +8,7 @@ import { Account, JsonRpcProvider, KeyPair, nearToYocto } from "near-api-js";
 export const ONE_YOCTO = "1";
 export const TGAS = BigInt(10) ** BigInt(12);
 export const TUSDC = BigInt(1_000_000); // 6 decimals
-export const AGENT_METHODS = ["propose_payment", "sweep"];
+export const AGENT_METHODS = ["propose_payment", "sweep", "anchor_log"];
 
 export const WASM = {
   vault: "contracts/near/target/near/kinwarden_vault/kinwarden_vault.wasm",

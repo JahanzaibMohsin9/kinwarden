@@ -55,3 +55,6 @@ pub const GAS: &str = "E_GAS: attach at least 100 TGas";
 /// Recorded as a status reason, not raised as a panic.
 pub const TRANSFER_FAILED: &str =
     "E_TRANSFER_FAILED: the token transfer failed; funds stay in the case";
+pub const ANCHOR_HEAD: &str = "E_ANCHOR_HEAD: head must be 64 lowercase hex characters";
+pub const ANCHOR_LABEL: &str = "E_ANCHOR_LABEL: label must be 1-96 printable ASCII characters";
+pub const BOUND_ANCHORS: &str = "E_BOUND_ANCHORS: too many anchors for this case";

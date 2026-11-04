@@ -1,6 +1,6 @@
 // Thin client for the Kinwarden vault. It holds only the agent's function-call key, and checks that
 // key's real permissions on chain before using it: a secret key string does not reveal its authority.
-import { Account, JsonRpcProvider, KeyPair, type KeyPairString } from "near-api-js";
+import { Account, actions, JsonRpcProvider, KeyPair, type KeyPairString } from "near-api-js";
 import type { VaultProposal } from "@/near/commitment";
 import { AGENT_METHODS, type NearConfig, type NearDeployment } from "./config";
 
@@ -113,6 +113,15 @@ export class VaultClient {
   /** Anyone: release proposals that can no longer be approved. */
   async sweep(caseId: string): Promise<number> {
     return (await this.agent.callFunction({ contractId: this.deployment.vault, methodName: "sweep", args: { case_id: caseId }, gas: BigInt(50) * TGAS })) as number;
+  }
+
+  /** Agent: anchor the activity log's head hash on the vault. Returns the transaction hash. */
+  async anchor(caseId: string, seq: number, head: string, label: string): Promise<string> {
+    const out = (await this.agent.signAndSendTransaction({
+      receiverId: this.deployment.vault,
+      actions: [actions.functionCall("anchor_log", { case_id: caseId, seq: String(seq), head, label }, BigInt(30) * TGAS, BigInt(0))],
+    })) as unknown as { transaction: { hash: string } };
+    return out.transaction.hash;
   }
 }
 

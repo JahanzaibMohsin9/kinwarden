@@ -4,7 +4,7 @@
 import type { LedgerEntry } from "@/domain/types";
 import { verifyChain } from "../hash";
 import type { Anchor, Store } from "../store";
-import { explorerTx, type ChainPublisher } from "./chain";
+import type { ChainPublisher } from "./chain";
 
 /** Log entries worth an anchor: what a family, a bank or an auditor would ask about later. */
 export const MILESTONES: Record<string, string> = {
@@ -48,6 +48,11 @@ export class AnchorService {
     private opts: { debounceMs?: number; retries?: number; retryMs?: number } = {},
   ) {}
 
+  /** The chain this world anchors to. */
+  get chain(): ChainPublisher {
+    return this.publisher;
+  }
+
   /** Several milestones in quick succession (approve → submitted → …) share one anchor. */
   milestone(label: string) {
     this.pending.add(label);
@@ -78,9 +83,9 @@ export class AnchorService {
       for (let attempt = 1; attempt <= (this.opts.retries ?? 3); attempt++) {
         try {
           const txHash = await this.publisher.publish({ head: anchor.hash, seq: anchor.seq, label });
-          this.store.updateAnchor(anchor.id, { ...base, status: "pending", txHash, explorerUrl: explorerTx(txHash) });
+          this.store.updateAnchor(anchor.id, { ...base, status: "pending", txHash, explorerUrl: this.publisher.explorerTx(txHash) });
           const r = await this.publisher.confirm(txHash);
-          this.store.updateAnchor(anchor.id, { ...base, status: r.ok ? "confirmed" : "failed", txHash, blockNumber: r.blockNumber, explorerUrl: explorerTx(txHash), ...(r.ok ? {} : { error: "Transaction reverted" }) });
+          this.store.updateAnchor(anchor.id, { ...base, status: r.ok ? "confirmed" : "failed", txHash, blockNumber: r.blockNumber, explorerUrl: this.publisher.explorerTx(txHash), ...(r.ok ? {} : { error: "Transaction reverted" }) });
           return;
         } catch (err) {
           lastError = err instanceof Error ? (err as { shortMessage?: string }).shortMessage ?? err.message : String(err);

@@ -1,6 +1,6 @@
 "use client";
 
-import { FileText, Link2, Loader2, PauseCircle, PlayCircle, Wallet } from "lucide-react";
+import { Bot, BotOff, FileText, Link2, Loader2, PauseCircle, PlayCircle, Wallet } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useCarry } from "@/lib/client";
 import { cn } from "@/lib/format";
@@ -116,7 +116,8 @@ export function NearCaseCard({ caseId }: { caseId: string }) {
             <p className="text-[12px] text-ink-3">
               {near.tokenSymbol} (test token, no value) · limits: {tusdc(vcase.limits.per_payment_max)} per payment, {tusdc(vcase.limits.rolling_24h_cap)} per 24 h,{" "}
               {tusdc(vcase.limits.lifetime_cap)} in total · policy v{vcase.policy_version} ·{" "}
-              <span className={cn("font-semibold", vcase.status === "Paused" ? "text-danger" : "text-success")}>{vcase.status}</span>
+              <span className={cn("font-semibold", vcase.status === "Paused" ? "text-danger" : "text-success")}>{vcase.status}</span> · agent{" "}
+              <span className={cn("font-semibold", vcase.agent_enabled ? "text-success" : "text-danger")}>{vcase.agent_enabled ? "on" : "switched off"}</span>
             </p>
           </>
         )}
@@ -168,6 +169,16 @@ export function NearCaseCard({ caseId }: { caseId: string }) {
                     onClick={() => act("pause", { receiverId: near.vault, methodName: vcase.status === "Paused" ? "unpause" : "pause", args: { case_id: link.vaultCaseId }, gasTgas: 50, depositYocto: "1" })}
                   >
                     {vcase.status === "Paused" ? "Resume payments" : "Pause all payments (cancels pending approvals)"}
+                  </Action>
+                )}
+                {vcase && (
+                  <Action
+                    busy={busy === "agent"}
+                    disabled={busy !== null}
+                    icon={vcase.agent_enabled ? <BotOff size={15} /> : <Bot size={15} />}
+                    onClick={() => act("agent", { receiverId: near.vault, methodName: vcase.agent_enabled ? "revoke_agent" : "enable_agent", args: { case_id: link.vaultCaseId }, gasTgas: 50, depositYocto: "1" })}
+                  >
+                    {vcase.agent_enabled ? "Switch the agent off (cancels its pending proposals)" : "Switch the agent back on"}
                   </Action>
                 )}
               </>

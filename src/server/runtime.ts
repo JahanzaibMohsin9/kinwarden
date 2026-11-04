@@ -14,6 +14,7 @@ import { DEFAULT_SESSION } from "./session";
 import { answerFamily } from "./agent/answer";
 import { nearConfig } from "./near/config";
 import { NearBridge } from "./near/bridge";
+import { nearPublisher } from "./near/anchors";
 
 interface Runtime {
   id: string;
@@ -63,17 +64,20 @@ function create(id: string): Runtime {
   const runner = new AgentRunner(store);
   runner.resetSession();
   const rt: Runtime = { id, store, runner, runnerClass: AgentRunner, autoplayTimer: setInterval(() => autoplayTick(rt.store, rt.runner), 1500) };
-  const pub = publisher();
-  if (pub) {
+  const attachAnchors = (pub: ChainPublisher) => {
     const anchors = new AnchorService(store, pub);
     store.on("logged", (e) => {
       const m = milestoneOf(e);
       if (m) anchors.milestone(m);
     });
     rt.anchors = anchors;
-  }
+  };
   // One family case on chain belongs to one world: per-visitor sandbox copies stay on simulated rails.
   const near = id === DEFAULT_SESSION ? nearConfig() : null;
+  if (!near) {
+    const pub = publisher();
+    if (pub) attachAnchors(pub);
+  }
   if (near) {
     const bridge = new NearBridge(store, near);
     store.on("logged", (e) => bridge.onLogged(e));
@@ -81,7 +85,16 @@ function create(id: string): Runtime {
     rt.nearTimer = setInterval(() => {
       if (bridge.hasOpenLinks()) void bridge.sync();
     }, 4000);
-    void bridge.ready();
+    // The linked world anchors its log on the vault when the agent key may call anchor_log;
+    // otherwise it falls back to the Conflux publisher, if that is configured.
+    void bridge.ready().then((k) => {
+      const caseId = Object.values(near.deployment.cases)[0]?.vaultCaseId;
+      if (k.ok && k.methods.includes("anchor_log") && caseId) attachAnchors(nearPublisher(bridge.client, caseId, () => bridge.runId()));
+      else {
+        const pub = publisher();
+        if (pub) attachAnchors(pub);
+      }
+    });
   }
   return rt;
 }
@@ -152,8 +165,20 @@ function autoplayTick(store: Store, runner: AgentRunner) {
   advanceToNext(store);
 }
 
+/** Where this world's log is anchored, for the UI. */
+function anchoringInfo(rt: Runtime) {
+  const pub = rt.anchors?.chain;
+  if (pub && typeof pub.chainId === "string" && rt.near) {
+    const d = rt.near.deployment;
+    return { chain: `NEAR ${d.network}`, chainId: pub.chainId, contract: d.vault, contractUrl: d.explorerTx ? d.explorerTx.replace(/\/txns\/$/, "/address/") + d.vault : undefined };
+  }
+  const cfg = anchorConfig();
+  return cfg ? { chain: ANCHOR_CHAIN.name, chainId: ANCHOR_CHAIN.id, contract: cfg.contract, contractUrl: explorerAddress(cfg.contract) } : null;
+}
+
 export function publicState(sid?: string) {
-  const { store, runner, near } = runtime(sid);
+  const rt = runtime(sid);
+  const { store, runner, near } = rt;
   const next = nextScheduled(store);
   return {
     world: store.world,
@@ -173,9 +198,7 @@ export function publicState(sid?: string) {
           agentKey: near.keyCheck ? (near.keyCheck.ok ? { ok: true as const } : { ok: false as const, reason: near.keyCheck.reason }) : null,
         }
       : null,
-    anchoring: anchorConfig()
-      ? { chain: ANCHOR_CHAIN.name, chainId: ANCHOR_CHAIN.id, contract: anchorConfig()!.contract, contractUrl: explorerAddress(anchorConfig()!.contract) }
-      : null,
+    anchoring: anchoringInfo(rt),
     chain: verifyChain(store.ledger),
     agentBusy: runner.isBusy || store.world.agent.status === "working",
     nextEvent: next ? { at: next.at, label: next.label } : null,

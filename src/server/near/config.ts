@@ -29,7 +29,7 @@ export interface NearConfig {
 }
 
 /** Methods the app's agent key may call. Anything broader disables NEAR. */
-export const AGENT_METHODS = ["propose_payment", "sweep"] as const;
+export const AGENT_METHODS = ["propose_payment", "sweep", "anchor_log"] as const;
 
 export function deploymentFile(): string {
   return process.env.NEAR_DEPLOYMENT_FILE || path.join(process.cwd(), ".near", "deployment.json");

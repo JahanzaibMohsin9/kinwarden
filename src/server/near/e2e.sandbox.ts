@@ -5,7 +5,7 @@
 // receipt all agree. Run: npm run test:near (Linux x86_64 or macOS ARM64, contracts built).
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { actions, Account } from "near-api-js";
-import { DEFAULT_ACCOUNT_ID, DEFAULT_PRIVATE_KEY, Sandbox } from "near-sandbox";
+import type { Sandbox } from "near-sandbox";
 import { sha256 } from "@noble/hashes/sha2";
 import { bytesToHex } from "@noble/hashes/utils";
 import { stableStringify } from "@/lib/canonical";
@@ -16,6 +16,7 @@ import { seedScenario } from "../scenarios";
 import { advanceToNext } from "../sim/engine";
 import type { NearDeployment } from "./config";
 import { NearBridge, tusdcUnits } from "./bridge";
+import { startSandboxDeployment } from "./sandbox-kit";
 import * as setup from "../../../scripts/near/lib.mjs";
 
 const CASE = "case-th-e2e";
@@ -26,18 +27,7 @@ let agentKey: string;
 let family: Account;
 
 beforeAll(async () => {
-  sandbox = await Sandbox.start({ version: "2.14.0" });
-  const rpc = sandbox.rpcUrl;
-  const root = setup.account(rpc, DEFAULT_ACCOUNT_ID, DEFAULT_PRIVATE_KEY);
-  const familyKey = setup.newKey();
-  await root.createSubAccount({ accountOrPrefix: "family", publicKey: familyKey.publicKey, nearToTransfer: BigInt(10) * BigInt(10) ** BigInt(24) });
-  const familyId = `family.${DEFAULT_ACCOUNT_ID}`;
-  const out = await setup.deploy({ rpc, network: "sandbox", rootId: DEFAULT_ACCOUNT_ID, rootKey: DEFAULT_PRIVATE_KEY, familyId, log: () => {} });
-  deployment = { ...out.deployment, cases: { case_th: { vaultCaseId: CASE, owner: familyId } } };
-  keys = out.keys;
-  agentKey = out.agentKey;
-  family = setup.account(rpc, familyId, familyKey.secretKey);
-  await setup.openAndFundCase({ rpc, deployment, family, caseId: CASE, fundUnits: (BigInt(30_000) * setup.TUSDC).toString() });
+  ({ sandbox, deployment, keys, agentKey, family } = await startSandboxDeployment(CASE));
 });
 
 afterAll(async () => {
@@ -65,7 +55,7 @@ describe("hospital deposit through the NEAR vault", () => {
     const { store, bridge, settle } = await boot();
     const w = () => store.world;
 
-    expect(await bridge.ready()).toMatchObject({ ok: true, methods: ["propose_payment", "sweep"] });
+    expect(await bridge.ready()).toMatchObject({ ok: true, methods: ["propose_payment", "sweep", "anchor_log"] });
 
     // Run the scenario until the agent asks to pay the deposit by bank transfer.
     for (let i = 0; i < 20 && !Object.values(w().payments).some((p) => p.status === "awaiting_approval"); i++) {

@@ -4,8 +4,10 @@
 //!
 //! This file: configuration, cases, payee and invoice enrollment, deposits and
 //! views. `payments.rs`: proposals, approval, settlement and withdrawal.
+//! `anchors.rs`: activity-log anchors.
 //! Design: docs/near/DECISIONS.md, STATE_AND_ENCODING.md, THREAT_MODEL.md.
 
+pub mod anchors;
 pub mod commitment;
 pub mod errors;
 pub mod ids;
@@ -499,3 +501,6 @@ mod tests;
 
 #[cfg(test)]
 mod tests_payments;
+
+#[cfg(test)]
+mod tests_anchors;

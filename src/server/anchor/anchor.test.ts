@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { Store } from "../store";
 import { seedScenario } from "../scenarios";
 import { AnchorService, milestoneOf } from "./service";
-import { anchorConfig, type ChainPublisher, type OnChainRecord } from "./chain";
+import { anchorConfig, explorerTx, type ChainPublisher, type OnChainRecord } from "./chain";
 
 function fakeChain(opts: { failFirst?: number } = {}) {
   const txs = new Map<string, OnChainRecord>();
@@ -12,6 +12,7 @@ function fakeChain(opts: { failFirst?: number } = {}) {
   const chain: ChainPublisher = {
     chainId: 71,
     contract: "0x7cebbc3ac1a2ec61607025a589efa01b597c42cf",
+    explorerTx,
     publish: async (a) => {
       if (fails-- > 0) throw new Error("network down");
       sent.push(a);

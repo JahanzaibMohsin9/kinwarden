@@ -41,8 +41,10 @@ export interface OnChainRecord {
 
 /** What the anchoring service needs from a chain; tests swap in a fake. */
 export interface ChainPublisher {
-  chainId: number;
+  /** an EVM chain id, or a name such as "near:testnet" */
+  chainId: number | string;
   contract: string;
+  explorerTx(txHash: string): string | undefined;
   publish(a: { head: string; seq: number; label: string }): Promise<string>;
   confirm(txHash: string): Promise<{ ok: boolean; blockNumber: number }>;
   read(txHash: string): Promise<OnChainRecord | null>;
@@ -56,6 +58,7 @@ export function viemPublisher(cfg: AnchorConfig): ChainPublisher {
   return {
     chainId: ANCHOR_CHAIN.id,
     contract: cfg.contract,
+    explorerTx,
     publish: ({ head, seq, label }) =>
       wallet.writeContract({ address: cfg.contract, abi: ANCHOR_ABI, functionName: "anchor", args: [`0x${head}`, BigInt(seq), label] }),
     confirm: async (txHash) => {
