@@ -232,6 +232,15 @@ fn paused_case_takes_no_proposals() {
 }
 
 #[test]
+#[should_panic(expected = "E_PAYEE_NOT_ACTIVE")]
+fn invoice_of_a_revoked_payee_cannot_be_proposed() {
+    let mut v = ready();
+    as_caller(VERIFIER, ONE_YOCTO);
+    v.revoke_payee("bih".into());
+    propose(&mut v, "r", 1);
+}
+
+#[test]
 #[should_panic(expected = "E_AGENT_DISABLED")]
 fn revoked_agent_cannot_propose() {
     let mut v = ready();

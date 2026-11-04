@@ -38,7 +38,7 @@ export class VaultClient {
   readonly provider: JsonRpcProvider;
   readonly deployment: NearDeployment;
   private readonly agent: Account;
-  private readonly publicKey: string;
+  readonly publicKey: string;
 
   constructor(cfg: NearConfig) {
     this.deployment = cfg.deployment;

@@ -9,6 +9,8 @@ import type { LabAttack, ForceStep } from "@/server/attacklab";
 import { RuleChip } from "../RuleChip";
 import { SiteNav } from "../SiteNav";
 import { BringYourOwnAI } from "./BringYourOwnAI";
+import { NearKeyLab } from "./NearKeyLab";
+import type { BypassRun } from "@/server/near/bypass";
 
 export type Recorded = Record<string, { model: string; attempted: string | null; executed: string | null; flagged: boolean; warnedFamily: boolean; blocked: number; tools: string[] }>;
 
@@ -43,7 +45,19 @@ async function call(action: string, id: string) {
   return j;
 }
 
-export function AttackLab({ attacks, recorded, naive, summary }: { attacks: LabAttack[]; recorded: Recorded; naive: Recorded; summary: Summary }) {
+export function AttackLab({
+  attacks,
+  recorded,
+  naive,
+  summary,
+  nearRecorded,
+}: {
+  attacks: LabAttack[];
+  recorded: Recorded;
+  naive: Recorded;
+  summary: Summary;
+  nearRecorded: (BypassRun & { commit?: string }) | null;
+}) {
   const { state } = useCarry();
   const [sel, setSel] = useState(attacks[0].id);
   const [launched, setLaunched] = useState<string | null>(null);
@@ -273,6 +287,8 @@ export function AttackLab({ attacks, recorded, naive, summary }: { attacks: LabA
             {error && <p className="rounded-xl bg-[#f2827a]/15 px-3 py-2 text-[13px] text-[#f2827a]">{error}</p>}
           </section>
         </div>
+        <NearKeyLab recorded={nearRecorded} />
+
         <BringYourOwnAI />
       </main>
     </div>

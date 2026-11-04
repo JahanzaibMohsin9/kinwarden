@@ -15,6 +15,7 @@ import type { Store } from "../store";
 import { setPaymentStatus, settlePayment } from "../sim/engine";
 import { explorerTx, type NearConfig } from "./config";
 import { refusalCode, VaultClient, type KeyCheck } from "./vault";
+import { permissionsReport, runBypass, type BypassRun } from "./bypass";
 
 /** How long the family has to approve a proposal in their wallet. */
 const TTL_SECONDS = 12 * 3600;
@@ -41,6 +42,9 @@ export function formatTusdc(units: string): string {
 export class NearBridge {
   readonly client: VaultClient;
   keyCheck?: KeyCheck;
+  /** the last gateway-bypass run against this deployment (see bypass.ts) */
+  lastBypass?: BypassRun;
+  private bypassing?: Promise<BypassRun>;
   private checking?: Promise<KeyCheck>;
   private queue: Promise<void> = Promise.resolve();
 
@@ -53,6 +57,30 @@ export class NearBridge {
 
   get deployment() {
     return this.cfg.deployment;
+  }
+
+  /** What the app's agent key may do, read from the chain now. */
+  permissions() {
+    return permissionsReport(this.client.provider, this.deployment, this.client.publicKey);
+  }
+
+  /**
+   * Try every gateway-bypass attempt with the app's real agent key against this deployment (one run
+   * at a time). Refused attempts change nothing; the vault's refusals cost the key's gas allowance a
+   * fraction of a milliNEAR each.
+   */
+  bypass(): Promise<BypassRun> {
+    this.bypassing ??= (async () => {
+      const links = Object.values(this.store.world.payments).flatMap((p) => (p.near ? [p.near] : []));
+      const pending = links.find((l) => l.state === "PendingApproval" && l.proposalId);
+      const authorized = links.find((l) => l.proposalId);
+      const caseId = Object.values(this.deployment.cases)[0].vaultCaseId;
+      const run = await runBypass({ provider: this.client.provider, deployment: this.deployment, agentKey: this.cfg.agentKey, caseId, pendingProposalId: pending?.proposalId, authorizedInvoiceId: authorized?.vaultInvoiceId });
+      this.lastBypass = run;
+      this.store.log({ actor: "near", type: "near.bypass", narration: run.held ? "Gateway-bypass check: the agent's real key was refused every time and nothing moved" : "Gateway-bypass check: NOT HELD, see the attack lab", data: { held: run.held, results: run.results.map((r) => `${r.id}:${r.refusedBy}:${r.reason}`) } });
+      return run;
+    })().finally(() => (this.bypassing = undefined));
+    return this.bypassing;
   }
 
   /** The agent key is checked on chain once; a bad key disables NEAR with the reason. */

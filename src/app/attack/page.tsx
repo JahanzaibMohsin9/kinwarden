@@ -4,6 +4,8 @@ import { AttackLab, type Recorded } from "@/components/attack/AttackLab";
 import { LAB } from "@/server/attacklab";
 import results from "../../../docs/redteam/results.json";
 import naive from "../../../docs/redteam/results-naive.json";
+import nearBypass from "../../../docs/redteam/near/bypass-sandbox.json";
+import type { BypassRun } from "@/server/near/bypass";
 
 export const metadata: Metadata = { title: "Kinwarden · Try to fool it", description: "Launch real attacks at Kinwarden's AI agent and watch the safety layer stop them." };
 
@@ -29,7 +31,7 @@ export default function Page() {
   };
   return (
     <Providers>
-      <AttackLab attacks={LAB} recorded={recorded(ours)} naive={recorded(theirs)} summary={summary} />
+      <AttackLab attacks={LAB} recorded={recorded(ours)} naive={recorded(theirs)} summary={summary} nearRecorded={nearBypass as unknown as BypassRun & { commit?: string }} />
     </Providers>
   );
 }
