@@ -233,3 +233,22 @@ and say who holds it.
   allowed). FastNEAR (`https://test.rpc.fastnear.com`) also works but
   rate-limited a short burst in our tests. The RPC is a setting in
   `.near/deployment.json`, read by the server, the verifier and the browser.
+
+## D-11 Activity-log anchors on the vault (G4)
+
+- **Where.** `anchor_log(case_id, seq, head, label)` on the vault, callable only
+  by the agent account, so the app's existing restricted key signs it. The key's
+  methods become `propose_payment`, `sweep` and `anchor_log`; a key without
+  `anchor_log` still passes the app's check, and the app then anchors to Conflux
+  if that is configured, or not at all.
+- **What.** A SHA-256 head (64 lowercase hex), the log sequence number and a
+  label of at most 96 printable ASCII characters (the world's run tag, scenario
+  and milestone). No names, amounts or medical details.
+- **Append-only, not ordered.** Each anchor gets the next index and the block
+  time, and none is replaced. A reset demo world starts its log again at 1, so
+  sequence numbers are not required to increase.
+- **Bounded.** At most 200 anchors per case (`E_BOUND_ANCHORS`); each costs the
+  vault about 0.002 NEAR of storage.
+- **No state migration.** Anchors use their own raw storage prefix instead of a
+  field in the contract struct, so the code can be redeployed onto an existing
+  vault without changing its state layout.

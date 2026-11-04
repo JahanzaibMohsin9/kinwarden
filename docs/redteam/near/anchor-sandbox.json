@@ -1,0 +1,46 @@
+{
+  "anchor": {
+    "id": "anc_mw289fel_1",
+    "seq": 2,
+    "hash": "7293a789549c78756cca75ecea9878cfbda0ec0254ce01c56d1826c7208e5006",
+    "at": "2026-11-04T14:44:14.014Z",
+    "simAt": "2026-11-02T02:30:00.000Z",
+    "note": "payment approved",
+    "chain": {
+      "chainId": "near:sandbox",
+      "contract": "vault.sandbox",
+      "status": "confirmed",
+      "txHash": "5A1M25ma88mZ6EAVzPwM9sJbz42MTVSVSsbWX2KFxQ1o",
+      "blockNumber": 67
+    }
+  },
+  "clean": {
+    "ok": true,
+    "onChain": {
+      "head": "7293a789549c78756cca75ecea9878cfbda0ec0254ce01c56d1826c7208e5006",
+      "seq": 2,
+      "label": "run001:th-medical:payment approved",
+      "blockNumber": 67,
+      "contract": "vault.sandbox"
+    },
+    "log": {
+      "ok": true
+    }
+  },
+  "tampered": {
+    "ok": false,
+    "onChain": {
+      "head": "7293a789549c78756cca75ecea9878cfbda0ec0254ce01c56d1826c7208e5006",
+      "seq": 2,
+      "label": "run001:th-medical:payment approved",
+      "blockNumber": 67,
+      "contract": "vault.sandbox"
+    },
+    "log": {
+      "ok": false,
+      "brokenAt": 2,
+      "reason": "Entry contents were changed after it was written"
+    },
+    "reason": "The log was changed after it was anchored (entry #2)."
+  }
+}

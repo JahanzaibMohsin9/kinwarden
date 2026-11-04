@@ -61,7 +61,8 @@ function run(label) {
   const [cmd, args] = UNIT;
   const r = spawnSync(cmd, args, { cwd: "contracts/near", encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
   const out = `${r.stdout}\n${r.stderr}`;
-  const failed = [...out.matchAll(/^test (\S+) \.\.\. FAILED$/gm)].map((m) => m[1]);
+  // cargo lists failing tests under "failures:" as indented module paths, also with --quiet
+  const failed = [...new Set([...out.matchAll(/^ {4}((?:\w+::)+\w+)$/gm)].map((m) => m[1]))];
   const compiled = !/error\[E\d+\]|could not compile/.test(out);
   console.log(`${label}: exit ${r.status}${failed.length ? `, failed: ${failed.join(", ")}` : ""}${compiled ? "" : " (did not compile)"}`);
   return { exit: r.status, failed, compiled };

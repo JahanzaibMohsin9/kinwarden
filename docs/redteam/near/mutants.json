@@ -1,0 +1,54 @@
+{
+  "commit": "50457a0",
+  "command": "cargo test -p kinwarden-vault --quiet",
+  "results": [
+    {
+      "id": "allowlist",
+      "control": "Only verifier-enrolled, active institutions can be proposed for payment",
+      "file": "contracts/near/vault/src/payments.rs",
+      "killed": true,
+      "failingTests": [],
+      "compiled": true
+    },
+    {
+      "id": "invoice-ceiling",
+      "control": "A proposal cannot exceed what the verifier authorized for the invoice",
+      "file": "contracts/near/vault/src/payments.rs",
+      "killed": true,
+      "failingTests": [],
+      "compiled": true
+    },
+    {
+      "id": "reservation",
+      "control": "Proposing reserves the amount, so pending payments cannot overspend the case",
+      "file": "contracts/near/vault/src/payments.rs",
+      "killed": true,
+      "failingTests": [],
+      "compiled": true
+    },
+    {
+      "id": "approval-commitment",
+      "control": "The family's approval must carry the hash of the exact stored proposal",
+      "file": "contracts/near/vault/src/payments.rs",
+      "killed": true,
+      "failingTests": [],
+      "compiled": true
+    },
+    {
+      "id": "approval-policy-version",
+      "control": "An approval made under an older policy version is refused",
+      "file": "contracts/near/vault/src/payments.rs",
+      "killed": true,
+      "failingTests": [],
+      "compiled": true
+    },
+    {
+      "id": "finish-once",
+      "control": "A transfer's result is accounted once; a repeated or late callback changes nothing",
+      "file": "contracts/near/vault/src/payments.rs",
+      "killed": true,
+      "failingTests": [],
+      "compiled": true
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "network": "sandbox",
+  "commit": "50457a0",
+  "wasmSha256": {
+    "vault": "732efbe16dc736a12e1a6be3d3edffade747439cbe259695d37c4ce229f95ff4",
+    "token": "243798d400c1039b95a02c9a235fb43812872400d90b371d876d17de9322cd7f"
+  },
+  "amountUnits": "7000000000",
+  "failedApprovalTx": "9VYZvfVfdEoszf2iRGP44soMeQijGThU4YbdL35JyHhz",
+  "settledApprovalTx": "5UDnhCehFcdi8XJXb1QdyoySLBk4Wf9HSq7nGbeMELFH",
+  "rows": [
+    {
+      "step": "1. Case funded",
+      "vaultTokens": "30000000000",
+      "hospitalTokens": "0",
+      "caseBalance": "30000000000",
+      "caseAvailable": "30000000000",
+      "caseReserved": "0",
+      "caseInFlight": "0",
+      "casePaid": "0",
+      "rolling24hCharged": "0"
+    },
+    {
+      "step": "2. Agent proposed; amount reserved",
+      "vaultTokens": "30000000000",
+      "hospitalTokens": "0",
+      "caseBalance": "30000000000",
+      "caseAvailable": "23000000000",
+      "caseReserved": "7000000000",
+      "caseInFlight": "0",
+      "casePaid": "0",
+      "rolling24hCharged": "7000000000"
+    },
+    {
+      "step": "3. Family approved; transfer sent, outcome not yet known",
+      "vaultTokens": "30000000000",
+      "hospitalTokens": "0",
+      "caseBalance": "30000000000",
+      "caseAvailable": "23000000000",
+      "caseReserved": "0",
+      "caseInFlight": "7000000000",
+      "casePaid": "0",
+      "rolling24hCharged": "7000000000"
+    },
+    {
+      "step": "4. Transfer failed (confirmed by the vault's callback)",
+      "vaultTokens": "30000000000",
+      "hospitalTokens": "0",
+      "caseBalance": "30000000000",
+      "caseAvailable": "30000000000",
+      "caseReserved": "0",
+      "caseInFlight": "0",
+      "casePaid": "0",
+      "rolling24hCharged": "0"
+    },
+    {
+      "step": "5. Later sweep: nothing changes",
+      "vaultTokens": "30000000000",
+      "hospitalTokens": "0",
+      "caseBalance": "30000000000",
+      "caseAvailable": "30000000000",
+      "caseReserved": "0",
+      "caseInFlight": "0",
+      "casePaid": "0",
+      "rolling24hCharged": "0"
+    },
+    {
+      "step": "6. Agent proposed attempt 2; amount reserved",
+      "vaultTokens": "30000000000",
+      "hospitalTokens": "0",
+      "caseBalance": "30000000000",
+      "caseAvailable": "23000000000",
+      "caseReserved": "7000000000",
+      "caseInFlight": "0",
+      "casePaid": "0",
+      "rolling24hCharged": "7000000000"
+    },
+    {
+      "step": "7. Family approved attempt 2; transfer settled",
+      "vaultTokens": "23000000000",
+      "hospitalTokens": "7000000000",
+      "caseBalance": "23000000000",
+      "caseAvailable": "23000000000",
+      "caseReserved": "0",
+      "caseInFlight": "0",
+      "casePaid": "7000000000",
+      "rolling24hCharged": "7000000000"
+    }
+  ]
+}

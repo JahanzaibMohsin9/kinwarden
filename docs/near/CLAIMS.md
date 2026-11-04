@@ -6,13 +6,14 @@ is not made in the README. Unit tests: `contracts/near/vault/src/`. Sandbox
 tests (real NEAR node, deployed contracts, real keys):
 `contracts/near/integration-tests/tests/`.
 
-Status: **G1 (C1–C14), G2 (C15–C30) and G3 app integration (C31–C38).**
-Testnet deployment and log anchoring (G4) have no rows yet. Contract unit tests:
+Status: **G1 (C1–C14), G2 (C15–C30), G3 app integration (C31–C41) and G4
+adversarial evidence (C42–C48).** Generated evidence: [docs/redteam/ONCHAIN.md](../redteam/ONCHAIN.md).
+Contract unit tests:
 `vault/src/tests.rs`, `tests_payments.rs`, `types.rs`, `ids.rs`,
-`commitment.rs`. Contract sandbox tests: `integration-tests/tests/g1.rs`,
-`g2.rs`. App tests: `src/near/*.test.ts`, `src/server/near/*.test.ts`; app
-end to end on a local NEAR node: `src/server/near/e2e.sandbox.ts`
-(`npm run test:near`).
+`commitment.rs`, `tests_anchors.rs`. Contract sandbox tests:
+`integration-tests/tests/g1.rs`, `g2.rs`. App tests: `src/near/*.test.ts`,
+`src/server/near/*.test.ts`; app tests on a local NEAR node:
+`src/server/near/*.sandbox.ts` (`npm run test:near`).
 
 | # | Claim | Enforced by | Tests |
 |---|---|---|---|
@@ -58,6 +59,13 @@ end to end on a local NEAR node: `src/server/near/e2e.sandbox.ts`
 | C40 | Delivery is stated as delivered, failed or unknown from the vault's record; an approval or a submitted transaction alone is never shown as delivered, and an unknown outcome is never shown as failed or refunded. For each state the receipt and the app say where the reserved money is and what the family can do next | `src/near/outcome.ts`; `NearOutcomeNote`, `NearReceiptView` | app unit `outcome.test.ts`, `bridge.test.ts` (delivered, failed, unknown) |
 | C41 | The institution's acknowledgement is a separate event in the receipt, marked as coming from the simulated hospital | `NearBridge.apply`, `buildReceipt` | app unit `bridge.test.ts`; e2e |
 | C38 | A failed NEAR transfer cannot be resent without a new proposal and a new wallet approval | App: `resubmit_payment` guard; vault attempts | app unit `bridge.test.ts`; contract `failed_transfer_restores_funds_once_and_allows_a_retry` |
+| C42 | With the app's gateway bypassed, the agent's real key is refused by NEAR for approving (with or without a deposit), enrolling a payee, authorizing an invoice, switching itself on, withdrawing, calling the token contract, adding a key, deploying code and sending NEAR; and by the vault for an unauthorized invoice or an amount over the family's limits. No attacker, vault or case balance changes | NEAR protocol (function-call key permissions); vault checks | `bypass.sandbox.ts` (every attempt's refuser and reason, balances before and after); live rerun in the attack lab |
+| C43 | A read-only report records the agent account's keys at a stated block: the app key's receiver, methods and gas allowance, and any other key with its authority, kept apart from the vault's payment limits | `permissionsReport` | `bypass.sandbox.ts` |
+| C44 | When the family switches the agent off, its pending proposals are invalidated, their reservations released, new proposals refused, and the agent cannot switch itself back on; once its key is deleted it can sign nothing and no balance changes | Vault `revoke_agent`; NEAR protocol | `bypass.sandbox.ts`; unit `revoked_agent_cannot_propose` |
+| C45 | A confirmed transfer failure credits the recipient nothing and returns the amount and its 24-hour budget to the case exactly once; while the outcome is unknown the amount stays in flight; a retry pays exactly once | Vault `finish_transfer` | `reconcile.sandbox.ts` (balance table, including the state at the approval's block); contract `failed_transfer_restores_funds_once_and_a_retry_settles` |
+| C46 | Only the agent can anchor the activity log on the vault; anchors are append-only, at most 200 per case, carry only a SHA-256 head, a sequence number and a short ASCII label | Vault `anchor_log` | unit `tests_anchors.rs` |
+| C47 | The app anchors its log head on the vault and, after an anchored entry is edited, the anchor check fails and names the change | `nearPublisher`, `AnchorService.check` | `anchor.sandbox.ts`; app unit `anchors.test.ts` |
+| C48 | Removing any of five selected vault checks (allowlist, invoice ceiling, reservation, approval hash and policy version, finish-once) makes the vault's tests fail | Mutation checks | `scripts/near/mutants.mjs` (results in ONCHAIN.md) |
 
 **Testnet run, 3 Nov 2026.** C31–C37 and C39–C41 were also observed on NEAR
 testnet with the family's own Meteor wallet: the agent key check, the

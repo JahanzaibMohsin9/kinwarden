@@ -1,0 +1,54 @@
+{
+  "case": {
+    "owner": "family.sandbox",
+    "status": "Active",
+    "agent_enabled": false,
+    "policy_version": 1,
+    "limits": {
+      "per_payment_max": "15000000000",
+      "rolling_24h_cap": "20000000000",
+      "lifetime_cap": "60000000000",
+      "group_caps": [
+        {
+          "group": "Hospital",
+          "rolling_24h_cap": "18000000000"
+        }
+      ]
+    },
+    "balance": "30000000000",
+    "reserved": "0",
+    "in_flight": "0",
+    "paid": "0",
+    "created_at": "1793803441017681830",
+    "pending": [],
+    "window": [
+      {
+        "proposal_id": 1,
+        "at": "1793803442537422109",
+        "amount": "7000000000",
+        "group": "Hospital",
+        "counted": false
+      }
+    ]
+  },
+  "proposal": {
+    "proposal_id": "1",
+    "case_id": "case-th-bypass",
+    "invoice_id": "bypass-srh-dep-0001",
+    "request_id": "bypass-req-1",
+    "attempt": 1,
+    "payee_id": "srh",
+    "recipient": "siam-riverside-hospital.sandbox",
+    "token": "tusdc.sandbox",
+    "amount": "7000000000",
+    "purpose_group": "Hospital",
+    "ttl_seconds": 3600,
+    "created_at": "1793803442537422109",
+    "expires_at": "1793807042537422109",
+    "policy_version": 1,
+    "payee_version": 2,
+    "status": "Invalidated",
+    "status_reason": "E_AGENT_DISABLED",
+    "updated_at": "1793803443676771789"
+  }
+}

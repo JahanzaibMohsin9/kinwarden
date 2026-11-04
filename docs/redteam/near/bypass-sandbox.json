@@ -1,27 +1,28 @@
 {
   "network": "sandbox",
   "vault": "vault.sandbox",
-  "ranAt": "2026-11-04T14:11:23.669Z",
+  "ranAt": "2026-11-04T14:44:03.422Z",
   "permissions": {
     "account": "agent.sandbox",
     "observedAt": {
-      "blockHeight": 69,
-      "blockHash": "3rqmvVP8zfhXMg3y1We6tbfocY2a4hm8aetMFEPwbqEK"
+      "blockHeight": 65,
+      "blockHash": "2EMNmvgxvfnv6zh5WPV8rMRKSAJFUGHruERHGqSan5Cd"
     },
     "appKey": {
-      "publicKey": "ed25519:4BQsX6YVC3mM3V5UfrsZYS16CjZrqfdJprAzPJTcggPV",
+      "publicKey": "ed25519:9UC47S2pFTsAwa9Wt8CHjhwo1Z54iaRcSpZmiAUcXj9H",
       "kind": "FunctionCall",
       "receiver": "vault.sandbox",
       "methods": [
         "propose_payment",
-        "sweep"
+        "sweep",
+        "anchor_log"
       ],
       "allowanceNear": "0.250",
       "note": "The app server's key."
     },
     "otherKeys": [
       {
-        "publicKey": "ed25519:J9FL5yNL6BFGHfqDA86aA1UmRCRXb6kmuMPVSoiE8gZg",
+        "publicKey": "ed25519:HYNte39y5m7eAr1Yymtvc51kZ9wzjkKzHYrfo5RXjEji",
         "kind": "FullAccess",
         "note": "Setup key held by the deployment tooling (.near/keys.json), never by the app server. It can do anything this account can, including deleting the app's key."
       }
