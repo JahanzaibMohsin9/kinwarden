@@ -16,6 +16,8 @@ const reconcile = read("reconcile-sandbox.json");
 const anchor = read("anchor-sandbox.json");
 const mutants = read("mutants.json");
 const testnet = read("bypass-testnet.json");
+const testnetVault = read("testnet-vault.json");
+const anchorTestnet = read("anchor-testnet.json");
 
 const t = (units) => (Number(BigInt(units) / BigInt(10_000)) / 100).toLocaleString("en-US", { minimumFractionDigits: 2 });
 const by = (r) => (r.refusedBy === "protocol" ? "NEAR protocol (key permissions)" : r.refusedBy === "contract" ? "Vault contract" : "**NOT REFUSED**");
@@ -33,6 +35,10 @@ line("**testnet** is the public NEAR testnet. Test tokens have no value.");
 line();
 if (reconcile) {
   line(`Tested commit: \`${reconcile.commit}\`. Vault WASM sha256: \`${reconcile.wasmSha256.vault}\`; token WASM sha256: \`${reconcile.wasmSha256.token}\`.`);
+  line();
+}
+if (testnetVault) {
+  line(`The testnet vault \`${testnetVault.vault}\` runs code with sha256 \`${testnetVault.codeSha256}\` (on-chain code hash \`${testnetVault.codeHashBase58}\`, read ${testnetVault.upgradedAt}): ${testnetVault.matches ? "**the same build** the sandbox tests and mutation checks ran against" : "**a different build** from the tested one"}.`);
   line();
 }
 
@@ -104,6 +110,15 @@ if (anchor) {
   const a = anchor.anchor;
   line(`The app anchored log entry #${a.seq} (head \`${a.hash}\`) on \`${a.chain.contract}\` with the agent key: status \`${a.chain.status}\`, block ${a.chain.blockNumber}.`);
   line(`Check before any edit: \`ok: ${anchor.clean.ok}\`. After editing entry #${a.seq}: \`ok: ${anchor.tampered.ok}\`, "${anchor.tampered.reason}"`);
+  line();
+}
+
+if (anchorTestnet) {
+  line("## Activity-log anchor and tamper check (testnet)");
+  line();
+  const a = anchorTestnet.anchor;
+  line(`Log entry #${a.seq} (head \`${a.hash}\`) anchored on \`${a.chain.contract}\`: [transaction](${a.chain.explorerUrl}), block ${a.chain.blockNumber}, label \`${anchorTestnet.clean.onChain.label}\`.`);
+  line(`Check: \`ok: ${anchorTestnet.clean.ok}\`. After editing entry #${a.seq}: \`ok: ${anchorTestnet.tampered.ok}\`, "${anchorTestnet.tampered.reason}" After restoring the original text: \`ok: ${anchorTestnet.restored.ok}\`.`);
   line();
 }
 

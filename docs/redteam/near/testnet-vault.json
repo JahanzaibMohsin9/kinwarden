@@ -1,0 +1,9 @@
+{
+  "network": "testnet",
+  "vault": "vault.kinwarden-demo.testnet",
+  "upgradedAt": "2026-11-04",
+  "codeHashBase58": "8kdSQbhVeafAumSKocaCVLn66Hkx7SkkJvF1KjmMSxYB",
+  "codeSha256": "732efbe16dc736a12e1a6be3d3edffade747439cbe259695d37c4ce229f95ff4",
+  "testedWasmSha256": "732efbe16dc736a12e1a6be3d3edffade747439cbe259695d37c4ce229f95ff4",
+  "matches": true
+}

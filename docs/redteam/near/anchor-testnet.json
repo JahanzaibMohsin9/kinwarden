@@ -1,0 +1,63 @@
+{
+  "anchor": {
+    "id": "anc_mw28yzix_1",
+    "seq": 41,
+    "hash": "a6056b67a3aceaaf8c20330020b362c8c7af53a1dba0568a20994d211e0d41c8",
+    "at": "2026-11-04T15:04:06.489Z",
+    "simAt": "2026-11-05T07:30:00.000Z",
+    "note": "G4 testnet anchor check",
+    "chain": {
+      "chainId": "near:testnet",
+      "contract": "vault.kinwarden-demo.testnet",
+      "status": "confirmed",
+      "txHash": "2VaDSfVR24b95gLQ34kpdW3mC7ggBVQY5mHMJJEXzKYE",
+      "blockNumber": 276210787,
+      "explorerUrl": "https://testnet.nearblocks.io/txns/2VaDSfVR24b95gLQ34kpdW3mC7ggBVQY5mHMJJEXzKYE"
+    }
+  },
+  "clean": {
+    "ok": true,
+    "onChain": {
+      "head": "a6056b67a3aceaaf8c20330020b362c8c7af53a1dba0568a20994d211e0d41c8",
+      "seq": 41,
+      "label": "c2d305:th-medical:G4 testnet anchor check",
+      "blockNumber": 276210787,
+      "contract": "vault.kinwarden-demo.testnet"
+    },
+    "explorerUrl": "https://testnet.nearblocks.io/txns/2VaDSfVR24b95gLQ34kpdW3mC7ggBVQY5mHMJJEXzKYE",
+    "log": {
+      "ok": true
+    }
+  },
+  "tampered": {
+    "ok": false,
+    "onChain": {
+      "head": "a6056b67a3aceaaf8c20330020b362c8c7af53a1dba0568a20994d211e0d41c8",
+      "seq": 41,
+      "label": "c2d305:th-medical:G4 testnet anchor check",
+      "blockNumber": 276210787,
+      "contract": "vault.kinwarden-demo.testnet"
+    },
+    "explorerUrl": "https://testnet.nearblocks.io/txns/2VaDSfVR24b95gLQ34kpdW3mC7ggBVQY5mHMJJEXzKYE",
+    "log": {
+      "ok": false,
+      "brokenAt": 41,
+      "reason": "Entry contents were changed after it was written"
+    },
+    "reason": "The log was changed after it was anchored (entry #41)."
+  },
+  "restored": {
+    "ok": true,
+    "onChain": {
+      "head": "a6056b67a3aceaaf8c20330020b362c8c7af53a1dba0568a20994d211e0d41c8",
+      "seq": 41,
+      "label": "c2d305:th-medical:G4 testnet anchor check",
+      "blockNumber": 276210787,
+      "contract": "vault.kinwarden-demo.testnet"
+    },
+    "explorerUrl": "https://testnet.nearblocks.io/txns/2VaDSfVR24b95gLQ34kpdW3mC7ggBVQY5mHMJJEXzKYE",
+    "log": {
+      "ok": true
+    }
+  }
+}

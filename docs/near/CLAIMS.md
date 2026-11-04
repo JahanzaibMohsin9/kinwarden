@@ -75,6 +75,13 @@ verifier's authorization, the browser-side hash, the wallet approval
 and the receipt ([evidence/2026-11-03-testnet-receipt.json](evidence/2026-11-03-testnet-receipt.json),
 its hash recomputes). A failed or unknown outcome was not exercised on testnet.
 
+**Testnet run, 4 Nov 2026 (G4).** After upgrading the testnet vault to the
+tested build (code hash matches the tested WASM) and rotating the agent key,
+C42–C43 were observed on testnet with the app's real key (13 attempts refused,
+balances unchanged) and C47 with a testnet anchor and tamper check. See
+[ONCHAIN.md](../redteam/ONCHAIN.md). Revocation, reconciliation and mutation
+checks were run on a local node only.
+
 What these tests do **not** show:
 
 - That an enrolled account really belongs to a hospital. That is the

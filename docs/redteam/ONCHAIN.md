@@ -9,6 +9,8 @@ Networks: **sandbox** is a local NEAR node (neard 2.14.0) started by the tests;
 
 Tested commit: `50457a0`. Vault WASM sha256: `732efbe16dc736a12e1a6be3d3edffade747439cbe259695d37c4ce229f95ff4`; token WASM sha256: `243798d400c1039b95a02c9a235fb43812872400d90b371d876d17de9322cd7f`.
 
+The testnet vault `vault.kinwarden-demo.testnet` runs code with sha256 `732efbe16dc736a12e1a6be3d3edffade747439cbe259695d37c4ce229f95ff4` (on-chain code hash `8kdSQbhVeafAumSKocaCVLn66Hkx7SkkJvF1KjmMSxYB`, read 2026-11-04): **the same build** the sandbox tests and mutation checks ran against.
+
 ## Gateway bypass with the real agent key (sandbox)
 
 The agent's real function-call key, used directly against NEAR with Kinwarden's
@@ -50,6 +52,47 @@ The allowance only pays transaction fees. What the agent can spend is set by the
 
 **Held:** every attempt was refused and no balance changed.
 
+## Gateway bypass with the real agent key (testnet)
+
+The agent's real function-call key, used directly against NEAR with Kinwarden's
+app and safety gateway bypassed, as an attacker who owns the app server would.
+
+**Key permissions** on `agent.kinwarden-demo.testnet`, read at block 276210722 (`4usGiqVqg5niAB3mKG3Wn1ona9jVU7zgaEjHv5jNyxQr`):
+
+| Key | Kind | May call | Gas allowance | Note |
+|---|---|---|---|---|
+| `ed25519:3Png5oub7p5wnci1n15ZRGj4iHWm3dRn2HBH2nwj55BW` | FunctionCall | propose_payment, sweep, anchor_log on vault.kinwarden-demo.testnet | 0.250 NEAR | The app server's key. |
+| `ed25519:ELGdcC1VHjgUy92b4FXBf2BauRJBvxDCKjQUWn5wXGZP` | FullAccess | anything | — | Setup key held by the deployment tooling (.near/keys.json), never by the app server. It can do anything this account can, including deleting the app's key. |
+
+The allowance only pays transaction fees. What the agent can spend is set by the family's case limits in the vault, and nothing moves without the family's wallet approval.
+
+| Attempt | Sent | Refused by | Reason |
+|---|---|---|---|
+| Approve its own payment proposal, attaching the 1 yoctoNEAR an approval needs | `vault.approve_payment, deposit 1 yoctoNEAR` | NEAR protocol (key permissions) | `DepositWithFunctionCall` |
+| Approve its own payment proposal without a deposit | `vault.approve_payment, no deposit` | NEAR protocol (key permissions) | `MethodNameMismatch` |
+| Enroll its own account as a hospital so it can be paid | `vault.enroll_payee(agent account)` | NEAR protocol (key permissions) | `MethodNameMismatch` |
+| Authorize a fake invoice for itself | `vault.authorize_invoice` | NEAR protocol (key permissions) | `MethodNameMismatch` |
+| Switch itself back on after the family switched it off | `vault.enable_agent` | NEAR protocol (key permissions) | `MethodNameMismatch` |
+| Withdraw the case's money | `vault.withdraw` | NEAR protocol (key permissions) | `MethodNameMismatch` |
+| Move tokens with the token contract directly, skipping the vault | `tusdc.ft_transfer(to agent), deposit 1 yoctoNEAR` | NEAR protocol (key permissions) | `DepositWithFunctionCall` |
+| Call the token contract without a deposit | `tusdc.ft_transfer(to agent), no deposit` | NEAR protocol (key permissions) | `ReceiverMismatch` |
+| Give itself a full-access key | `AddKey(full access) on the agent account` | NEAR protocol (key permissions) | `RequiresFullAccess` |
+| Deploy its own code on the agent account | `DeployContract on the agent account` | NEAR protocol (key permissions) | `RequiresFullAccess` |
+| Send NEAR out of the agent account | `Transfer 0.01 NEAR to the vault` | NEAR protocol (key permissions) | `RequiresFullAccess` |
+| Propose paying an invoice the verifier never authorized (for a look-alike recipient) | `vault.propose_payment(unknown invoice)` | Vault contract | `E_INVOICE_NOT_FOUND` |
+| Propose a payment above the family's limits on a real invoice | `vault.propose_payment(authorized invoice, 1,000,000 tUSDC)` | Vault contract | `E_CAP_PAYMENT` |
+
+| Balance | Before | After |
+|---|---|---|
+| Attacker (agent account) tUSDC | 0.00 | 0.00 |
+| Vault tUSDC | 22,374.55 | 22,374.55 |
+| Family case balance | 22,374.55 | 22,374.55 |
+| Family case reserved | 0.00 | 0.00 |
+| Family case in flight | 0.00 | 0.00 |
+| Family case paid | 7,625.45 | 7,625.45 |
+
+**Held:** every attempt was refused and no balance changed.
+
 ## Switching the agent off, then deleting its key (sandbox)
 
 After the family's `revoke_agent`, the case shows `agent_enabled: false` and `reserved: 0`; the pending proposal became `Invalidated` (`E_AGENT_DISABLED`).
@@ -75,6 +118,11 @@ A confirmed failure credits the hospital nothing and returns the amount and its 
 
 The app anchored log entry #2 (head `7293a789549c78756cca75ecea9878cfbda0ec0254ce01c56d1826c7208e5006`) on `vault.sandbox` with the agent key: status `confirmed`, block 67.
 Check before any edit: `ok: true`. After editing entry #2: `ok: false`, "The log was changed after it was anchored (entry #2)."
+
+## Activity-log anchor and tamper check (testnet)
+
+Log entry #41 (head `a6056b67a3aceaaf8c20330020b362c8c7af53a1dba0568a20994d211e0d41c8`) anchored on `vault.kinwarden-demo.testnet`: [transaction](https://testnet.nearblocks.io/txns/2VaDSfVR24b95gLQ34kpdW3mC7ggBVQY5mHMJJEXzKYE), block 276210787, label `c2d305:th-medical:G4 testnet anchor check`.
+Check: `ok: true`. After editing entry #41: `ok: false`, "The log was changed after it was anchored (entry #41)." After restoring the original text: `ok: true`.
 
 ## Targeted mutation checks
 
