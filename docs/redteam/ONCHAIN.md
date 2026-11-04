@@ -78,13 +78,13 @@ Check before any edit: `ok: true`. After editing entry #2: `ok: false`, "The log
 
 ## Targeted mutation checks
 
-Each mutation removes one hard check from the vault; `cargo test -p kinwarden-vault --quiet` must fail with it applied (commit `50457a0`). This shows these tests cover these controls; it is not an audit or a coverage guarantee.
+Each mutation removes one hard check from the vault; `cargo test -p kinwarden-vault --quiet` must fail with it applied (commit `d63dd6f`). This shows these tests cover these controls; it is not an audit or a coverage guarantee.
 
 | Control | Mutation caught | Failing tests |
 |---|---|---|
-| Only verifier-enrolled, active institutions can be proposed for payment | yes | — |
-| A proposal cannot exceed what the verifier authorized for the invoice | yes | — |
-| Proposing reserves the amount, so pending payments cannot overspend the case | yes | — |
-| The family's approval must carry the hash of the exact stored proposal | yes | — |
-| An approval made under an older policy version is refused | yes | — |
-| A transfer's result is accounted once; a repeated or late callback changes nothing | yes | — |
+| Only verifier-enrolled, active institutions can be proposed for payment | yes | `invoice_of_a_revoked_payee_cannot_be_proposed` |
+| A proposal cannot exceed what the verifier authorized for the invoice | yes | `invoice_ceiling_counts_reservations` |
+| Proposing reserves the amount, so pending payments cannot overspend the case | yes | `approval_happens_once`, `approval_moves_reservation_to_in_flight`, `failed_transfer_restores_funds_once_and_allows_a_retry`, `finishing_a_pending_proposal_does_nothing`, `invoice_revocation_invalidates_pending_immediately`, `late_failure_never_releases_current_window_budget`, `lifetime_cap_counts_paid_amounts`, `liquidity_counts_reservations`, `owner_withdraws_only_unreserved_funds`, `policy_change_pause_and_agent_revocation_invalidate_pending`, `preview_matches_what_approval_checks`, `proposal_is_approvable_until_just_before_expiry`, `proposal_rate_is_bounded_even_when_rejected`, `proposal_reserves_and_takes_recipient_from_the_verifier`, `rejection_releases_reservation_once`, `repeated_request_returns_the_same_proposal_and_reserves_once`, `reserved_funds_cannot_be_withdrawn`, `rolling_window_counts_a_charge_for_exactly_24_hours`, `rolling_window_still_counts_one_nanosecond_before_24_hours`, `successful_transfer_settles_once`, `sweep_releases_expired_and_payee_changed_proposals` |
+| The family's approval must carry the hash of the exact stored proposal | yes | `approval_with_other_hash_is_refused` |
+| An approval made under an older policy version is refused | yes | `approval_with_other_policy_version_is_refused` |
+| A transfer's result is accounted once; a repeated or late callback changes nothing | yes | `failed_transfer_restores_funds_once_and_allows_a_retry`, `finishing_a_pending_proposal_does_nothing`, `successful_transfer_settles_once` |

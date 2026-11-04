@@ -1,5 +1,5 @@
 {
-  "commit": "50457a0",
+  "commit": "d63dd6f",
   "command": "cargo test -p kinwarden-vault --quiet",
   "results": [
     {
@@ -7,7 +7,9 @@
       "control": "Only verifier-enrolled, active institutions can be proposed for payment",
       "file": "contracts/near/vault/src/payments.rs",
       "killed": true,
-      "failingTests": [],
+      "failingTests": [
+        "tests_payments::invoice_of_a_revoked_payee_cannot_be_proposed"
+      ],
       "compiled": true
     },
     {
@@ -15,7 +17,9 @@
       "control": "A proposal cannot exceed what the verifier authorized for the invoice",
       "file": "contracts/near/vault/src/payments.rs",
       "killed": true,
-      "failingTests": [],
+      "failingTests": [
+        "tests_payments::invoice_ceiling_counts_reservations"
+      ],
       "compiled": true
     },
     {
@@ -23,7 +27,29 @@
       "control": "Proposing reserves the amount, so pending payments cannot overspend the case",
       "file": "contracts/near/vault/src/payments.rs",
       "killed": true,
-      "failingTests": [],
+      "failingTests": [
+        "tests_payments::approval_happens_once",
+        "tests_payments::approval_moves_reservation_to_in_flight",
+        "tests_payments::failed_transfer_restores_funds_once_and_allows_a_retry",
+        "tests_payments::finishing_a_pending_proposal_does_nothing",
+        "tests_payments::invoice_revocation_invalidates_pending_immediately",
+        "tests_payments::late_failure_never_releases_current_window_budget",
+        "tests_payments::lifetime_cap_counts_paid_amounts",
+        "tests_payments::liquidity_counts_reservations",
+        "tests_payments::owner_withdraws_only_unreserved_funds",
+        "tests_payments::policy_change_pause_and_agent_revocation_invalidate_pending",
+        "tests_payments::preview_matches_what_approval_checks",
+        "tests_payments::proposal_is_approvable_until_just_before_expiry",
+        "tests_payments::proposal_rate_is_bounded_even_when_rejected",
+        "tests_payments::proposal_reserves_and_takes_recipient_from_the_verifier",
+        "tests_payments::rejection_releases_reservation_once",
+        "tests_payments::repeated_request_returns_the_same_proposal_and_reserves_once",
+        "tests_payments::reserved_funds_cannot_be_withdrawn",
+        "tests_payments::rolling_window_counts_a_charge_for_exactly_24_hours",
+        "tests_payments::rolling_window_still_counts_one_nanosecond_before_24_hours",
+        "tests_payments::successful_transfer_settles_once",
+        "tests_payments::sweep_releases_expired_and_payee_changed_proposals"
+      ],
       "compiled": true
     },
     {
@@ -31,7 +57,9 @@
       "control": "The family's approval must carry the hash of the exact stored proposal",
       "file": "contracts/near/vault/src/payments.rs",
       "killed": true,
-      "failingTests": [],
+      "failingTests": [
+        "tests_payments::approval_with_other_hash_is_refused"
+      ],
       "compiled": true
     },
     {
@@ -39,7 +67,9 @@
       "control": "An approval made under an older policy version is refused",
       "file": "contracts/near/vault/src/payments.rs",
       "killed": true,
-      "failingTests": [],
+      "failingTests": [
+        "tests_payments::approval_with_other_policy_version_is_refused"
+      ],
       "compiled": true
     },
     {
@@ -47,7 +77,11 @@
       "control": "A transfer's result is accounted once; a repeated or late callback changes nothing",
       "file": "contracts/near/vault/src/payments.rs",
       "killed": true,
-      "failingTests": [],
+      "failingTests": [
+        "tests_payments::failed_transfer_restores_funds_once_and_allows_a_retry",
+        "tests_payments::finishing_a_pending_proposal_does_nothing",
+        "tests_payments::successful_transfer_settles_once"
+      ],
       "compiled": true
     }
   ]
