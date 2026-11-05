@@ -25,6 +25,8 @@ COPY --from=build --chown=node:node /app/.next/static ./.next/static
 COPY --from=build --chown=node:node /app/public ./public
 # curated live runs for Replay mode
 COPY --from=build --chown=node:node /app/recordings ./recordings
+# the public NEAR testnet deployment (account names and limits only), for the read-only demo
+COPY --from=build --chown=node:node /app/deploy/near-testnet.json ./deploy/near-testnet.json
 RUN mkdir -p /data && chown node:node /data
 USER node
 VOLUME ["/data"]

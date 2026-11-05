@@ -47,3 +47,15 @@ export function nearConfig(): NearConfig | null {
 export function explorerTx(d: NearDeployment, hash: string): string | undefined {
   return d.explorerTx ? `${d.explorerTx}${hash}` : undefined;
 }
+
+/**
+ * A deployment without the agent's private key, for a public demo: the app reads NEAR (the agent key's
+ * permissions, the vault) from public RPC and shows recorded runs instead of signing anything. Needs
+ * the deployment file and NEAR_AGENT_PUBLIC_KEY; never active when NEAR_AGENT_KEY is set.
+ */
+export function nearReadOnly(): { deployment: NearDeployment; agentPublicKey: string } | null {
+  const file = deploymentFile();
+  const agentPublicKey = process.env.NEAR_AGENT_PUBLIC_KEY;
+  if (process.env.NEAR_AGENT_KEY || !agentPublicKey || !fs.existsSync(/*turbopackIgnore: true*/ file)) return null;
+  return { deployment: JSON.parse(fs.readFileSync(/*turbopackIgnore: true*/ file, "utf8")) as NearDeployment, agentPublicKey };
+}

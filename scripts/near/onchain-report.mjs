@@ -19,6 +19,7 @@ const testnet = read("bypass-testnet.json");
 const testnetVault = read("testnet-vault.json");
 const anchorTestnet = read("anchor-testnet.json");
 const nearaiReplay = read("nearai-replay-sandbox.json");
+const forged = read("forged-sandbox.json");
 
 const t = (units) => (Number(BigInt(units) / BigInt(10_000)) / 100).toLocaleString("en-US", { minimumFractionDigits: 2 });
 const by = (r) => (r.refusedBy === "protocol" ? "NEAR protocol (key permissions)" : r.refusedBy === "contract" ? "Vault contract" : "**NOT REFUSED**");
@@ -120,6 +121,19 @@ if (anchorTestnet) {
   const a = anchorTestnet.anchor;
   line(`Log entry #${a.seq} (head \`${a.hash}\`) anchored on \`${a.chain.contract}\`: [transaction](${a.chain.explorerUrl}), block ${a.chain.blockNumber}, label \`${anchorTestnet.clean.onChain.label}\`.`);
   line(`Check: \`ok: ${anchorTestnet.clean.ok}\`. After editing entry #${a.seq}: \`ok: ${anchorTestnet.tampered.ok}\`, "${anchorTestnet.tampered.reason}" After restoring the original text: \`ok: ${anchorTestnet.restored.ok}\`.`);
+  line();
+}
+
+if (forged) {
+  line("## A forged proposal shown to the family's wallet (sandbox)");
+  line();
+  line(`A lying RPC shows the family proposal ${forged.proposal.proposalId} (${t(forged.proposal.amount)} tUSDC to \`${forged.proposal.recipient}\`) with fields changed, and the family's real wallet signs an approval for what it was shown. The forged recipient is \`${forged.forgedRecipient}\`.`);
+  line();
+  line("| Forgery | Refused by the vault with |");
+  line("|---|---|");
+  for (const r of forged.results) line(`| ${r.title} | \`${r.refusedWith}\` |`);
+  line();
+  line(`Balances after the forged approvals: attacker ${t(forged.afterForgeries.attacker)} tUSDC (before ${t(forged.before.attacker)}), hospital ${t(forged.afterForgeries.hospital)} (before ${t(forged.before.hospital)}), case reserved ${t(forged.afterForgeries.caseReserved)}; the proposal stayed pending. The honest approval afterwards paid exactly ${t(forged.honestApprovalPaid)} tUSDC. In the browser, a field changed with the vault's hash kept turns Approve off (\`src/near/approvalCheck.test.ts\`). Covered by \`src/server/near/forged.sandbox.ts\`.`);
   line();
 }
 

@@ -1,0 +1,34 @@
+{
+  "network": "testnet",
+  "rpcUrl": "https://near-testnet.drpc.org",
+  "explorerTx": "https://testnet.nearblocks.io/txns/",
+  "vault": "vault.kinwarden-demo.testnet",
+  "token": "tusdc.kinwarden-demo.testnet",
+  "tokenSymbol": "tUSDC",
+  "tokenDecimals": 6,
+  "verifier": "verifier.kinwarden-demo.testnet",
+  "agent": "agent.kinwarden-demo.testnet",
+  "caseLimits": {
+    "per_payment_max": "15000000000",
+    "rolling_24h_cap": "20000000000",
+    "lifetime_cap": "60000000000",
+    "group_caps": [
+      {
+        "group": "Hospital",
+        "rolling_24h_cap": "18000000000"
+      }
+    ]
+  },
+  "cases": {
+    "case_th": {
+      "vaultCaseId": "case-th-e16f",
+      "owner": "simplekale6118.testnet"
+    }
+  },
+  "payees": {
+    "srh": {
+      "payeeId": "srh",
+      "account": "siam-riverside-hospital.kinwarden-demo.testnet"
+    }
+  }
+}

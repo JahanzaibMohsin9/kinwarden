@@ -1,8 +1,16 @@
-# Linux build and sandbox-test environment for the Kinwarden NEAR contracts.
+# Linux build and sandbox-test environment for the Kinwarden NEAR contracts and the app tests on a local
+# node (scripts/near/check.sh --docker).
 # The NEAR sandbox runs on Linux x86_64 and macOS ARM64 only, so Windows hosts
 # use this image. Build: docker build -f contracts/near/dev.Dockerfile -t kinwarden-near-dev contracts/near
 # The near-sandbox 2.14 node binary needs glibc >= 2.39, so the base is Debian trixie.
+FROM node:24.14.0-trixie-slim AS node
+
 FROM rust:1.95-trixie
+
+# Node 24 for `npm run test:near` (merged into /usr/local next to the Rust toolchain)
+COPY --from=node /usr/local/bin/node /usr/local/bin/node
+COPY --from=node /usr/local/lib/node_modules /usr/local/lib/node_modules
+RUN ln -s ../lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm && ln -s ../lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx
 
 RUN rustup target add wasm32-unknown-unknown \
  && apt-get update \

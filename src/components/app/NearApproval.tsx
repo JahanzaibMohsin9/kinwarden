@@ -4,20 +4,12 @@ import { Link2, Loader2, ShieldCheck, TriangleAlert, Wallet } from "lucide-react
 import { useEffect, useState } from "react";
 import { post, useCarry } from "@/lib/client";
 import { cn } from "@/lib/format";
-import { commitmentForProposal, commitmentHash, type VaultProposal } from "@/near/commitment";
+import { approvalCheck, type ApprovalPreview } from "@/near/approvalCheck";
 import { nearView, tusdc } from "@/near/rpc";
 import { callWithWallet, connectWallet, connectedAccount } from "@/near/wallet";
 import { NearOutcomeNote, NearReceiptView } from "./NearReceipt";
 
-interface Preview {
-  proposal: VaultProposal;
-  commitment_hash: string;
-  blockers: string[];
-  case_available: string;
-  invoice_remaining: string;
-  rolling_24h_remaining: string;
-  lifetime_remaining: string;
-}
+type Preview = ApprovalPreview;
 
 const WAITING: Record<string, string> = {
   proposing: "Registering this payment on the NEAR vault…",
@@ -68,11 +60,7 @@ export function NearApproval({ paymentId, onDone }: { paymentId: string; onDone:
   if (!near || !p || !link) return null;
 
   const proposal = preview?.proposal;
-  const localHash = proposal ? commitmentHash(commitmentForProposal(proposal, near.network, near.vault)) : null;
-  const hashOk = Boolean(preview && localHash === preview.commitment_hash);
-  const pending = proposal?.status === "PendingApproval";
-  const rightAccount = account !== null && account === owner;
-  const canDecide = Boolean(pending && hashOk && preview && !preview.blockers.length && walletNet && rightAccount);
+  const { localHash, hashOk, pending, rightAccount, canDecide } = approvalCheck({ preview, network: near.network, vault: near.vault, account, owner, walletAvailable: Boolean(walletNet) });
 
   const run = async (kind: "approve" | "reject") => {
     if (!proposal || !walletNet || !localHash) return;

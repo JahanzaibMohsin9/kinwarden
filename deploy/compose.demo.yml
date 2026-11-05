@@ -1,0 +1,7 @@
+# Public demo: the app with deploy/demo.env (no keys) instead of .env.production.
+#   echo "KINWARDEN_DOMAIN=<hostname>" > .env
+#   docker compose -f docker-compose.yml -f deploy/compose.demo.yml up -d --build
+services:
+  app:
+    env_file: !override
+      - deploy/demo.env

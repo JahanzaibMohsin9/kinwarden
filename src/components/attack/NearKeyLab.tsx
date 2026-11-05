@@ -9,6 +9,8 @@ const card = "rounded-2xl border border-white/10 bg-white/[0.04]";
 
 interface Live {
   configured: boolean;
+  /** public demo: no key on the server; the run shown was recorded on testnet with the real key */
+  readOnly?: boolean;
   network?: string;
   vault?: string;
   explorerTx?: string | null;
@@ -57,7 +59,8 @@ export function NearKeyLab({ recorded }: { recorded: (BypassRun & { commit?: str
 
   const run = live?.lastRun ?? recorded;
   const permissions = live?.permissions ?? run?.permissions;
-  const isLive = Boolean(live?.lastRun);
+  const isLive = Boolean(live?.lastRun) && !live?.readOnly;
+  const recordedOnNetwork = live?.readOnly && live.lastRun ? live.network : null;
   if (!run && !permissions) return null;
   const txUrl = (hash?: string) => (hash && live?.explorerTx ? `${live.explorerTx}${hash}` : undefined);
 
@@ -113,7 +116,11 @@ export function NearKeyLab({ recorded }: { recorded: (BypassRun & { commit?: str
       {run && (
         <div className="space-y-2">
           <h3 className="text-[13px] font-semibold uppercase tracking-[0.08em] text-[#9fb2ad]">
-            {isLive ? `Run just now on NEAR ${run.network}` : `Recorded on a local NEAR node${recorded?.commit ? ` (commit ${recorded.commit})` : ""}`}
+            {isLive
+              ? `Run just now on NEAR ${run.network}`
+              : recordedOnNetwork
+                ? `Recorded on NEAR ${recordedOnNetwork} with the app's real key${run.ranAt ? `, ${run.ranAt.slice(0, 10)}` : ""}`
+                : `Recorded on a local NEAR node${recorded?.commit ? ` (commit ${recorded.commit})` : ""}`}
           </h3>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[560px] text-left text-[13px]">
@@ -156,7 +163,12 @@ export function NearKeyLab({ recorded }: { recorded: (BypassRun & { commit?: str
         </div>
       )}
 
-      {live?.configured && (
+      {live?.readOnly && (
+        <p className="text-[12px] text-[#9fb2ad]">
+          This public demo holds no NEAR key, so it cannot send the attack again. The permissions above are read from NEAR {live.network} now; the table is the run recorded there with the app&apos;s real key.
+        </p>
+      )}
+      {live?.configured && !live.readOnly && (
         <div className="space-y-1">
           <button
             onClick={runLive}
