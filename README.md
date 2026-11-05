@@ -102,7 +102,7 @@ Vault WASM sha256: 732efbe16dc736a12e1a6be3d3edffade747439cbe259695d37c4ce229f95
 All suites passed.
 ```
 
-The script exits non-zero if any suite fails. The WASM hash above is the code the testnet vault runs; step 1's `verify.mjs` compares the two. The same steps by hand:
+The script exits non-zero if any suite fails. Built natively on Ubuntu 24.04, the vault WASM hash above is the code the testnet vault runs; step 1's `verify.mjs` compares the two. The `--docker` run passes the same suites but prints a different hash, because a non-reproducible build embeds its build path. The same steps by hand:
 
 ```bash
 (cd contracts/near && cargo test -p kinwarden-vault -p kinwarden-tusdc)   # contract unit tests

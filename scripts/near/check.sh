@@ -11,9 +11,11 @@ cd "$(dirname "$0")/../.."
 
 if [ "${1:-}" = "--docker" ]; then
   docker build -q -f contracts/near/dev.Dockerfile -t kinwarden-near-dev contracts/near >/dev/null || exit 1
-  # node_modules and target stay inside the container's volume so the host's (Windows/macOS) builds are untouched
+  # node_modules and target stay inside the container's volumes so the host's (Windows/macOS) builds are untouched;
+  # TMPDIR is on the node_modules volume because near-sandbox moves its downloaded node binary from TMPDIR into it
   exec docker run --rm -v "$PWD":/work -v kinwarden-near-target:/work/contracts/near/target -v kinwarden-node-modules:/work/node_modules \
-    -w /work kinwarden-near-dev bash -c 'npm ci --no-audit --no-fund >/dev/null && bash scripts/near/check.sh'
+    -w /work kinwarden-near-dev \
+    bash -c 'npm ci --no-audit --no-fund >/dev/null && mkdir -p node_modules/.tmp && TMPDIR=/work/node_modules/.tmp bash scripts/near/check.sh'
 fi
 
 LOG=$(mktemp -d)
@@ -35,7 +37,7 @@ run() {
 # "test result: ok. 98 passed; 0 failed" lines from cargo, summed
 cargo_count='awk "/^test result:/ {p+=\$4; f+=\$6} END {printf \"%d passed, %d failed\", p, f}"'
 # "Tests  5 passed (5)" from vitest, colour codes removed
-vitest_count='sed "s/\x1b\[[0-9;]*m//g" | awk "/^ *Test Files/ {files=\$3} /^ *Tests/ {print \$2\" tests passed in \"files\" files\"; found=1} END {if (!found) print \"no summary\"}"'
+vitest_count='sed "s/\x1b\[[0-9;]*m//g" | awk "/^ *Test Files/ {f=\$0} /^ *Tests  / {t=\$0} END {gsub(/^ +| +\$/, \"\", f); gsub(/^ +| +\$/, \"\", t); gsub(/ +/, \" \", f); gsub(/ +/, \" \", t); if (f) print f\" · \"t; else print \"no summary\"}"'
 build_count='echo "wasm built"'
 
 echo "Kinwarden NEAR check · $(git rev-parse --short HEAD 2>/dev/null || echo unknown) · logs in $LOG"
