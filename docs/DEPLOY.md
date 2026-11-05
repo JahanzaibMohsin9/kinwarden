@@ -27,6 +27,24 @@ Caddy gets and renews the certificate on its own, and passes the event stream th
 
 Update: `git pull && docker compose up -d --build`. Logs: `docker compose logs -f app`.
 
+## Public demo: Replay, read-only NEAR, no keys
+
+For a public URL, run the app with `deploy/demo.env` instead of `.env.production`. It holds no secrets:
+no NEAR agent key, no model key and no anchor key. Visitors each get their own sandbox, starting in
+Replay (the recorded live NEAR AI runs). The NEAR parts are read-only: the attack lab reads the agent
+key's permissions from public testnet RPC with the agent's public key, and shows the bypass run that
+was recorded on testnet with the real key; the rerun button is off.
+
+```bash
+echo "KINWARDEN_DOMAIN=<hostname>" > .env
+docker compose -f docker-compose.yml -f deploy/compose.demo.yml up -d --build
+```
+
+After deploying, check from a fresh browser with no cookies: the landing page's testnet links open,
+the hospital case plays in Replay, and the attack lab shows "read now" permissions and the testnet
+run. `GET /api/state` must show `"near": null` and `"hasKey": false`, and `POST /api/near/bypass` must
+answer 403.
+
 ## On a server that already runs other sites
 
 If ports 80/443 are taken by your own reverse proxy, run only the app and point the proxy at it:

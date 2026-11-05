@@ -1,5 +1,5 @@
 {
-  "commit": "8fa482a",
+  "commit": "c6e3c3c",
   "command": "cargo test -p kinwarden-vault --quiet",
   "results": [
     {

@@ -1,13 +1,13 @@
 {
   "network": "sandbox",
-  "commit": "8fa482a",
+  "commit": "c6e3c3c",
   "wasmSha256": {
     "vault": "732efbe16dc736a12e1a6be3d3edffade747439cbe259695d37c4ce229f95ff4",
     "token": "243798d400c1039b95a02c9a235fb43812872400d90b371d876d17de9322cd7f"
   },
   "amountUnits": "7000000000",
-  "failedApprovalTx": "D7V3DF4uVt5aUEzk8ZcA14SrEMK4FUJMDpx4gvbAWTZi",
-  "settledApprovalTx": "FbF9NoCnao8LdktNhB2bHBK9ZekojmDUVHL1mguQEi5h",
+  "failedApprovalTx": "CrUb5qXs1EUht2TpZMSQZT9ErYS5vFsZXgBtYh5ERVom",
+  "settledApprovalTx": "HABVzBd48YoVkcDZuMd4Xk3bDKBTH2GJxX7wgrtrBzBv",
   "rows": [
     {
       "step": "1. Case funded",

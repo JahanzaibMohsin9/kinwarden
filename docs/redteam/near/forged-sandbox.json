@@ -1,0 +1,44 @@
+{
+  "network": "sandbox",
+  "proposal": {
+    "proposalId": "1",
+    "recipient": "siam-riverside-hospital.sandbox",
+    "amount": "7000000000"
+  },
+  "forgedRecipient": "agent.sandbox",
+  "results": [
+    {
+      "id": "recipient-changed-hash-kept",
+      "title": "Recipient changed, the vault's hash kept",
+      "refusedWith": "E_FIELD_MISMATCH"
+    },
+    {
+      "id": "recipient-and-hash-forged",
+      "title": "Recipient changed and the hash recomputed to match",
+      "refusedWith": "E_FIELD_MISMATCH"
+    },
+    {
+      "id": "amount-and-hash-forged",
+      "title": "Amount changed and the hash recomputed to match",
+      "refusedWith": "E_FIELD_MISMATCH"
+    },
+    {
+      "id": "hash-only-forged",
+      "title": "Fields honest, the hash of a forged recipient",
+      "refusedWith": "E_COMMITMENT_MISMATCH"
+    }
+  ],
+  "before": {
+    "attacker": "0",
+    "hospital": "0",
+    "caseReserved": "7000000000",
+    "caseBalance": "30000000000"
+  },
+  "afterForgeries": {
+    "attacker": "0",
+    "hospital": "0",
+    "caseReserved": "7000000000",
+    "caseBalance": "30000000000"
+  },
+  "honestApprovalPaid": "7000000000"
+}
