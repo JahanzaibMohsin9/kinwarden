@@ -1,23 +1,23 @@
 {
   "anchor": {
-    "id": "anc_mw289fel_1",
+    "id": "anc_mw3lqae6_1",
     "seq": 2,
-    "hash": "7293a789549c78756cca75ecea9878cfbda0ec0254ce01c56d1826c7208e5006",
-    "at": "2026-11-04T14:44:14.014Z",
+    "hash": "f6a1f35411598324c15916c4c0138238788dd497769ec53788aa385bb52c3c7d",
+    "at": "2026-11-05T13:49:01.854Z",
     "simAt": "2026-11-02T02:30:00.000Z",
     "note": "payment approved",
     "chain": {
       "chainId": "near:sandbox",
       "contract": "vault.sandbox",
       "status": "confirmed",
-      "txHash": "5A1M25ma88mZ6EAVzPwM9sJbz42MTVSVSsbWX2KFxQ1o",
+      "txHash": "2vtxNyhJEuiTpsRJP1iZ5u8738fyZr3BxR1H1QMAtAib",
       "blockNumber": 67
     }
   },
   "clean": {
     "ok": true,
     "onChain": {
-      "head": "7293a789549c78756cca75ecea9878cfbda0ec0254ce01c56d1826c7208e5006",
+      "head": "f6a1f35411598324c15916c4c0138238788dd497769ec53788aa385bb52c3c7d",
       "seq": 2,
       "label": "run001:th-medical:payment approved",
       "blockNumber": 67,
@@ -30,7 +30,7 @@
   "tampered": {
     "ok": false,
     "onChain": {
-      "head": "7293a789549c78756cca75ecea9878cfbda0ec0254ce01c56d1826c7208e5006",
+      "head": "f6a1f35411598324c15916c4c0138238788dd497769ec53788aa385bb52c3c7d",
       "seq": 2,
       "label": "run001:th-medical:payment approved",
       "blockNumber": 67,
