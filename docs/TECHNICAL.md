@@ -1,6 +1,6 @@
 # Kinwarden: technical documentation
 
-Application baseline documentation. NEAR integration is planned; see the repository README for current status.
+Application baseline documentation. The NEAR integration (vault and token contracts, restricted agent key, family wallet approval, NEAR log anchors) is documented in [docs/near](near/), with its claim → test map in [docs/near/CLAIMS.md](near/CLAIMS.md); see the repository README for current status.
 
 Companion documents: [SECURITY.md](SECURITY.md) (security self-assessment), [EVAL.md](EVAL.md) (live evaluation), [evidence/](evidence/README.md) (execution logs with on-chain anchors), [DEPLOY.md](DEPLOY.md). Live demo: http://localhost:3000 · Source: https://github.com/JahanzaibMohsin9/kinwarden
 

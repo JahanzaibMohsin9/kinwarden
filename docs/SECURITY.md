@@ -1,6 +1,6 @@
 # Kinwarden: security self-assessment
 
-> Inherited application baseline documentation. Any historical live-model results describe baseline runs, not a new Kinwarden evaluation. NEAR security controls are not implemented yet. See [the README](../README.md) for current status.
+> Inherited application baseline documentation. Any historical live-model results describe baseline runs, not a new Kinwarden evaluation. The NEAR vault, restricted agent key, family wallet approval and NEAR log anchors are documented separately in [docs/near](near/) and the [claim → test map](near/CLAIMS.md); see [the README](../README.md) for current status.
 
 Version 1.0 · 15 October 2026 · companion to [TECHNICAL.md](TECHNICAL.md)
 
