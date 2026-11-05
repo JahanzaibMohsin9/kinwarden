@@ -1,5 +1,7 @@
 # Kinwarden
 
+**Live demo: [kinwarden.duckdns.org](https://kinwarden.duckdns.org)**: your own sandbox, replaying the recorded NEAR AI runs, with NEAR testnet data read live. The demo server holds no keys, so it cannot sign anything.
+
 A family from Pakistan has to pay a Bangkok hospital for their father's heart procedure before treatment can go ahead. An AI agent can read the bill, check the hospital and prepare the payment, but nobody should have to trust that agent, or the server it runs on, with the family's money.
 
 Kinwarden is an assistant for families paying hospital and university bills abroad. It checks invoices and payment rules, compares bank and card routes, prepares forms, asks the family to approve, and records the outcome in a tamper-evident activity log. On NEAR, the money sits in a vault contract: the agent can only *propose* paying an invoice that an independent verifier authorized, the family approves the exact payment in their own NEAR wallet, and the vault pays only the enrolled institution, within the family's limits.

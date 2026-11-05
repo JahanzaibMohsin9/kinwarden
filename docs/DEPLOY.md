@@ -4,7 +4,7 @@ Kinwarden is one long-running Node process: the agent, the sandbox world, the ti
 
 ## Deployment status
 
-No Kinwarden deployment is configured by this repository setup. Local development runs at `http://localhost:3000`. The examples below describe how to deploy your own instance; replace example hostnames with a domain you control. Passkeys are scoped to the hostname where they were registered.
+The public demo runs at https://kinwarden.duckdns.org with `deploy/demo.env` (Replay, read-only NEAR, no keys), on a 2 vCPU / 4 GB VM. Local development runs at `http://localhost:3000`. The examples below describe how to deploy your own instance; replace example hostnames with a domain you control. Passkeys are scoped to the hostname where they were registered.
 
 ## Server requirements
 
