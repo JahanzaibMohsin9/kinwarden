@@ -9,7 +9,7 @@ import { extractText, getDocumentProxy } from "unpdf";
 import { DESTINATIONS } from "@/domain/corridors";
 import { USD_RATES } from "@/domain/market";
 import type { CaseType, Currency, Lang, UploadedBill } from "@/domain/types";
-import { fallbackConfig, providerConfig, type ProviderConfig } from "./agent/llm";
+import { fallbackConfig, maxTokens, providerConfig, type ProviderConfig } from "./agent/llm";
 import { nameForms } from "./agent/privacy";
 
 export const MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
@@ -106,7 +106,7 @@ async function extractWith(cfg: ProviderConfig, text: string) {
   const r = await client.chat.completions.create({
     model: cfg.model,
     response_format: { type: "json_object" },
-    ...(cfg.provider === "deepseek" ? { max_tokens: 4000 } : { max_completion_tokens: 4000 }),
+    ...maxTokens(cfg, 4000),
     messages: [
       { role: "system", content: EXTRACT_PROMPT },
       { role: "user", content: text },
@@ -130,7 +130,7 @@ export async function draftFromBill(
 ): Promise<BillDraft> {
   const masked = maskNames(read.text, [family.subjectName, family.payerName]);
   const primary = providerConfig();
-  if (primary.provider === "anthropic" || !primary.apiKey) throw new Error("Reading a bill needs the DeepSeek or OpenAI key.");
+  if (primary.provider === "anthropic" || !primary.apiKey) throw new Error("Reading a bill needs the NEAR AI, DeepSeek or OpenAI key.");
   let out: { json: unknown; model: string };
   try {
     out = await extractWith(primary, masked);

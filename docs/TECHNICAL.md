@@ -10,7 +10,7 @@ Companion documents: [SECURITY.md](SECURITY.md) (security self-assessment), [EVA
 |---|---|
 | What | An AI agent that pays a family's hospital and university bills abroad, under their home country's foreign-exchange rules |
 | Corridors | Pakistan → Thailand (hospital), Pakistan → UK (admission through an agent), China → UK (tuition; fake study agent), plus uploaded bills from 13 destination countries |
-| Model | DeepSeek V4 Pro (function calling, thinking mode); OpenAI fallback |
+| Model | NEAR AI Cloud (`deepseek-ai/DeepSeek-V4.1-Flash-1017`) when `NEARAI_API_KEY` is set, added for NEAR ([D-12](near/DECISIONS.md)); baseline: DeepSeek V4 Pro (function calling, thinking mode), OpenAI fallback |
 | Safety design | The AI proposes; deterministic code and the family's passkey decide. 17 tools in 3 permission tiers behind a safety gateway |
 | Validation | Run the unit and replay suites; see [EVAL.md](EVAL.md). |
 | Proof | SHA-256 hash-chained activity log, head hash anchored on the Conflux eSpace testnet at each milestone |
@@ -128,14 +128,15 @@ Returned transfers come back with a reason (e.g. the receiving bank needs the pa
 
 ## 4. LLM integration
 
-- **DeepSeek `deepseek-v4-pro`** in thinking mode with function calling, via the OpenAI SDK against `https://api.deepseek.com` (`src/server/agent/llm.ts`, `runner.ts`). Reasons: cost, and DeepSeek is reachable from mainland China.
+- **NEAR AI Cloud** (added for NEAR, [D-12](near/DECISIONS.md)): same Chat Completions path against `https://cloud-api.near.ai/v1`, chosen first when `NEARAI_API_KEY` is set, never falling back to another provider.
+- **DeepSeek `deepseek-v4-pro`** (baseline) in thinking mode with function calling, via the OpenAI SDK against `https://api.deepseek.com` (`src/server/agent/llm.ts`, `runner.ts`). Reasons: cost, and DeepSeek is reachable from mainland China.
 - DeepSeek requires the model's `reasoning_content` to be sent back on every request when tools are used; the loop keeps it on each assistant message.
 - **Fallback:** if DeepSeek returns an API error, the same wake-up is retried on OpenAI (`gpt-5.4-mini`) and the switch is logged. Our own safety checks never trigger a fallback.
 - Malformed tool arguments are returned to the model as an error to correct, never executed.
 - Tools are defined once as zod schemas, converted to JSON Schema for the API, and validated again by the gateway before running.
 - Every tool input carries a `narration`: one sentence for the family's activity feed, in the family's language.
 - The model's reasoning summary is logged and shown under "How Kinwarden reasoned" in the feed.
-- Live runs are recorded (tool name + input per step). Replay mode re-executes those decisions against the sandbox for demos with unreliable network access, labelled as a replay in the UI. Curated best runs live in `recordings/<scenario>.json` (committed); Replay prefers them over the newest local run.
+- Live runs are recorded (tool name + input per step). Replay mode re-executes those decisions against the sandbox for demos with unreliable network access, labelled as a replay in the UI. Curated runs live in `recordings/<scenario>.json` (committed; live NEAR AI Cloud runs since 5 Nov 2026); Replay prefers them over the newest local run. The baseline's DeepSeek runs are kept in `recordings/baseline/`, and `npm run eval:replay` replays both sets.
 - Token usage is logged per wake-up (`agent.usage`), including DeepSeek's cache hits, so each case's AI cost is measured, not estimated.
 
 ### 4.1 Privacy firewall

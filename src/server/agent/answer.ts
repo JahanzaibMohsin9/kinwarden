@@ -6,7 +6,7 @@ import OpenAI from "openai";
 import type { Store } from "../store";
 import { buildVault } from "./privacy";
 import { caseSnapshot } from "./snapshot";
-import { fallbackConfig, providerConfig, type ProviderConfig } from "./llm";
+import { fallbackConfig, maxTokens, providerConfig, type ProviderConfig } from "./llm";
 import { withNetworkRetry } from "./runner";
 
 const SYSTEM = `You are Kinwarden, an agent that pays a family's hospital or university bills abroad under their home country's rules. In this mode you can only answer the family's question: you cannot send emails, propose or make payments, or change anything, and you must not promise to.
@@ -21,7 +21,7 @@ async function ask(cfg: ProviderConfig, user: string) {
   const r = await withNetworkRetry(() =>
     client.chat.completions.create({
       model: cfg.model,
-      ...(cfg.provider === "deepseek" ? { max_tokens: 800 } : { max_completion_tokens: 800 }),
+      ...maxTokens(cfg, 800),
       messages: [
         { role: "system", content: SYSTEM },
         { role: "user", content: user },

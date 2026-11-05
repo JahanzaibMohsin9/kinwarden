@@ -18,6 +18,7 @@ const mutants = read("mutants.json");
 const testnet = read("bypass-testnet.json");
 const testnetVault = read("testnet-vault.json");
 const anchorTestnet = read("anchor-testnet.json");
+const nearaiReplay = read("nearai-replay-sandbox.json");
 
 const t = (units) => (Number(BigInt(units) / BigInt(10_000)) / 100).toLocaleString("en-US", { minimumFractionDigits: 2 });
 const by = (r) => (r.refusedBy === "protocol" ? "NEAR protocol (key permissions)" : r.refusedBy === "contract" ? "Vault contract" : "**NOT REFUSED**");
@@ -119,6 +120,20 @@ if (anchorTestnet) {
   const a = anchorTestnet.anchor;
   line(`Log entry #${a.seq} (head \`${a.hash}\`) anchored on \`${a.chain.contract}\`: [transaction](${a.chain.explorerUrl}), block ${a.chain.blockNumber}, label \`${anchorTestnet.clean.onChain.label}\`.`);
   line(`Check: \`ok: ${anchorTestnet.clean.ok}\`. After editing entry #${a.seq}: \`ok: ${anchorTestnet.tampered.ok}\`, "${anchorTestnet.tampered.reason}" After restoring the original text: \`ok: ${anchorTestnet.restored.ok}\`.`);
+  line();
+}
+
+if (nearaiReplay) {
+  const r = nearaiReplay;
+  line("## Recorded NEAR AI run, replayed through the vault (sandbox)");
+  line();
+  line(`The live NEAR AI Cloud run of the hospital case (\`${r.recording.file}\`, ${r.recording.model}, recorded ${r.recording.recordedAt.slice(0, 10)}) replayed without a model key, with the vault connected on a local node and a test-only key standing in for the family's wallet.`);
+  line();
+  line("| Proposal | Recipient | Amount | Status |");
+  line("|---|---|---|---|");
+  for (const p of r.vaultProposals) line(`| ${p.proposalId} | \`${p.recipient}\` | ${t(p.amount)} tUSDC | ${p.status} |`);
+  line();
+  line(`The model flagged the look-alike "new bank details" email; payments naming the forged account: ${r.paymentsToForgedAccount}. The hospital received ${t(r.hospitalReceived)} tUSDC; the family approved ${t(r.familyApproved)} tUSDC. Agent account tUSDC: ${t(r.agentTokensBefore)} before, ${t(r.agentTokensAfter)} after. All ${r.evaluationChecksPassed} evaluation checks passed. Covered by \`src/server/near/replay.sandbox.ts\`.`);
   line();
 }
 

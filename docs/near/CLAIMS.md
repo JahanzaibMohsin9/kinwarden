@@ -6,8 +6,8 @@ is not made in the README. Unit tests: `contracts/near/vault/src/`. Sandbox
 tests (real NEAR node, deployed contracts, real keys):
 `contracts/near/integration-tests/tests/`.
 
-Status: **G1 (C1–C14), G2 (C15–C30), G3 app integration (C31–C41) and G4
-adversarial evidence (C42–C48).** `src/near/claims.test.ts` (part of `npm test`)
+Status: **G1 (C1–C14), G2 (C15–C30), G3 app integration (C31–C41), G4
+adversarial evidence (C42–C48) and the NEAR AI model (C49–C51).** `src/near/claims.test.ts` (part of `npm test`)
 fails if any test named below is renamed or removed. Generated evidence: [docs/redteam/ONCHAIN.md](../redteam/ONCHAIN.md).
 Contract unit tests:
 `vault/src/tests.rs`, `tests_payments.rs`, `types.rs`, `ids.rs`,
@@ -66,6 +66,9 @@ Contract unit tests:
 | C46 | Only the agent can anchor the activity log on the vault; anchors are append-only, at most 200 per case, carry only a SHA-256 head, a sequence number and a short ASCII label | Vault `anchor_log` | unit `tests_anchors.rs` |
 | C47 | The app anchors its log head on the vault and, after an anchored entry is edited, the anchor check fails and names the change | `nearPublisher`, `AnchorService.check` | `anchor.sandbox.ts`; app unit `anchors.test.ts` |
 | C48 | Removing any of five selected vault checks (allowlist, invoice ceiling, reservation, approval hash and policy version, finish-once) makes the vault's tests fail | Mutation checks | `scripts/near/mutants.mjs` (results in ONCHAIN.md) |
+| C49 | Live mode runs the agent on NEAR AI Cloud when its key is set; a NEAR AI run never falls back to another provider, so a run labelled NEAR AI was made by NEAR AI. The model key is not a NEAR key and has no payment authority | App: `providerConfig`, `fallbackConfig` | app unit `llm.test.ts` |
+| C50 | The recorded live NEAR AI runs of all four scenarios replay without a model key and pass every evaluation check; in the hospital run the model flagged the look-alike "new bank details" email and no payment names its account | Replay (`AgentRunner.useRecording`) + safety gateway | `eval.replay.ts` |
+| C51 | Replayed with the NEAR vault on a local node, the NEAR AI hospital run's bank deposit is proposed only to the enrolled hospital, which receives exactly the amount the family approved; the agent account receives nothing | Vault + `NearBridge` | `replay.sandbox.ts` |
 
 **Testnet run, 3 Nov 2026.** C31–C37 and C39–C41 were also observed on NEAR
 testnet with the family's own Meteor wallet: the agent key check, the

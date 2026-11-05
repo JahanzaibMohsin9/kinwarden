@@ -87,6 +87,13 @@ export class AgentRunner {
     this.replaySource = loadLatestRecording(w.scenarioId);
   }
 
+  /** Replay this recording instead of the curated one (the replay evaluation covers several per scenario). */
+  useRecording(rec: Recording) {
+    if (rec.scenarioId !== this.store.world.scenarioId) throw new Error(`Recording is for ${rec.scenarioId}, not ${this.store.world.scenarioId}.`);
+    this.replaySource = rec;
+    this.replayCursor.clear();
+  }
+
   enqueue(t: Trigger) {
     const list = this.pending.get(t.caseId) ?? [];
     list.push(t);
@@ -147,7 +154,7 @@ export class AgentRunner {
   private async runLive(caseId: string, triggers: Trigger[]) {
     const cfg = providerConfig();
     if (!cfg.apiKey) {
-      throw new Error("No LLM API key set. Add DEEPSEEK_API_KEY (or OPENAI_API_KEY) to .env.local, or switch the agent to Replay or Scripted mode in the Director.");
+      throw new Error("No LLM API key set. Add NEARAI_API_KEY (or DEEPSEEK_API_KEY, OPENAI_API_KEY) to .env.local, or switch the agent to Replay or Scripted mode in the Director.");
     }
     if (cfg.provider !== "anthropic") {
       try {
@@ -163,7 +170,7 @@ export class AgentRunner {
     await this.runLiveAnthropic(caseId, triggers, cfg);
   }
 
-  /** DeepSeek and OpenAI via the Chat Completions API with function calling. */
+  /** NEAR AI Cloud, DeepSeek and OpenAI via the Chat Completions API with function calling. */
   private async runLiveOpenAICompatible(caseId: string, triggers: Trigger[], cfg: ProviderConfig) {
     const client = new OpenAI({ apiKey: cfg.apiKey, baseURL: cfg.baseURL, timeout: 180_000, maxRetries: 2 });
     const tools: OpenAI.Chat.Completions.ChatCompletionTool[] = anthropicToolDefs().map((t) => ({
@@ -206,6 +213,9 @@ export class AgentRunner {
         body.thinking = { type: "enabled" };
         body.reasoning_effort = cfg.effort;
         body.max_tokens = 16000;
+      } else if (cfg.provider === "nearai") {
+        // NEAR AI serves many model families; max_tokens is the parameter all of them accept
+        body.max_tokens = 16000;
       } else {
         // OpenAI's Chat Completions rejects reasoning_effort together with function tools on gpt-5.4-mini
         // (it wants the Responses API for that), so the model's default reasoning is used here.
@@ -220,8 +230,9 @@ export class AgentRunner {
       usage.cachedInputTokens += u?.prompt_cache_hit_tokens ?? u?.prompt_tokens_details?.cached_tokens ?? 0;
       usage.outputTokens += u?.completion_tokens ?? 0;
       const choice = response.choices[0];
-      const msg = choice.message as OpenAI.Chat.Completions.ChatCompletionMessage & { reasoning_content?: string };
-      const thinking = msg.reasoning_content?.trim() ?? "";
+      const msg = choice.message as OpenAI.Chat.Completions.ChatCompletionMessage & { reasoning_content?: string; reasoning?: string };
+      // DeepSeek names the model's reasoning reasoning_content; several NEAR AI models call it reasoning
+      const thinking = (msg.reasoning_content ?? msg.reasoning)?.trim() ?? "";
       // the log is ours and the family reads it: real names go back in for display
       if (thinking) this.store.log({ actor: "agent", type: "agent.thinking", caseId, data: { summary: vault.unmask(thinking.slice(0, 1500)), model: cfg.label } });
 
@@ -438,7 +449,7 @@ function describeError(err: unknown): string {
   if (err instanceof Anthropic.RateLimitError) return "Rate limited by the Anthropic API. Try again shortly.";
   if (err instanceof Anthropic.APIConnectionError) return "Could not reach the Anthropic API (network).";
   if (err instanceof Anthropic.APIError) return `Anthropic API error ${err.status}: ${err.message}`;
-  if (err instanceof OpenAI.AuthenticationError) return "The LLM API key was rejected.";
+  if (err instanceof OpenAI.AuthenticationError) return "The LLM API key was rejected (check NEARAI_API_KEY, DEEPSEEK_API_KEY or OPENAI_API_KEY).";
   if (err instanceof OpenAI.RateLimitError) return "Rate limited or out of credit at the LLM provider. Try again shortly.";
   if (err instanceof OpenAI.APIConnectionError) return "Could not reach the LLM provider (network).";
   if (err instanceof OpenAI.APIError) return `LLM API error ${err.status}: ${err.message}`;

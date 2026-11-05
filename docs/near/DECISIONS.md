@@ -252,3 +252,33 @@ and say who holds it.
 - **No state migration.** Anchors use their own raw storage prefix instead of a
   field in the contract struct, so the code can be redeployed onto an existing
   vault without changing its state layout.
+
+## D-12 NEAR AI Cloud as the Live-mode model
+
+Checked against the live API on 5 Nov 2026 with the team's key.
+
+- **API.** NEAR AI Cloud is OpenAI-compatible at `https://cloud-api.near.ai/v1`
+  (`/models`, `/chat/completions` with function tools). It joins DeepSeek and
+  OpenAI on the app's existing Chat Completions path. `NEARAI_API_KEY` selects
+  it first; `KINWARDEN_PROVIDER` and `KINWARDEN_MODEL` override, and
+  `KINWARDEN_NEARAI_BASE_URL` changes the endpoint.
+- **Model.** `deepseek-ai/DeepSeek-V4.1-Flash-1017`: NEAR AI's own deployment
+  (`owned_by: nearai`), tool calling confirmed, $0.30 / $1.20 per million
+  input / output tokens, and the same model family as the baseline's recorded
+  DeepSeek runs. `Qwen/Qwen3.8-27B` and `z-ai/glm-5.3-flash` also called tools
+  correctly in the same check. Models listed under other owners (OpenAI,
+  Anthropic, Google) are routed to those companies.
+- **No privacy claim from us.** NEAR AI describes this deployment as served
+  from its attested TEE infrastructure. Kinwarden does not fetch or verify an
+  attestation report, so it claims nothing about private or attested inference.
+  What the model sees is unchanged: the app's privacy gateway masks names and
+  identifiers before any provider call.
+- **No fallback.** A failed NEAR AI call fails the run instead of switching to
+  DeepSeek or OpenAI, so a run labelled NEAR AI was made by NEAR AI.
+- **No payment authority.** The model key is not a NEAR account key. The model
+  proposes through the app's tools; NEAR payments still need the verifier's
+  invoice, the vault's limits and the family's wallet signature.
+- **Reproduction.** Judges and CI have no model key. The live NEAR AI runs are
+  saved in `recordings/` (model name and date inside) and replayed by
+  `npm run eval:replay` through today's tools and safety gateway without
+  calling a model.

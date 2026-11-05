@@ -4,7 +4,7 @@ A family from Pakistan has to pay a Bangkok hospital for their father's heart pr
 
 Kinwarden is an assistant for families paying hospital and university bills abroad. It checks invoices and payment rules, compares bank and card routes, prepares forms, asks the family to approve, and records the outcome in a tamper-evident activity log. On NEAR, the money sits in a vault contract: the agent can only *propose* paying an invoice that an independent verifier authorized, the family approves the exact payment in their own NEAR wallet, and the vault pays only the enrolled institution, within the family's limits.
 
-**What is real:** the NEAR vault and test token contracts, deployed on NEAR testnet; the family's wallet approval; the token transfer to the institution's account; the agent's restricted NEAR key; log anchors on the vault. **What is simulated:** the hospitals and universities, bank transfers, card payments, exchange rates and refunds. tUSDC is a test token with no value. No real money moves.
+**What is real:** the NEAR vault and test token contracts, deployed on NEAR testnet; the family's wallet approval; the token transfer to the institution's account; the agent's restricted NEAR key; log anchors on the vault; the agent's model, run live on NEAR AI Cloud. **What is simulated:** the hospitals and universities, bank transfers, card payments, exchange rates and refunds. tUSDC is a test token with no value. No real money moves.
 
 ## Check it in three steps (no wallet, no API key)
 
@@ -27,6 +27,7 @@ This repository starts from pre-existing application code (see [Hackathon baseli
 - **App integration.** When a NEAR deployment and the agent key are configured, the hospital case's bank transfers settle in tUSDC through the vault. The app server holds only a function-call key for the vault's `propose_payment`, `sweep` and `anchor_log`, and checks that on chain before use. A separate verifier process authorizes invoices. The approval screen reads the proposal from NEAR, recomputes its hash in the browser and asks the family's wallet to sign; the server cannot approve. The case receipt names the exact recipient, token and amount, records the approval and the on-chain transfer as separate steps, and says whether delivery is confirmed, failed or unknown, where the reserved money is and what the family can do next. The institution's acknowledgement is a separate, simulated event.
 - **Revocation.** The family can switch the agent off from the NEAR case card; its pending proposals are released and it cannot switch itself back on. Deleting its key stops it signing anything.
 - **Log anchoring.** The app writes its activity log's head hash to the vault (`anchor_log`, agent key only) at case milestones; the anchor check names any later edit to the log.
+- **NEAR AI Cloud model.** In Live mode the agent runs on NEAR AI Cloud when `NEARAI_API_KEY` is set (`deepseek-ai/DeepSeek-V4.1-Flash-1017`, NEAR AI's own deployment), through the same tools and safety gateway as before. A NEAR AI run never falls back to another provider. The model key has no NEAR account authority: whatever the model decides, payments still need the verifier's invoice, the vault's limits and the family's wallet. The four replays in [`recordings/`](recordings) are live NEAR AI runs from 5 Nov 2026, recorded on the simulated rails; in the hospital run the model flagged the look-alike "new bank details" email. NEAR AI describes this model as served from its attested TEE infrastructure; Kinwarden does not verify attestation and makes no privacy claim from it ([D-12](docs/near/DECISIONS.md)).
 - **Attack lab** ([localhost:3000/attack](http://localhost:3000/attack)) shows the agent key's live permissions and the recorded bypass run, and can rerun the bypass on a configured network.
 
 **On NEAR testnet** (accounts under `kinwarden-demo.testnet`; vault `vault.kinwarden-demo.testnet`, token `tusdc.kinwarden-demo.testnet`):
@@ -39,7 +40,7 @@ This repository starts from pre-existing application code (see [Hackathon baseli
 
 Revocation, the failed-transfer reconciliation and the mutation checks were run on a local NEAR node only. A failed or unknown outcome was not exercised on testnet.
 
-**Not implemented yet:** the NEAR AI model provider; gas sponsorship for the family (meta transactions); recovery when a settlement callback never runs (the proposal stays `Submitted` with its funds held). These tests do not show who controls the family account or that an enrolled account belongs to a real hospital.
+**Not implemented yet:** verifying NEAR AI's TEE attestation; gas sponsorship for the family (meta transactions); recovery when a settlement callback never runs (the proposal stays `Submitted` with its funds held). These tests do not show who controls the family account or that an enrolled account belongs to a real hospital.
 
 ## Run the app
 
@@ -57,7 +58,7 @@ Open [the demo stage](http://localhost:3000/stage), select **Scripted** in the d
 - [Attack lab](http://localhost:3000/attack): exercise the safety gateway and see the NEAR key bypass.
 - [Case pack](http://localhost:3000/pack): inspect the printable case record.
 
-Agent modes: **Scripted** follows a fixed plan and uses no model. **Replay** re-executes the decisions of recorded live model runs ([`recordings/`](recordings)) through today's tools, safety gateway and rules, without calling a model or needing a key. **Live** calls a model provider: copy `.env.local.example` to `.env.local` and set a provider key. Optional configuration uses the `KINWARDEN_` prefix. Keep credentials local. Passkeys work on localhost or an HTTPS deployment.
+Agent modes: **Scripted** follows a fixed plan and uses no model. **Replay** re-executes the decisions of recorded live NEAR AI Cloud runs ([`recordings/`](recordings); the model and date are inside each file) through today's tools, safety gateway and rules, without calling a model or needing a key. **Live** calls a model provider: copy `.env.local.example` to `.env.local` and set `NEARAI_API_KEY` (or a DeepSeek, OpenAI or Anthropic key). Optional configuration uses the `KINWARDEN_` prefix. Keep credentials local. Passkeys work on localhost or an HTTPS deployment.
 
 Without a NEAR deployment the app runs on its simulated payment rails.
 
@@ -65,7 +66,7 @@ Without a NEAR deployment the app runs on its simulated payment rails.
 
 ```sh
 npm test               # unit tests: safety, privacy, passkey, scenarios, red team, NEAR app code, claim map
-npm run eval:replay    # the four recorded live runs, replayed without a model key
+npm run eval:replay    # four live NEAR AI runs and the four baseline DeepSeek runs, replayed without a model key
 npx next typegen && npx tsc --noEmit
 npx eslint src
 npm run build
@@ -86,7 +87,7 @@ npm ci
 npm run test:near
 ```
 
-`npm run test:near` deploys both contracts to a fresh local node and runs the app against them: the hospital case end to end (proposal, verifier, family approval with a test-only harness key, hospital paid, receipt); the bypass with the agent's real key (all 13 attempts refused, balances equal); switching the agent off and deleting its key; the failed-transfer reconciliation table; and the log anchor and tamper check. Expect `Test Files 4 passed`. The first run downloads a NEAR node and compiles for several minutes.
+`npm run test:near` deploys both contracts to a fresh local node and runs the app against them: the hospital case end to end (proposal, verifier, family approval with a test-only harness key, hospital paid, receipt); the bypass with the agent's real key (all 13 attempts refused, balances equal); switching the agent off and deleting its key; the failed-transfer reconciliation table; the log anchor and tamper check; and the recorded NEAR AI hospital run replayed with the vault connected (its deposit goes only to the enrolled hospital, which receives exactly what the family approved). Expect `Test Files 5 passed`. The first run downloads a NEAR node and compiles for several minutes.
 
 `bash scripts/near/evidence.sh` runs the same tests plus the vault mutation checks (each removes one hard check; the vault's tests must fail) and rewrites `docs/redteam/near/*.json` and [ONCHAIN.md](docs/redteam/ONCHAIN.md) from the results.
 
@@ -94,7 +95,7 @@ npm run test:near
 
 ## Hackathon baseline
 
-This repository starts from pre-existing, team-developed application code, imported with fresh Git history and renamed to Kinwarden. The `pre-hackathon` tag marks this baseline before NEAR implementation. The agent tools, the LLM agent and its model providers, simulated payment rails, safety rules, passkey flow and optional Conflux testnet log anchoring belong to the baseline. Only changes after `pre-hackathon` are intended for the NEAR submission: inspect them with `git diff pre-hackathon..HEAD`. At submission, `hackathon-submission` will be tagged with a public compare link for `pre-hackathon...hackathon-submission`.
+This repository starts from pre-existing, team-developed application code, imported with fresh Git history and renamed to Kinwarden. The `pre-hackathon` tag marks this baseline before NEAR implementation. The agent tools, the LLM agent and its DeepSeek, OpenAI and Anthropic providers (their recorded runs are in `recordings/baseline/`), simulated payment rails, safety rules, passkey flow and optional Conflux testnet log anchoring belong to the baseline. Only changes after `pre-hackathon` are intended for the NEAR submission: inspect them with `git diff pre-hackathon..HEAD`. At submission, `hackathon-submission` will be tagged with a public compare link for `pre-hackathon...hackathon-submission`.
 
 ## Development
 
