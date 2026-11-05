@@ -2,7 +2,7 @@
 
 | Crate | What it is |
 |---|---|
-| [`vault`](vault) | Family payment vault: cases, verifier-enrolled payees and invoices, per-case deposits, agent proposals with reservations and caps, exact family approval bound to a commitment hash, settlement with failure recovery, owner withdrawal. **Not yet:** NEAR log anchoring (G4). |
+| [`vault`](vault) | Family payment vault: cases, verifier-enrolled payees and invoices, per-case deposits, agent proposals with reservations and caps, exact family approval bound to a commitment hash, settlement with failure recovery, owner withdrawal., activity-log anchors written by the agent. |
 | [`tusdc`](tusdc) | Kinwarden Test USD (tUSDC): a standard NEP-141 test token with 6 decimals and owner-only minting. It has no value and is not USDC. |
 | [`integration-tests`](integration-tests) | Sandbox tests against a local NEAR node with both contracts deployed. |
 

@@ -7,7 +7,8 @@ tests (real NEAR node, deployed contracts, real keys):
 `contracts/near/integration-tests/tests/`.
 
 Status: **G1 (C1–C14), G2 (C15–C30), G3 app integration (C31–C41) and G4
-adversarial evidence (C42–C48).** Generated evidence: [docs/redteam/ONCHAIN.md](../redteam/ONCHAIN.md).
+adversarial evidence (C42–C48).** `src/near/claims.test.ts` (part of `npm test`)
+fails if any test named below is renamed or removed. Generated evidence: [docs/redteam/ONCHAIN.md](../redteam/ONCHAIN.md).
 Contract unit tests:
 `vault/src/tests.rs`, `tests_payments.rs`, `types.rs`, `ids.rs`,
 `commitment.rs`, `tests_anchors.rs`. Contract sandbox tests:
@@ -47,18 +48,17 @@ Contract unit tests:
 | C28 | The agent cannot grow storage or lock the budget without bound: at most 8 pending and 32 proposals per case per 24 h, lifetime at most 24 h | Vault: `propose_payment` bounds | unit `pending_proposals_are_bounded`, `proposal_rate_is_bounded_even_when_rejected`, `ttl_is_bounded` |
 | C29 | The approval preview runs the same checks as the approval and shows the remaining budgets | Vault: `approval_preview` uses `blockers` | unit `preview_matches_what_approval_checks`; sandbox `g2::*` approve with preview values |
 | C30 | Only the owner can withdraw, and only unreserved funds | Vault: `withdraw` | sandbox `g2::owner_withdraws_unreserved_funds_only`; unit `owner_withdraws_only_unreserved_funds`, `reserved_funds_cannot_be_withdrawn`, `only_the_owner_withdraws` |
-
-| C31 | The app server holds only a function-call key limited to `propose_payment` and `sweep`, checked on chain before use; a full-access key, another receiver, extra methods or no allowance disables NEAR | App: `VaultClient.checkAgentKey` | app unit `vault.test.ts` (7 cases); e2e `ready()` |
+| C31 | The app server holds only a function-call key limited to the vault's `propose_payment`, `sweep` and `anchor_log`, checked on chain before use; a full-access key, another receiver, extra methods or no allowance disables NEAR | App: `VaultClient.checkAgentKey` | app unit `vault.test.ts` (7 cases); e2e `ready()` |
 | C32 | The app cannot approve or reject a NEAR payment: HTTP decisions are refused and its own key is blocked by the protocol | App: `decideApprovalIn`; NEAR protocol | app unit `bridge.test.ts`; e2e (HTTP refusal and `DepositWithFunctionCall` with the app's key) |
 | C33 | A payment is proposed only after the separate verifier authorizes its invoice on chain; until then the vault refuses | Vault + `scripts/near/verifier.mjs` (own key) | e2e (`waiting_for_verifier`, then proposed) |
 | C34 | The approval screen reads the proposal from NEAR and recomputes the commitment hash in the browser; it must match the vault's | Browser: `NearApproval`, `src/near/commitment.ts` | app unit `commitment.test.ts` (16 shared vectors); e2e (browser-side hash equals the vault's) |
 | C35 | A wallet-reported approval is recorded only if the chain shows the case owner's successful `approve_payment` for that proposal | App: `NearBridge.recordApprovalTx` | e2e (an unrelated transaction is refused, the real one accepted) |
 | C36 | When the vault settles, the hospital's token balance rises by exactly the proposed amount and the app marks the payment completed, the approval as made in the wallet, and the invoice paid | Vault + `NearBridge.apply` | e2e |
 | C37 | The case receipt binds invoice, proposal, commitment hash, approval transaction and settlement; any edit changes its hash | App: `NearBridge.receipt` | e2e (hash recomputed; an edited copy differs) |
+| C38 | A failed NEAR transfer cannot be resent without a new proposal and a new wallet approval | App: `resubmit_payment` guard; vault attempts | app unit `bridge.test.ts`; contract `failed_transfer_restores_funds_once_and_allows_a_retry` |
 | C39 | The receipt names the exact recipient, token contract and amount, and records the family's approval and the settlement as separate on-chain steps with their own block times: the approval, the token contract's NEP-141 transfer event (from the vault, to the recipient, amount) and the vault's callback. A transfer that differs from the approved payment is flagged | App: `evidenceFromTx`, `buildReceipt` | app unit `bridge.test.ts`; e2e (the reported transfer equals the hospital's balance change) |
 | C40 | Delivery is stated as delivered, failed or unknown from the vault's record; an approval or a submitted transaction alone is never shown as delivered, and an unknown outcome is never shown as failed or refunded. For each state the receipt and the app say where the reserved money is and what the family can do next | `src/near/outcome.ts`; `NearOutcomeNote`, `NearReceiptView` | app unit `outcome.test.ts`, `bridge.test.ts` (delivered, failed, unknown) |
 | C41 | The institution's acknowledgement is a separate event in the receipt, marked as coming from the simulated hospital | `NearBridge.apply`, `buildReceipt` | app unit `bridge.test.ts`; e2e |
-| C38 | A failed NEAR transfer cannot be resent without a new proposal and a new wallet approval | App: `resubmit_payment` guard; vault attempts | app unit `bridge.test.ts`; contract `failed_transfer_restores_funds_once_and_allows_a_retry` |
 | C42 | With the app's gateway bypassed, the agent's real key is refused by NEAR for approving (with or without a deposit), enrolling a payee, authorizing an invoice, switching itself on, withdrawing, calling the token contract, adding a key, deploying code and sending NEAR; and by the vault for an unauthorized invoice or an amount over the family's limits. No attacker, vault or case balance changes | NEAR protocol (function-call key permissions); vault checks | `bypass.sandbox.ts` (every attempt's refuser and reason, balances before and after); live rerun in the attack lab |
 | C43 | A read-only report records the agent account's keys at a stated block: the app key's receiver, methods and gas allowance, and any other key with its authority, kept apart from the vault's payment limits | `permissionsReport` | `bypass.sandbox.ts` |
 | C44 | When the family switches the agent off, its pending proposals are invalidated, their reservations released, new proposals refused, and the agent cannot switch itself back on; once its key is deleted it can sign nothing and no balance changes | Vault `revoke_agent`; NEAR protocol | `bypass.sandbox.ts`; unit `revoked_agent_cannot_propose` |
@@ -82,6 +82,13 @@ balances unchanged) and C47 with a testnet anchor and tamper check. See
 [ONCHAIN.md](../redteam/ONCHAIN.md). Revocation, reconciliation and mutation
 checks were run on a local node only.
 
+**Recheck the testnet evidence without any key.** `node scripts/near/verify.mjs`
+(Node 24 only; no `npm ci`, wallet or key) reads the public testnet and checks
+the receipt's hashes, the settled proposal in the vault, the family's approval
+transaction and the token transfer it caused (C17, C18, C36, C37, C39), the
+agent account's keys today (C31, C43), the vault's code hash against the tested
+build, and the stored log anchor (C47). Any edit to the receipt fails it.
+
 What these tests do **not** show:
 
 - That an enrolled account really belongs to a hospital. That is the
@@ -92,4 +99,9 @@ What these tests do **not** show:
 - That a real wallet shows the approval readably. That was checked by hand
   with Meteor on testnet (DECISIONS.md D-03); the end-to-end test signs with a
   test-only harness key instead of a wallet.
-- Anything on testnet. The end-to-end test runs on a local NEAR node.
+- That the automated tests ran on testnet. They run on a local NEAR node; the
+  testnet runs above are recorded evidence, rechecked against the public chain
+  by `node scripts/near/verify.mjs`.
+- Who controls the family account, or that the hospital is a real hospital.
+  The vault enforces that the case owner approved and that the enrolled
+  account was paid; identity is outside the chain.
