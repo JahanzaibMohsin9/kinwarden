@@ -1,10 +1,10 @@
 # Kinwarden NEAR: threat model
 
-> **Status:** the contract controls for T1–T9 and the on-chain part of T12 are
-> implemented and tested; each is a row in [CLAIMS.md](CLAIMS.md). T10–T11 are
-> wallet-and-person residuals. T13 (NEAR anchoring) and T14 (app restart) are
-> G3–G4 work and remain goals until tested. The baseline application's own
-> threat model is in [../SECURITY.md](../SECURITY.md).
+> **Status:** the controls for T1–T9, T12, T13, T15 and T16 are implemented and
+> tested; each is a row in [CLAIMS.md](CLAIMS.md). T10–T11 are wallet-and-person
+> residuals. T14 (app restart) relies on the contract being the source of truth
+> and is not covered by a dedicated test. The baseline application's own threat
+> model is in [../SECURITY.md](../SECURITY.md).
 
 ## What we protect
 
@@ -29,7 +29,7 @@ invoice, within the case's limits, after the family approves that exact payment.
 | # | Threat | Planned control | Where enforced | Covers |
 |---|---|---|---|---|
 | T1 | Forged "new bank details" makes the agent propose a lookalike account | Proposals only for `Active` verifier-enrolled payees on an authorized invoice for that case | Vault contract | K03, K04 |
-| T2 | Stolen or compromised agent key calls the vault directly, bypassing the server | Contract role checks plus a function-call key limited to `propose_payment`/`anchor_log`; family methods need 1 yoctoNEAR, which function-call keys cannot attach | Contract + protocol | K03 |
+| T2 | Stolen or compromised agent key calls the vault directly, bypassing the server | Contract role checks plus a function-call key limited to `propose_payment`, `sweep` and `anchor_log`; family methods need 1 yoctoNEAR, which function-call keys cannot attach | Contract + protocol | K03 |
 | T3 | Agent tries to approve, enroll a payee, raise limits, call `ft_transfer`, deploy code or add keys | Same as T2; keys cannot target the token contract or perform account actions | Contract + protocol | K03 |
 | T4 | Approval for one payment reused for another, or approval of stale state | Readable expected fields + versioned commitment hash + policy and payee versions + network/vault domain | Contract | K01 |
 | T5 | Change between approval and execution (pause, payee revoked, limit lowered) | Every hard rule rechecked inside `approve_payment` before dispatch | Contract | K01, K02 |
@@ -42,6 +42,8 @@ invoice, within the case's limits, after the family approves that exact payment.
 | T12 | Sensitive data leaks on chain or into public receipts | Opaque IDs only on chain; canary tests on chain arguments and receipts | Contract interface + tests | K10 |
 | T13 | Tampered activity log | Hash chain anchored on NEAR; verification fails on an edited entry | Anchor + verifier script | K08 |
 | T14 | App restart loses track of a submitted payment | Contract state is the source of truth; the app rebuilds state from views | App + contract | K06 |
+| T15 | A lying RPC (or anything between the vault and the browser) shows the family a forged proposal | The browser recomputes the commitment hash from what it reads, so a changed field turns Approve off; a forgery with a recomputed hash is refused by the vault, which compares the approval with the proposal it stored (C52) | Browser + contract | K01 |
+| T16 | The recorded "AI decisions" the demo replays were written or edited by hand | Each recorded answer keeps NEAR AI's signature from its TEE; the signing key is attested by an Intel TDX quote bound to the recording; every replayed tool call must be in a signed answer (C53, D-13) | Verifier script + tests | — |
 
 ## Residual risks we state openly
 
@@ -52,7 +54,8 @@ invoice, within the case's limits, after the family approves that exact payment.
   will pay it. In the demo, verification is simulated with fictional
   institutions.
 - **Upgrade authority.** While the deployer key exists, whoever holds it can
-  change the contract (D-08).
+  change the contract (D-08). K11 deletes the vault's and token's full-access
+  keys before submission; after that, no one can change their code.
 - **Wallet connector supply chain.** NEAR Connect loads each wallet's script in
   a sandboxed iframe at runtime. Trust in that script equals trust in the
   wallet.
@@ -62,6 +65,8 @@ invoice, within the case's limits, after the family approves that exact payment.
 
 ## Out of scope for the hackathon build
 
-Real institutional verification, fiat payout, mainnet funds, TEE-attested
-inference, a shared reputation registry and timed holds. Each is labeled as
-simulated or not built wherever it appears in the product.
+Real institutional verification, fiat payout, mainnet funds, checking each
+model answer's attestation live while the app runs (the recorded runs are
+checked; D-13), NVIDIA GPU attestation, a shared reputation registry and timed
+holds. Each is labeled as simulated or not built wherever it appears in the
+product.

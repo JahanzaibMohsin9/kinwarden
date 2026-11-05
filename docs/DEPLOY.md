@@ -9,9 +9,9 @@ The public demo runs at https://kinwarden.duckdns.org with `deploy/demo.env` (Re
 ## Server requirements
 
 - **Region:** choose a server close to the intended users.
-- **Size:** 1 vCPU, 1–2 GB RAM and 10 GB disk are enough. The model runs at DeepSeek/OpenAI, not on the server.
+- **Size:** 1 vCPU, 1–2 GB RAM and 10 GB disk are enough. The model runs at NEAR AI Cloud (or DeepSeek/OpenAI), not on the server.
 - **Domain:** any domain with an A record pointing at the server. HTTPS is required: passkeys and installing the app (PWA) only work on HTTPS.
-- **Outbound access** to `api.deepseek.com`, `api.openai.com` and, for anchors, `evmtestnet.confluxrpc.com`.
+- **Outbound access** to `cloud-api.near.ai` (or `api.deepseek.com`, `api.openai.com`), a NEAR RPC such as `near-testnet.drpc.org`, and, for Conflux anchors, `evmtestnet.confluxrpc.com`.
 
 ## Run it (Docker)
 

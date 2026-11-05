@@ -10,6 +10,19 @@ Kinwarden is an assistant for families paying hospital and university bills abro
 
 **Testnet by design:** the institutions are fictional and no real hospital has agreed to receive funds, so a mainnet payment would only reach an account we control. The real parts are the family's wallet approval, the NEAR AI model, the on-chain enforcement and the keyless check below.
 
+Who can do what with the money:
+
+```mermaid
+flowchart LR
+  model["AI agent on NEAR AI Cloud<br/>(answers signed in a TEE)"] -->|tool calls| app["Kinwarden app server<br/>safety gateway"]
+  app -->|"agent key: propose_payment,<br/>sweep, anchor_log only"| vault[("Family's NEAR vault<br/>limits · reservations")]
+  verifier["Verifier<br/>(own key)"] -->|"enroll hospital,<br/>authorize invoice"| vault
+  family["Family's own wallet<br/>(Meteor)"] -->|"approve exact recipient,<br/>token, amount, hash"| vault
+  vault -->|"tUSDC, only to the<br/>enrolled account"| hospital["Hospital's account"]
+```
+
+The agent and the app server can only propose. The recipient comes from the verifier, and nothing moves until the family's wallet signs the exact payment.
+
 ## Check it in four steps (no wallet, no API key)
 
 | Do | See | Shows |
@@ -17,7 +30,7 @@ Kinwarden is an assistant for families paying hospital and university bills abro
 | **1.** `node scripts/near/verify.mjs` (Node 24, no `npm ci` needed) | `All 6 checks passed.` | The recorded testnet payment, rechecked against the public chain: the [case receipt](docs/near/evidence/2026-11-03-testnet-receipt.json) is unedited; the vault holds the proposal as `Settled`; the case owner's wallet signed `approve_payment` for exactly that recipient, token, amount and hash ([transaction](https://testnet.nearblocks.io/txns/Ej6saHJebcSFZQQ18XxQQp9TSJ6E1xmbLukV76LWRSJZ)); the token contract moved 7,625.45 tUSDC from the vault to the hospital's account; the agent's key today can call only `propose_payment`, `sweep` and `anchor_log`; the testnet vault runs the tested build; the log anchor is stored. |
 | **2.** Open [docs/redteam/ONCHAIN.md](docs/redteam/ONCHAIN.md), "Gateway bypass with the real agent key" | 13 attempts, each refused, with the refusing layer and reason; balances before and after are equal | The agent's real NEAR key, used directly with the app bypassed (as an attacker who owns the app server would), cannot approve, enroll a payee, authorize an invoice, switch itself back on, withdraw, move tokens, add a key, deploy code or send NEAR; the vault refuses an unauthorized invoice and an over-limit amount. Run on a local node and on testnet. To rerun it yourself, see [Rerun the evidence on a local NEAR node](#rerun-the-evidence-on-a-local-near-node). |
 | **3.** Same file, "Balance reconciliation: a failed transfer and its retry" | A 7-row table of vault, hospital and case balances | A confirmed failed transfer credits the hospital nothing and returns the money and its 24-hour budget to the case exactly once; while the outcome is unknown the amount stays in flight (not spendable, not refunded, not resent); the retry pays exactly once. |
-| **4.** `npm ci && node scripts/near/verify-model.mjs` | `All 4 recordings check out.` | The AI is real: every replayed decision in [`recordings/`](recordings) is a tool call, with its exact arguments, in an answer NEAR AI's model signed, and the signing key is attested by an Intel TDX quote that verifies as up to date. Editing one step or one byte of an answer fails it. |
+| **4.** `npm ci && node scripts/near/verify-model.mjs` (reads Intel's quote collateral online) | `All 4 recordings check out.` | The AI is real: every replayed decision in [`recordings/`](recordings) is a tool call, with its exact arguments, in an answer NEAR AI's model signed, and the signing key is attested by an Intel TDX quote that verifies as up to date. Editing one step or one byte of an answer fails it. |
 
 What each piece of evidence proves: the **receipt hash** shows the receipt file was not edited after it was written; it does not prove the bill was genuine. The **chain** confirms that the case owner's account approved and the vault paid the enrolled account; whether that account belongs to a real hospital is the verifier's off-chain decision, simulated here. Steps 2 and 3 are generated from test runs by `scripts/near/evidence.sh`, not written by hand; the report names the tested commit and the WASM hash, and step 1 checks the testnet vault runs that same WASM.
 
@@ -33,8 +46,9 @@ This repository starts from pre-existing application code (see [Hackathon baseli
 - **Revocation.** The family can switch the agent off from the NEAR case card; its pending proposals are released and it cannot switch itself back on. Deleting its key stops it signing anything.
 - **Log anchoring.** The app writes its activity log's head hash to the vault (`anchor_log`, agent key only) at case milestones; the anchor check names any later edit to the log.
 - **NEAR AI Cloud model.** In Live mode the agent runs on NEAR AI Cloud when `NEARAI_API_KEY` is set (`deepseek-ai/DeepSeek-V4.1-Flash-1017`, NEAR AI's own deployment), through the same tools and safety gateway as before. A NEAR AI run never falls back to another provider. The model key has no NEAR account authority: whatever the model decides, payments still need the verifier's invoice, the vault's limits and the family's wallet. The four replays in [`recordings/`](recordings) are live NEAR AI runs from 5 Nov 2026, recorded on the simulated rails; in the hospital run the model flagged the look-alike "new bank details" email. Every recorded answer carries NEAR AI's signature, and `node scripts/near/verify-model.mjs` checks that each replayed decision is a tool call in an answer signed by a key that an up-to-date Intel TDX quote attests, so the recordings cannot have been written or edited by hand ([D-13](docs/near/DECISIONS.md)). NVIDIA's GPU evidence is not checked.
+- **AI red team on NEAR AI.** 20 attacks delivered as a real attacker would (look-alike emails, hidden instructions in documents, a compromised hospital mailbox, family pressure to split payments or pay a doctor directly) to the live NEAR AI agent: 0 of 20 unsafe actions executed. The model tried one (paying the whole estimate up front, at the family's request); the gateway refused it as above the invoice, and the agent then proposed the correct deposit. [docs/redteam/REPORT.md](docs/redteam/REPORT.md), generated by `npm run redteam:llm`.
 - **Forged-proposal defence.** The approval screen recomputes the commitment hash from the proposal it reads, so a field changed between the vault and the browser turns Approve off. A forgery that also fakes the hash can fool the browser, but the vault compares the signed approval with the proposal it stored and refuses it; nothing moves (C52, tested on a local node).
-- **Attack lab** ([localhost:3000/attack](http://localhost:3000/attack)) shows the agent key's live permissions and the recorded bypass run, and can rerun the bypass on a configured network. Without the agent's private key (as on a public demo), it reads the permissions from public RPC and shows the run recorded on testnet.
+- **Attack lab** ([live](https://kinwarden.duckdns.org/attack), or `/attack` locally) shows the agent key's live permissions and the recorded bypass run, and can rerun the bypass on a configured network. Without the agent's private key (as on a public demo), it reads the permissions from public RPC and shows the run recorded on testnet.
 
 **On NEAR testnet** (accounts under `kinwarden-demo.testnet`; vault `vault.kinwarden-demo.testnet`, token `tusdc.kinwarden-demo.testnet`):
 

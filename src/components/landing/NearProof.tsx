@@ -14,7 +14,7 @@ const FLOW = [
     who: "Agent on NEAR AI",
     call: "propose_payment",
     title: "The agent proposes",
-    text: "It names an authorized invoice and an amount. The recipient comes from the verifier's record, and the vault reserves the amount against the family's limits.",
+    text: "It names an authorized invoice and an amount; the recipient comes from the verifier's record. Every answer the model gives is signed inside NEAR AI's attested enclave.",
   },
   {
     icon: Wallet,
@@ -90,6 +90,14 @@ export function NearProof() {
             <p className="mt-0.5 text-[12.5px] text-[#a6b8b3]">Reads the public testnet: the receipt, the vault&apos;s record, the family&apos;s approval, the agent key&apos;s permissions, the deployed code and the log anchor.</p>
           </div>
           <code className="overflow-x-auto whitespace-nowrap rounded-lg bg-white/5 px-3 py-2 font-mono text-[13px] text-[#9fd9cb]">node scripts/near/verify.mjs</code>
+        </div>
+        <div className="mt-3 flex flex-col gap-3 rounded-[var(--radius)] bg-[#0b1312] p-5 text-[#e9f1ee] md:flex-row md:items-center">
+          <Bot size={18} className="shrink-0 text-[#5ccdb4]" />
+          <div className="min-w-0 flex-1">
+            <p className="text-[14px] font-semibold">And that the AI is real</p>
+            <p className="mt-0.5 text-[12.5px] text-[#a6b8b3]">Every decision the demo replays is checked against an answer NEAR AI&apos;s model signed, with the signing key attested by a verified Intel TDX quote. Editing one step fails it.</p>
+          </div>
+          <code className="overflow-x-auto whitespace-nowrap rounded-lg bg-white/5 px-3 py-2 font-mono text-[13px] text-[#9fd9cb]">node scripts/near/verify-model.mjs</code>
         </div>
         <p className="mt-4 text-[12.5px] text-ink-3">
           NEAR testnet by design: tUSDC is a test token with no value, and the hospitals are fictional, so no real institution receives funds. Every claim and the test that checks it:{" "}
