@@ -1,0 +1,49 @@
+name: Live testnet check
+
+# Every day, re-reads the public NEAR testnet and checks the recorded evidence still holds: the
+# receipt, the settled proposal in the vault, the family's approval transaction and its token
+# transfer, the agent key's permissions, the vault's code hash against the tested build, and the log
+# anchor. Read-only: no keys, no transactions, no npm install (Node built-ins only).
+
+on:
+  schedule:
+    - cron: "23 5 * * *" # daily, 05:23 UTC
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/near/verify.mjs"
+      - "docs/near/evidence/**"
+      - "docs/redteam/near/*-testnet.json"
+      - "docs/redteam/near/testnet-vault.json"
+      - ".github/workflows/live-check.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+
+      - name: Recheck the testnet evidence against the chain
+        run: |
+          set +e
+          node scripts/near/verify.mjs
+          code=$?
+          set -e
+          if [ "$code" -eq 2 ]; then
+            # an RPC outage is not a project failure: warn and pass
+            echo "::warning::Could not reach the NEAR RPC; the live check did not run"
+            exit 0
+          fi
+          if [ "$code" -ne 0 ]; then
+            echo "::error::The testnet no longer matches the recorded evidence (see the FAIL lines above)"
+          fi
+          exit "$code"

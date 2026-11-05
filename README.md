@@ -20,7 +20,7 @@ Kinwarden is an assistant for families paying hospital and university bills abro
 
 What each piece of evidence proves: the **receipt hash** shows the receipt file was not edited after it was written; it does not prove the bill was genuine. The **chain** confirms that the case owner's account approved and the vault paid the enrolled account; whether that account belongs to a real hospital is the verifier's off-chain decision, simulated here. Steps 2 and 3 are generated from test runs by `scripts/near/evidence.sh`, not written by hand; the report names the tested commit and the WASM hash, and step 1 checks the testnet vault runs that same WASM.
 
-Every claim, where it is enforced and the test that checks it: [docs/near/CLAIMS.md](docs/near/CLAIMS.md) (52 claims). `npm test` fails if a test named there is renamed or removed.
+Every claim, where it is enforced and the test that checks it: [docs/near/CLAIMS.md](docs/near/CLAIMS.md) (52 claims). `npm test` fails if a test named there is renamed or removed. A daily GitHub Actions job ([live-check](.github/workflows/live-check.yml)) reruns step 1 against the chain, so the testnet evidence is checked again every day, not just once.
 
 ## NEAR implementation
 
@@ -126,7 +126,7 @@ This repository starts from pre-existing, team-developed application code, impor
 
 ## Development
 
-See [architecture and development](docs/TECHNICAL.md), [security](docs/SECURITY.md), [deployment](docs/DEPLOY.md), [evaluation](docs/EVAL.md), and the NEAR [decisions](docs/near/DECISIONS.md), [threat model](docs/near/THREAT_MODEL.md) and [state and encoding](docs/near/STATE_AND_ENCODING.md).
+See [architecture and development](docs/TECHNICAL.md), [security](docs/SECURITY.md) and the [security policy](SECURITY.md), a one-file summary for AI reviewers ([llms.txt](llms.txt)), [deployment](docs/DEPLOY.md), [evaluation](docs/EVAL.md), and the NEAR [decisions](docs/near/DECISIONS.md), [threat model](docs/near/THREAT_MODEL.md) and [state and encoding](docs/near/STATE_AND_ENCODING.md).
 
 The application uses Next.js, React, TypeScript, Tailwind CSS, Zod, model-provider SDKs, viem and near-api-js; versions are pinned by `package-lock.json`. Contracts use Rust and near-sdk. Tests use Vitest and cargo test. Tools used: the baseline's development notes identify Claude for coding and MiMo for review of a Chinese-language interface that has since been removed; Codex assisted with this repository setup. The NEAR work after `pre-hackathon` (contracts, app integration, evidence tooling and documentation) was written with Claude Code (Anthropic) under the team's direction and review.
 

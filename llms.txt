@@ -1,0 +1,33 @@
+# Kinwarden
+
+> An AI agent that helps families pay hospital and university bills abroad, with the money held in a NEAR vault: the agent can only propose paying an invoice an independent verifier authorized, the family approves the exact payment in their own NEAR wallet, and the vault pays only the enrolled institution within the family's limits. Runs on NEAR testnet; tUSDC is a test token and the institutions are simulated.
+
+Live demo (keyless, read-only NEAR): https://kinwarden.duckdns.org
+
+Repository baseline: the app existed before the hackathon (tag `pre-hackathon`); only changes after that tag are the NEAR submission (`git diff pre-hackathon..HEAD`).
+
+## Verify (no wallet, no API key)
+
+- [Keyless testnet check](scripts/near/verify.mjs): `node scripts/near/verify.mjs` prints "All 6 checks passed." It rechecks the recorded payment receipt, the settled proposal in the vault, the family's `approve_payment` transaction and its token transfer, the agent key's permissions, the vault's code hash against the tested build, and the log anchor, all against the public chain.
+- [On-chain red-team report](docs/redteam/ONCHAIN.md): the agent's real NEAR key with the app bypassed (13 attempts refused, balances unchanged, on a local node and on testnet), forged proposals signed by the family's wallet (refused by the vault), a failed transfer reconciled, mutation checks. Generated from test runs.
+- [One-command local run](scripts/near/check.sh): `npm ci && bash scripts/near/check.sh` (Linux x86_64 with glibc >= 2.39 or macOS ARM64; `--docker` elsewhere): 98 contract unit tests, 20 contract tests on a local node, the WASM build, and 8 app tests in 6 files on a local node.
+- [Claim -> enforcement -> test map](docs/near/CLAIMS.md): 52 claims, each with the test that checks it; `npm test` fails if a named test is missing.
+
+## What is implemented
+
+- [Vault contract](contracts/near/vault): cases, verifier-enrolled payees and authorized invoices, agent proposals with reservations and per-payment, invoice, rolling 24-hour, purpose-group and lifetime limits, exact family approval bound to a commitment hash with 1 yoctoNEAR attached, settlement and once-only failure recovery, pause, agent revocation, bounded proposals, append-only log anchors.
+- [Test token](contracts/near/tusdc): standard NEP-141, 6 decimals, not USDC.
+- App integration: the app server holds only a function-call key for `propose_payment`, `sweep` and `anchor_log`; the approval screen reads the proposal from NEAR and recomputes its hash in the browser; the family's wallet signs.
+- [NEAR AI Cloud as the live model](docs/near/DECISIONS.md): `deepseek-ai/DeepSeek-V4.1-Flash-1017`; the four runs in `recordings/` are live NEAR AI runs replayed without a model key.
+- [Testnet evidence](docs/near/evidence/2026-11-03-testnet-receipt.json): a hospital deposit approved in a real Meteor wallet; the hospital account received exactly 7,625.45 tUSDC.
+
+## Limits
+
+- Not implemented: a visitor opening a NEAR vault case for their own bill (uploads run on simulated rails), NEAR Intents funding, verification of NEAR AI's TEE attestation, gas sponsorship, recovery when a settlement callback never runs.
+- The chain shows the case owner approved and the enrolled account was paid; whether that account belongs to a real hospital is the verifier's off-chain decision, simulated here.
+
+## More
+
+- [README](README.md): the full description and the three-step judge path
+- [Design decisions](docs/near/DECISIONS.md), [threat model](docs/near/THREAT_MODEL.md), [state and encoding](docs/near/STATE_AND_ENCODING.md)
+- [Security policy](SECURITY.md)

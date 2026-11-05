@@ -14,7 +14,8 @@
 //   4. the agent account's keys today: the app's key can call only the vault's agent methods;
 //   5. the testnet vault runs the build the tests and mutation checks ran against;
 //   6. the activity-log anchor recorded in the evidence is stored on the vault.
-// Exit code 0 when every check passes, 1 otherwise.
+// Exit code 0 when every check passes, 1 when a check fails, 2 when the network could not be reached
+// (every failure was an RPC/connection error), so a scheduled job can warn instead of failing.
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
@@ -88,6 +89,7 @@ async function rpc(url, method, params) {
       continue;
     }
     const body = await res.json().catch(() => ({ error: { message: `HTTP ${res.status}` } }));
+    if (res.status === 429 || res.status >= 500) throw Object.assign(new Error(`${method}: HTTP ${res.status}`), { network: true });
     if (body.error) throw new Error(`${method}: ${body.error.data ?? body.error.message ?? JSON.stringify(body.error)}`);
     return body.result;
   }
@@ -108,7 +110,9 @@ async function check(title, fn, limit) {
     const detail = await fn();
     results.push({ title, ok: true, detail, limit });
   } catch (e) {
-    results.push({ title, ok: false, detail: e.message, limit });
+    // fetch() rejects with a TypeError when the connection fails; RPC overload is marked above
+    const network = e.network === true || (e instanceof TypeError && /fetch failed/i.test(e.message));
+    results.push({ title, ok: false, detail: e.message, limit, network });
   }
 }
 function expect(cond, message) {
@@ -266,6 +270,10 @@ for (const r of results) {
   if (r.limit) console.log(`      Limit: ${r.limit}`);
   console.log();
 }
-const failed = results.filter((r) => !r.ok).length;
-console.log(failed ? `${failed} of ${results.length} checks failed.` : `All ${results.length} checks passed.`);
-process.exit(failed ? 1 : 0);
+const failed = results.filter((r) => !r.ok);
+console.log(failed.length ? `${failed.length} of ${results.length} checks failed.` : `All ${results.length} checks passed.`);
+if (failed.length && failed.every((r) => r.network)) {
+  console.log("Every failure was a network error: the chain could not be reached, so nothing was checked.");
+  process.exit(2);
+}
+process.exit(failed.length ? 1 : 0);
