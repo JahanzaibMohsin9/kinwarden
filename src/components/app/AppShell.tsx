@@ -10,7 +10,6 @@ import { useT } from "@/lib/i18n";
 import { activeCase, pendingApprovals, threatCount } from "@/lib/selectors";
 import { cn } from "@/lib/format";
 import { corridorOf } from "@/domain/corridors";
-import type { Lang } from "@/domain/types";
 import { Dots, Logo } from "../ui";
 import { Flag } from "../Flag";
 import { ApprovalSheet } from "./ApprovalSheet";
@@ -27,11 +26,10 @@ const TABS = [
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { state } = useCarry();
-  const { t, lang, setLang } = useT();
+  const { t } = useT();
   const pathname = usePathname();
   const [approvalId, setApprovalId] = useState<string | null>(null);
   const seenApprovals = useRef(new Set<string>());
-  const lastScenario = useRef<string | null>(null);
 
   // inside the stage's phone frame: leave room for the notch
   const embedded = useSyncExternalStore(
@@ -43,15 +41,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pending = useMemo(() => (state && c ? pendingApprovals(state.world, c.id) : []), [state, c]);
   const viewer = useViewer(c);
   const threats = state ? threatCount(state.world) : 0;
-
-  // follow the case language when a scenario loads
-  useEffect(() => {
-    if (!state || !c) return;
-    if (lastScenario.current !== state.world.scenarioId) {
-      if (lastScenario.current !== null) setLang(c.lang);
-      lastScenario.current = state.world.scenarioId;
-    }
-  }, [state, c, setLang]);
 
   // pop the approval sheet when a new approval arrives
   useEffect(() => {
@@ -75,10 +64,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const corridor = corridorOf(c.corridor);
   const agent = state.world.agent;
   const working = state.agentBusy;
-  const urdu = lang === "ur";
 
   return (
-    <div lang={lang} dir={urdu ? "rtl" : "ltr"} className="relative mx-auto flex h-dvh max-w-[480px] flex-col overflow-hidden bg-bg">
+    <div className="relative mx-auto flex h-dvh max-w-[480px] flex-col overflow-hidden bg-bg">
       {/* Top bar */}
       <header className={cn("z-20 shrink-0 border-b border-line/70 bg-bg/85 px-4 pb-2 backdrop-blur-md", embedded ? "pt-10" : "pt-[max(12px,env(safe-area-inset-top))]")}>
         <div className="flex items-center gap-2">
@@ -86,12 +74,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <Logo mark className="text-[15px]" />
           </Link>
           <div className="min-w-0 flex-1">
-            <p className={cn("truncate text-[15px] font-semibold leading-tight", urdu && "urdu text-[14px] leading-6")}>{c.title}</p>
+            <p className={cn("truncate text-[15px] font-semibold leading-tight")}>{c.title}</p>
             <p className="truncate text-[11.5px] text-ink-3" dir="ltr">
               <Flag code={corridor.fromCode} /> {corridor.fromCity.name} → <Flag code={corridor.toCode} /> {corridor.toCity.name}
             </p>
           </div>
-          <LangSwitch lang={lang} setLang={setLang} />
           <Link
             href="/app/security"
             className={cn("relative grid h-9 w-9 place-items-center rounded-full border border-line bg-surface", pathname === "/app/security" && "border-brand text-brand")}
@@ -179,7 +166,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   <span className={cn("grid h-7 w-12 place-items-center rounded-full transition-colors", active && "bg-brand-soft")}>
                     <Icon size={19} strokeWidth={active ? 2.4 : 2} />
                   </span>
-                  <span className={cn(urdu && "urdu text-[11px] leading-5")}>{t(key)}</span>
+                  <span>{t(key)}</span>
                 </Link>
               </li>
             );
@@ -191,56 +178,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <MessageBanner messages={state.world.messages.filter((m) => m.caseId === c.id)} hidden={pathname === "/app/activity" || approvalId !== null} />
 
       <ApprovalSheet key={approvalId ?? "none"} approvalId={approvalId} onClose={() => setApprovalId(null)} />
-    </div>
-  );
-}
-
-const LANGS: { l: Lang; label: string; name: string }[] = [
-  { l: "en", label: "EN", name: "English" },
-  { l: "ur", label: "اردو", name: "اردو" },
-  { l: "zh", label: "中文", name: "中文" },
-];
-
-function LangSwitch({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => void }) {
-  const [open, setOpen] = useState(false);
-  const current = LANGS.find((o) => o.l === lang)!;
-  return (
-    <div className="relative" dir="ltr">
-      <button
-        onClick={() => setOpen((v) => !v)}
-        aria-haspopup="listbox"
-        aria-expanded={open}
-        className={cn("grid h-9 min-w-9 place-items-center rounded-full border border-line bg-surface px-2 text-[11.5px] font-semibold", lang === "ur" && "urdu leading-none")}
-      >
-        {current.label}
-      </button>
-      <AnimatePresence>
-        {open && (
-          <motion.ul
-            role="listbox"
-            initial={{ opacity: 0, y: -4, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -4, scale: 0.96 }}
-            className="absolute right-0 top-11 z-40 w-32 overflow-hidden rounded-2xl border border-line bg-surface p-1 shadow-pop"
-          >
-            {LANGS.map((o) => (
-              <li key={o.l}>
-                <button
-                  role="option"
-                  aria-selected={lang === o.l}
-                  onClick={() => {
-                    setLang(o.l);
-                    setOpen(false);
-                  }}
-                  className={cn("w-full rounded-xl px-3 py-2 text-left text-[13px] font-semibold", lang === o.l ? "bg-brand-soft text-brand-strong" : "hover:bg-surface-3", o.l === "ur" && "urdu")}
-                >
-                  {o.name}
-                </button>
-              </li>
-            ))}
-          </motion.ul>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

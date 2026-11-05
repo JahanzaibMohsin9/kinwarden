@@ -112,8 +112,8 @@ export const PRICING: Record<CorridorId, Partial<Record<Route, RoutePricing>>> =
     bank_transfer: {
       fxMarkupPct: 0.006,
       fees: [
-        { label: "电汇手续费 Telegraphic transfer fee", kind: "pct_source", value: 0.001, min: 50, max: 260 },
-        { label: "电报费 Cable fee", kind: "flat_source", value: 80 },
+        { label: "Telegraphic transfer fee", kind: "pct_source", value: 0.001, min: 50, max: 260 },
+        { label: "Cable fee", kind: "flat_source", value: 80 },
       ],
       arrivesInHours: 48,
       note: "SWIFT transfer straight to the university's account",

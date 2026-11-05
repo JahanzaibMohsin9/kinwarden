@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
-import { BadgeCheck, Check, ChevronDown, Clock, FileSignature, Fingerprint, Info, KeyRound, ShieldCheck, TriangleAlert, Users } from "lucide-react";
+import { BadgeCheck, Check, ChevronDown, Clock, FileSignature, Fingerprint, FlaskConical, Info, KeyRound, Link2, Loader2, ShieldCheck, TriangleAlert, Users } from "lucide-react";
 import { useRef, useState } from "react";
 import { useCarry, post } from "@/lib/client";
 import { approveWithPasskey, passkeysSupported, registerPasskey } from "@/lib/passkey";
@@ -17,7 +17,7 @@ import { NearApproval } from "./NearApproval";
 
 export function ApprovalSheet({ approvalId, onClose }: { approvalId: string | null; onClose: () => void }) {
   const { state } = useCarry();
-  const { t, lang } = useT();
+  const { t } = useT();
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showBreakdown, setShowBreakdown] = useState(false);
@@ -36,7 +36,6 @@ export function ApprovalSheet({ approvalId, onClose }: { approvalId: string | nu
   const inst = w.institutions[p.institutionId];
   const payer = c.people.find((x) => x.id === p.payerId);
   const tz = caseTz(c);
-  const urdu = lang === "ur";
 
   // world as it was before this payment was proposed, so the comparison is like-for-like
   const before = { ...w, payments: Object.fromEntries(Object.entries(w.payments).filter(([id]) => id !== p.id)) };
@@ -55,6 +54,8 @@ export function ApprovalSheet({ approvalId, onClose }: { approvalId: string | nu
   const canPasskey = passkeysSupported();
   const hasPasskey = canPasskey && state.passkeys.length > 0;
   const passkeyMode = hasPasskey && !useHold;
+  // which rail moves this money: the NEAR vault (approved only in the family's wallet) or the simulated bank and card rails
+  const onNear = Boolean(p.near) || (p.route === "bank_transfer" && Boolean(state.near?.cases[p.caseId]) && Boolean(state.near?.payeeInstitutions.includes(p.institutionId)));
 
   const decide = async (decision: "approved" | "declined", method: "hold" | "passkey" = "hold") => {
     setError(null);
@@ -83,10 +84,21 @@ export function ApprovalSheet({ approvalId, onClose }: { approvalId: string | nu
   };
 
   return (
-    <Sheet open={open} onClose={onClose} title={<span className={cn(urdu && "urdu")}>{t("approvePayment")}</span>}>
-      <div lang={lang} dir={urdu ? "rtl" : "ltr"} className="space-y-4 pb-2">
+    <Sheet open={open} onClose={onClose} title={<span>{t("approvePayment")}</span>}>
+      <div className="space-y-4 pb-2">
         {/* Amount */}
         <div className="rounded-3xl bg-brand-softer p-4 text-center">
+          <p className="mb-2 flex justify-center">
+            {onNear ? (
+              <Badge tone="brand" icon={<Link2 size={12} />}>
+                NEAR vault · approve in your wallet
+              </Badge>
+            ) : (
+              <Badge tone="neutral" icon={<FlaskConical size={12} />}>
+                Simulated {p.route === "card_payment" ? "card payment" : p.route === "bank_transfer" ? "bank transfer" : "payment"} · sandbox rails
+              </Badge>
+            )}
+          </p>
           <p className="num text-[34px] font-bold leading-tight tracking-tight" dir="ltr">
             {money(p.amount, p.currency)}
           </p>
@@ -106,9 +118,9 @@ export function ApprovalSheet({ approvalId, onClose }: { approvalId: string | nu
             <Clock size={14} className="shrink-0 text-ink-3" />
             <span>
               <span className="block font-semibold text-ink-2">
-                {t("arrives")}: {p.cost.arrivesInHours === 0 ? t("instant") : dateTime(arrivesAt, tz, lang)}
+                {t("arrives")}: {p.cost.arrivesInHours === 0 ? t("instant") : dateTime(arrivesAt, tz)}
               </span>
-              {inv.dueAt && <span className="block text-ink-3">Due {dateTime(inv.dueAt, tz, lang)}</span>}
+              {inv.dueAt && <span className="block text-ink-3">Due {dateTime(inv.dueAt, tz)}</span>}
             </span>
           </div>
         </div>
@@ -116,7 +128,7 @@ export function ApprovalSheet({ approvalId, onClose }: { approvalId: string | nu
         {/* Why */}
         <div>
           <p className="mb-1 text-[12px] font-semibold uppercase tracking-[0.06em] text-ink-3">{t("why")}</p>
-          <p className={cn("text-[14.5px] leading-relaxed text-ink", urdu && "urdu")}>{p.rationale}</p>
+          <p className={cn("text-[14.5px] leading-relaxed text-ink")}>{p.rationale}</p>
         </div>
 
         {/* Route comparison: one series (total cost), chosen route highlighted, blocked routes hatched */}
@@ -222,6 +234,11 @@ export function ApprovalSheet({ approvalId, onClose }: { approvalId: string | nu
         {p.near ? (
           // Settles through the NEAR vault: only the family's wallet can approve or reject it.
           <NearApproval paymentId={p.id} onDone={onClose} />
+        ) : onNear ? (
+          // NEAR-bound but not on the vault yet: never offer the sandbox hold control for it
+          <p className="flex items-center gap-2 rounded-2xl bg-surface-2 px-3 py-3 text-[13px] text-ink-2">
+            <Loader2 size={15} className="shrink-0 animate-spin text-brand" /> Preparing this payment on the NEAR vault. You&apos;ll approve it in your wallet.
+          </p>
         ) : (
         <div className="sticky bottom-0 -mx-5 space-y-1.5 border-t border-line/60 bg-surface px-5 pb-1 pt-3">
           {notPayer && payer ? (
@@ -240,17 +257,17 @@ export function ApprovalSheet({ approvalId, onClose }: { approvalId: string | nu
             <HoldToApprove done={done} label={done ? t("approved") : t("holdToApprove")} onComplete={() => decide("approved")} />
           )}
           {!done && !notPayer && hasPasskey && (
-            <button onClick={() => setUseHold((v) => !v)} className={cn("mx-auto block rounded-full px-3 py-1 text-[12px] font-semibold text-ink-3 hover:bg-surface-3 hover:text-ink", urdu && "urdu")}>
+            <button onClick={() => setUseHold((v) => !v)} className={cn("mx-auto block rounded-full px-3 py-1 text-[12px] font-semibold text-ink-3 hover:bg-surface-3 hover:text-ink")}>
               {useHold ? t("approveWithPasskey") : t("holdInstead")}
             </button>
           )}
           {!done && !notPayer && canPasskey && !hasPasskey && (
-            <button onClick={setUp} className={cn("mx-auto flex items-center gap-1 rounded-full px-3 py-1 text-[12px] font-semibold text-brand hover:bg-brand-softer", urdu && "urdu")}>
+            <button onClick={setUp} className={cn("mx-auto flex items-center gap-1 rounded-full px-3 py-1 text-[12px] font-semibold text-brand hover:bg-brand-softer")}>
               <KeyRound size={13} /> {t("setUpPasskey")}
             </button>
           )}
           <div className="flex items-center justify-between gap-3 pb-1">
-            <p className={cn("flex items-center gap-1 text-[11px] leading-tight text-ink-3", passkeyMode && urdu && "urdu")}>
+            <p className={cn("flex items-center gap-1 text-[11px] leading-tight text-ink-3")}>
               <ShieldCheck size={12} className="shrink-0" /> {passkeyMode ? t("passkeySigns") : "Nothing moves without this. The safety layer re-checks it."}
             </p>
             {!done && (

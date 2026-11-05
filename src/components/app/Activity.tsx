@@ -31,7 +31,7 @@ import { ListenButton, VoiceButton } from "./Voice";
 
 export function ActivityFeed() {
   const { state } = useCarry();
-  const { t, lang } = useT();
+  const { t } = useT();
   const bottom = useRef<HTMLDivElement>(null);
   const count = useRef(0);
   const items = state ? feed(state, activeCase(state)!.id) : [];
@@ -49,7 +49,7 @@ export function ActivityFeed() {
   const groups: { key: string; label: string; items: FeedItem[] }[] = [];
   for (const it of items) {
     const k = dayKey(it.entry.simAt, tz);
-    if (groups.at(-1)?.key !== k) groups.push({ key: k, label: `${t("day")} ${dayNumber(it.entry.simAt, c.openedAt, tz)} · ${dayLabel(it.entry.simAt, tz, lang)}`, items: [] });
+    if (groups.at(-1)?.key !== k) groups.push({ key: k, label: `${t("day")} ${dayNumber(it.entry.simAt, c.openedAt, tz)} · ${dayLabel(it.entry.simAt, tz)}`, items: [] });
     groups.at(-1)!.items.push(it);
   }
 
@@ -80,7 +80,7 @@ export function ActivityFeed() {
 }
 
 function Composer({ caseId }: { caseId: string }) {
-  const { t, lang } = useT();
+  const { t } = useT();
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
   const send = async () => {
@@ -106,15 +106,15 @@ function Composer({ caseId }: { caseId: string }) {
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder={t("messagePlaceholder")}
-          className={cn("h-11 flex-1 rounded-full border border-line bg-surface px-4 text-[14px] outline-none placeholder:text-ink-3 focus:border-brand", lang === "ur" && "urdu")}
+          className={cn("h-11 flex-1 rounded-full border border-line bg-surface px-4 text-[14px] outline-none placeholder:text-ink-3 focus:border-brand")}
         />
         {text.trim() ? (
           <button disabled={sending} className="grid h-11 w-11 place-items-center rounded-full bg-brand text-brand-ink disabled:opacity-40" aria-label={t("send")}>
-            <SendHorizontal size={18} className={cn(lang === "ur" && "rotate-180")} />
+            <SendHorizontal size={18} />
           </button>
         ) : (
           <VoiceButton
-            lang={lang}
+           
             onText={(spoken) => post("/api/family", { caseId, text: spoken, voice: true })}
             labels={{ record: t("voiceRecord"), stop: t("voiceStop"), working: t("voiceWorking"), note: t("voiceNote") }}
           />
@@ -129,7 +129,7 @@ const TIER_LABEL = { read: "Read", communicate: "Write", money: "Money" } as con
 
 export function FeedLine({ item, tz, compact = false }: { item: FeedItem; tz: string; compact?: boolean }) {
   const [open, setOpen] = useState(false);
-  const { t, lang } = useT();
+  const { t } = useT();
   const e = item.entry;
   const time = <span className="num shrink-0 text-[11px] text-ink-3">{timeOf(e.simAt, tz)}</span>;
 
@@ -176,7 +176,7 @@ export function FeedLine({ item, tz, compact = false }: { item: FeedItem; tz: st
           )}
           <p className="whitespace-pre-wrap">{m.text}</p>
           <div className={cn("mt-1 flex items-center justify-end gap-1.5 text-[10.5px]", mine ? "text-bg/60" : "text-ink-3")}>
-            {!mine && <ListenButton text={m.text} lang={lang} labels={{ listen: t("listen"), stop: t("stopListening") }} className="-ml-1.5 mr-auto" />}
+            {!mine && <ListenButton text={m.text} labels={{ listen: t("listen"), stop: t("stopListening") }} className="-ml-1.5 mr-auto" />}
             {timeOf(m.at, tz)}
           </div>
         </div>

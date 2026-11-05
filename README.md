@@ -66,7 +66,7 @@ Without a NEAR deployment the app runs on its simulated payment rails.
 
 ```sh
 npm test               # unit tests: safety, privacy, passkey, scenarios, red team, NEAR app code, claim map
-npm run eval:replay    # four live NEAR AI runs and the four baseline DeepSeek runs, replayed without a model key
+npm run eval:replay    # the four live NEAR AI runs, replayed without a model key
 npx next typegen && npx tsc --noEmit
 npx eslint src
 npm run build
@@ -95,12 +95,12 @@ npm run test:near
 
 ## Hackathon baseline
 
-This repository starts from pre-existing, team-developed application code, imported with fresh Git history and renamed to Kinwarden. The `pre-hackathon` tag marks this baseline before NEAR implementation. The agent tools, the LLM agent and its DeepSeek, OpenAI and Anthropic providers (their recorded runs are in `recordings/baseline/`), simulated payment rails, safety rules, passkey flow and optional Conflux testnet log anchoring belong to the baseline. Only changes after `pre-hackathon` are intended for the NEAR submission: inspect them with `git diff pre-hackathon..HEAD`. At submission, `hackathon-submission` will be tagged with a public compare link for `pre-hackathon...hackathon-submission`.
+This repository starts from pre-existing, team-developed application code, imported with fresh Git history and renamed to Kinwarden. The `pre-hackathon` tag marks this baseline before NEAR implementation. The agent tools, the LLM agent and its DeepSeek, OpenAI and Anthropic providers, simulated payment rails, safety rules, passkey flow and optional Conflux testnet log anchoring belong to the baseline. Only changes after `pre-hackathon` are intended for the NEAR submission: inspect them with `git diff pre-hackathon..HEAD`. At submission, `hackathon-submission` will be tagged with a public compare link for `pre-hackathon...hackathon-submission`.
 
 ## Development
 
 See [architecture and development](docs/TECHNICAL.md), [security](docs/SECURITY.md), [deployment](docs/DEPLOY.md), [evaluation](docs/EVAL.md), and the NEAR [decisions](docs/near/DECISIONS.md), [threat model](docs/near/THREAT_MODEL.md) and [state and encoding](docs/near/STATE_AND_ENCODING.md).
 
-The application uses Next.js, React, TypeScript, Tailwind CSS, Zod, model-provider SDKs, viem and near-api-js; versions are pinned by `package-lock.json`. Contracts use Rust and near-sdk. Tests use Vitest and cargo test. The inherited development notes identify Claude for coding and MiMo for Chinese-language review; Codex assisted with this repository setup.
+The application uses Next.js, React, TypeScript, Tailwind CSS, Zod, model-provider SDKs, viem and near-api-js; versions are pinned by `package-lock.json`. Contracts use Rust and near-sdk. Tests use Vitest and cargo test. Tools used: the baseline's development notes identify Claude for coding and MiMo for review of a Chinese-language interface that has since been removed; Codex assisted with this repository setup. The NEAR work after `pre-hackathon` (contracts, app integration, evidence tooling and documentation) was written with Claude Code (Anthropic) under the team's direction and review.
 
 Licensed under [MIT](LICENSE).

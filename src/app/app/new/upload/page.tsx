@@ -60,8 +60,8 @@ function Segmented<V extends string>({ value, options, onChange, label }: { valu
 
 export default function UploadBill() {
   const router = useRouter();
-  const { t, lang } = useT();
-  const [home, setHome] = useState<"PK" | "CN">(lang === "zh" ? "CN" : "PK");
+  const { t } = useT();
+  const [home, setHome] = useState<"PK" | "CN">("PK");
   const [type, setType] = useState<CaseType>("medical");
   const [payerName, setPayer] = useState("");
   const [subjectName, setSubject] = useState("");
@@ -150,7 +150,7 @@ export default function UploadBill() {
                 onChange={setHome}
                 options={[
                   { value: "PK", label: <><Flag code="PK" /> Pakistan</> },
-                  { value: "CN", label: <><Flag code="CN" /> 中国 China</> },
+                  { value: "CN", label: <><Flag code="CN" /> China</> },
                 ]}
               />
             </Field>

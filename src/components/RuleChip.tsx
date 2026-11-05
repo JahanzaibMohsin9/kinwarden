@@ -18,7 +18,6 @@ export function RuleChip({ id, className }: { id: string; className?: string }) 
   const { lang } = useT();
   const ex = explainRule(id, lang, state?.world.now ?? new Date().toISOString());
   if (!ex) return <span className={cn("rounded bg-surface-3 px-1.5 py-0.5 font-mono text-[10px] text-ink-2", className)}>{id}</span>;
-  const urdu = lang === "ur";
   const status = ex.rule.status as keyof typeof STATUS_TONE;
   return (
     <>
@@ -34,14 +33,14 @@ export function RuleChip({ id, className }: { id: string; className?: string }) 
         {id}
       </button>
       <Sheet open={open} onClose={() => setOpen(false)} title={<span className="flex items-center gap-2"><Scale size={18} className="text-brand" /> {ex.rule.title}</span>}>
-        <div className="space-y-3 pb-3" lang={lang} dir={urdu ? "rtl" : "ltr"}>
-          <p className={cn("text-[15px] leading-relaxed text-ink", urdu && "urdu")}>{ex.text}</p>
+        <div className="space-y-3 pb-3">
+          <p className={cn("text-[15px] leading-relaxed text-ink")}>{ex.text}</p>
           <div className="flex flex-wrap items-center gap-2" dir="ltr">
             <Badge tone={STATUS_TONE[status] ?? "neutral"}>{STATUS_LABEL[status] ?? status}</Badge>
             <span className="font-mono text-[11px] text-ink-3">{ex.rule.id}</span>
             {ex.rule.effectiveFrom && <span className="text-[11.5px] text-ink-3">in force since {ex.rule.effectiveFrom}</span>}
           </div>
-          <p className={cn("text-[12.5px] text-ink-2", urdu && "urdu")}>{ex.status}</p>
+          <p className={cn("text-[12.5px] text-ink-2")}>{ex.status}</p>
           {ex.rule.source.url ? (
             <a href={ex.rule.source.url} target="_blank" rel="noreferrer" className="flex items-start gap-1.5 rounded-xl bg-surface-2 px-3 py-2.5 text-[12.5px] text-ink-2 hover:text-brand" dir="ltr">
               <ExternalLink size={14} className="mt-[2px] shrink-0" />

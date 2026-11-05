@@ -79,7 +79,7 @@ describe("Pakistan rules", () => {
     const w = world();
     const c = w.cases.case_th;
     w.invoices.inv_x = { id: "inv_x", caseId: c.id, institutionId: "srh", kind: "deposit_request", number: "X", currency: "THB", lineItems: [], total: 200000, amountDue: 200000, issuedAt: w.now, documentId: "d", status: "open" };
-    w.payments.pay_x = { id: "pay_x", caseId: c.id, invoiceId: "inv_x", payerId: "p_tariq", route: "card_payment", amount: 100000, currency: "THB", status: "completed", createdAt: w.now } as Payment;
+    w.payments.pay_x = { id: "pay_x", caseId: c.id, invoiceId: "inv_x", payerId: "p_daniel", route: "card_payment", amount: 100000, currency: "THB", status: "completed", createdAt: w.now } as Payment;
     const ev = evaluateRoute({ world: w, caseFile: c, payer: c.people[1], route: "card_payment", amount: 100000, currency: "THB", invoiceId: "inv_x" });
     expect(ev.blockers.map((b) => b.ruleId)).toContain("KINWARDEN.NO_SPLITTING");
   });
@@ -115,14 +115,14 @@ describe("route comparison", () => {
 });
 
 describe("rule explanations", () => {
-  it("every rule in every pack has a plain-language explanation (English, Chinese)", async () => {
+  it("every rule in every pack has a plain-language explanation", async () => {
     const { explainRule, rulesWithoutExplanation } = await import("./explain");
     expect(rulesWithoutExplanation()).toEqual([]);
     const ex = explainRule("PK.MED.REMIT.CAP", "en", "2026-11-02T00:00:00Z")!;
     expect(ex.text).toContain("USD 50,000");
     expect(explainRule("PK.CARD.ADVANCE_TAX", "en", "2026-11-02T00:00:00Z")!.text).toContain("0.5%");
     expect(explainRule("PK.CARD.ADVANCE_TAX", "en", "2025-11-02T00:00:00Z")!.text).toContain("5%");
-    expect(explainRule("CN.FX.ANNUAL_QUOTA", "zh", "2026-11-02T00:00:00Z")!.text).toContain("USD 50,000");
+    expect(explainRule("CN.FX.ANNUAL_QUOTA", "en", "2026-11-02T00:00:00Z")!.text).toContain("USD 50,000");
   });
 });
 
@@ -132,7 +132,7 @@ describe("admission verified before fees", () => {
     const { issueInvoice, addDoc } = await import("@/server/sim/factory");
     const store = new Store();
     store.reset(seedScenario("uk-tuition"));
-    const inv = issueInvoice(store, { caseId: "case_uk", institutionId: "kgu", kind: "fee_statement", title: "Fees", patientName: "Lin Yuxuan", patientRef: "KG2601847", lineItems: [{ description: "Tuition", amount: 14875 }] });
+    const inv = issueInvoice(store, { caseId: "case_uk", institutionId: "kgu", kind: "fee_statement", title: "Fees", patientName: "Emily Lane", patientRef: "KG2601847", lineItems: [{ description: "Tuition", amount: 14875 }] });
     const w = store.world;
     const ev = () => evaluateRoute({ world: w, caseFile: w.cases.case_uk, payer: w.cases.case_uk.people[0], route: "card_payment", amount: 14875, currency: "GBP", invoiceId: inv.id });
     addDoc(store, { caseId: "case_uk", kind: "admission_letter", title: "Offer (from an agent)", text: "offer", fields: {}, origin: "family" });

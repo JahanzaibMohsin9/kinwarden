@@ -25,7 +25,7 @@ describe("NEAR log anchors", () => {
 
   it("labels start with the run tag and stay within the vault's rules", () => {
     expect(anchorLabel("a1b2c3", "th-medical:case opened")).toBe("a1b2c3:th-medical:case opened");
-    expect(anchorLabel("a1b2c3", "uk-tuition:雨萱")).toBe("a1b2c3:uk-tuition:??");
+    expect(anchorLabel("a1b2c3", "uk-tuition:€£")).toBe("a1b2c3:uk-tuition:??");
     expect(anchorLabel("a1b2c3", "x".repeat(200))).toHaveLength(96);
   });
 });

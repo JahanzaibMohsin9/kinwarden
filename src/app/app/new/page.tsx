@@ -12,8 +12,8 @@ import { cn } from "@/lib/format";
 const LIVE = [
   { id: "th-medical", icon: HeartPulse, title: "Hospital treatment abroad", corridor: ["PK", "Pakistan", "TH", "Thailand"], rules: "State Bank of Pakistan rules" },
   { id: "pk-admission", icon: ShieldAlert, title: "University offer through an agent", corridor: ["PK", "Pakistan", "GB", "United Kingdom"], rules: "State Bank of Pakistan rules · admission check first" },
-  { id: "uk-tuition", icon: GraduationCap, title: "University fees abroad", corridor: ["CN", "China", "GB", "United Kingdom"], rules: "SAFE (国家外汇管理局) rules" },
-  { id: "cn-admission", icon: ShieldAlert, title: "Study agent promises a place", corridor: ["CN", "China", "GB", "United Kingdom"], rules: "SAFE rules · admission check first · no 蚂蚁搬家" },
+  { id: "uk-tuition", icon: GraduationCap, title: "University fees abroad", corridor: ["CN", "China", "GB", "United Kingdom"], rules: "SAFE (State Administration of Foreign Exchange) rules" },
+  { id: "cn-admission", icon: ShieldAlert, title: "Study agent promises a place", corridor: ["CN", "China", "GB", "United Kingdom"], rules: "SAFE rules · admission check first · no quota splitting" },
 ];
 
 const SOON = [

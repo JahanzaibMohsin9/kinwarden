@@ -37,6 +37,16 @@ export function AgentConsole() {
         </span>
       </div>
       <div className="scroll-thin min-h-0 flex-1 overflow-y-auto px-3 py-2">
+        {rows.length === 0 && (
+          <div className="grid h-full min-h-40 place-items-center px-6 text-center font-sans">
+            <div className="max-w-xs space-y-1.5">
+              <p className="text-[13px] font-semibold text-[#e9f1ee]">Nothing has happened yet</p>
+              <p className="text-[12px] leading-relaxed text-[#85968f]">
+                Press <span className="font-semibold text-[#5ccdb4]">Next</span> to move the case forward. Every tool the agent calls, every check the safety layer makes and every NEAR transaction appears here, hash-chained.
+              </p>
+            </div>
+          </div>
+        )}
         <AnimatePresence initial={false}>
           {rows.map((e) => {
             const decision = typeof e.data.decision === "string" ? e.data.decision : undefined;

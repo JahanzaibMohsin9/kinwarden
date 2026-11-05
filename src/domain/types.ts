@@ -1,7 +1,7 @@
 // Core domain types shared by the server (agent, mock world) and the UI.
 
 export type Currency = "USD" | "PKR" | "THB" | "GBP" | "CNY" | "EUR" | "SGD" | "MYR" | "AED" | "SAR" | "TRY" | "HKD" | "AUD" | "CAD";
-export type Lang = "en" | "ur" | "zh";
+export type Lang = "en";
 
 export type CaseType = "medical" | "tuition";
 /** Home country, then destination country. The three scenario corridors are fixed; an uploaded bill gets one derived from its country. */

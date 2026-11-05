@@ -27,3 +27,20 @@ export function tusdc(units: string | bigint, decimals = 6): string {
   const cents = ((n % base) * BigInt(100)) / base;
   return `${whole.toLocaleString("en-US")}.${cents.toString().padStart(2, "0")}`;
 }
+
+/** An account's spendable NEAR balance in yoctoNEAR, or null if the account does not exist. */
+export async function nearBalance(rpcUrl: string, accountId: string): Promise<bigint | null> {
+  const res = await fetch(rpcUrl, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ jsonrpc: "2.0", id: "kinwarden", method: "query", params: { request_type: "view_account", finality: "final", account_id: accountId } }),
+  });
+  const body = (await res.json()) as { result?: { amount?: string }; error?: unknown };
+  return body.result?.amount ? BigInt(body.result.amount) : null;
+}
+
+/** yoctoNEAR as NEAR with three decimals, e.g. "0.250". */
+export function nearAmount(yocto: bigint): string {
+  const milli = yocto / BigInt(10) ** BigInt(21);
+  return `${milli / BigInt(1000)}.${(milli % BigInt(1000)).toString().padStart(3, "0")}`;
+}

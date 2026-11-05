@@ -37,7 +37,7 @@ async function verifyInBrowser(entries: LedgerEntry[], onProgress: (n: number) =
 
 export function SecurityCenter() {
   const { state } = useCarry();
-  const { t, lang } = useT();
+  const { t } = useT();
   const [verifying, setVerifying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState<{ ok: boolean; brokenAt?: number; reason?: string; head?: string; at: number } | null>(null);
@@ -46,7 +46,6 @@ export function SecurityCenter() {
   const c = activeCase(state)!;
   const w = state.world;
   const tz = caseTz(c);
-  const urdu = lang === "ur";
   const events = [...w.security].reverse();
   const blocked = events.filter((e) => e.severity !== "info").length;
   const pack = PACKS[corridorOf(c.corridor).packId];
@@ -74,7 +73,7 @@ export function SecurityCenter() {
             {kill ? <OctagonX size={24} /> : <ShieldCheck size={24} />}
           </span>
           <div className="flex-1">
-            <p className={cn("text-[17px] font-bold", urdu && "urdu")}>{kill ? t("agentStopped") : t("protectedBy")}</p>
+            <p className={cn("text-[17px] font-bold")}>{kill ? t("agentStopped") : t("protectedBy")}</p>
             <p className="text-[12.5px] text-ink-2">
               {blocked > 0 ? `${blocked} attempt${blocked > 1 ? "s" : ""} blocked or flagged` : t("noThreats")} · {toolCounts.money ?? 0} money actions, each covered by your approval
             </p>
@@ -82,8 +81,8 @@ export function SecurityCenter() {
         </div>
         <div className="flex items-center gap-3 px-4 py-3">
           <div className="flex-1">
-            <p className={cn("text-[14px] font-semibold", urdu && "urdu")}>{t("emergencyStop")}</p>
-            <p className={cn("text-[12px] text-ink-3", urdu && "urdu")}>{t("emergencyStopHint")}</p>
+            <p className={cn("text-[14px] font-semibold")}>{t("emergencyStop")}</p>
+            <p className={cn("text-[12px] text-ink-3")}>{t("emergencyStopHint")}</p>
           </div>
           <button
             role="switch"
@@ -100,7 +99,7 @@ export function SecurityCenter() {
       {/* Threats */}
       <section>
         <SectionTitle>
-          <span className={cn(urdu && "urdu normal-case tracking-normal")}>{t("threats")}</span>
+          <span>{t("threats")}</span>
         </SectionTitle>
         <Card className="divide-y divide-line">
           {events.length === 0 && <p className="px-4 py-4 text-[13.5px] text-ink-3">{t("noThreats")}</p>}
@@ -115,7 +114,7 @@ export function SecurityCenter() {
                 <div className="mt-1 flex flex-wrap items-center gap-1.5">
                   <Badge tone={e.severity === "critical" ? "danger" : "amber"}>{e.severity === "critical" ? "Critical" : "Warning"}</Badge>
                   {e.ruleIds?.map((r) => <RuleChip key={r} id={r} />)}
-                  <span className="text-[11px] text-ink-3">{dateTime(e.at, tz, lang)}</span>
+                  <span className="text-[11px] text-ink-3">{dateTime(e.at, tz)}</span>
                 </div>
               </div>
             </div>
@@ -128,7 +127,7 @@ export function SecurityCenter() {
       {/* Log integrity */}
       <section>
         <SectionTitle>
-          <span className={cn(urdu && "urdu normal-case tracking-normal")}>{t("logIntegrity")}</span>
+          <span>{t("logIntegrity")}</span>
         </SectionTitle>
         <Card className="space-y-3 p-4">
           <div className="flex items-start gap-3">
@@ -181,20 +180,20 @@ export function SecurityCenter() {
       {/* Permissions */}
       <section>
         <SectionTitle>
-          <span className={cn(urdu && "urdu normal-case tracking-normal")}>{t("permissions")}</span>
+          <span>{t("permissions")}</span>
         </SectionTitle>
         <Card className="divide-y divide-line">
-          <Tier icon={<Eye size={15} />} tone="brand" title={t("tierRead")} hint={t("tierReadHint")} count={toolCounts.read} urdu={urdu} />
-          <Tier icon={<PenLine size={15} />} tone="brand" title={t("tierCommunicate")} hint={t("tierCommunicateHint")} count={toolCounts.communicate} urdu={urdu} />
-          <Tier icon={<Banknote size={15} />} tone="amber" title={t("tierMoney")} hint={t("tierMoneyHint")} count={toolCounts.money} urdu={urdu} />
-          <Tier icon={<Ban size={15} />} tone="danger" title={t("tierForbidden")} hint={t("tierForbiddenHint")} urdu={urdu} />
+          <Tier icon={<Eye size={15} />} tone="brand" title={t("tierRead")} hint={t("tierReadHint")} count={toolCounts.read} />
+          <Tier icon={<PenLine size={15} />} tone="brand" title={t("tierCommunicate")} hint={t("tierCommunicateHint")} count={toolCounts.communicate} />
+          <Tier icon={<Banknote size={15} />} tone="amber" title={t("tierMoney")} hint={t("tierMoneyHint")} count={toolCounts.money} />
+          <Tier icon={<Ban size={15} />} tone="danger" title={t("tierForbidden")} hint={t("tierForbiddenHint")} />
         </Card>
       </section>
 
       {/* Rules */}
       <section>
         <SectionTitle>
-          <span className={cn(urdu && "urdu normal-case tracking-normal")}>{t("rules")}</span>
+          <span>{t("rules")}</span>
         </SectionTitle>
         <Card className="p-0">
           <div className="border-b border-line px-4 py-3">
@@ -232,15 +231,15 @@ export function SecurityCenter() {
   );
 }
 
-function Tier({ icon, tone, title, hint, count, urdu }: { icon: React.ReactNode; tone: "brand" | "amber" | "danger"; title: string; hint: string; count?: number; urdu: boolean }) {
+function Tier({ icon, tone, title, hint, count }: { icon: React.ReactNode; tone: "brand" | "amber" | "danger"; title: string; hint: string; count?: number }) {
   return (
     <div className="flex items-start gap-3 px-4 py-3">
       <span className={cn("mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-full", tone === "brand" && "bg-brand-soft text-brand", tone === "amber" && "bg-amber-soft text-amber-strong", tone === "danger" && "bg-danger-soft text-danger")}>
         {icon}
       </span>
       <div className="flex-1">
-        <p className={cn("text-[13.5px] font-semibold", urdu && "urdu")}>{title}</p>
-        <p className={cn("text-[12px] text-ink-3", urdu && "urdu")}>{hint}</p>
+        <p className={cn("text-[13.5px] font-semibold")}>{title}</p>
+        <p className={cn("text-[12px] text-ink-3")}>{hint}</p>
       </div>
       {count !== undefined && <span className="num rounded-full bg-surface-3 px-2 py-0.5 text-[11px] font-semibold text-ink-2">{count}</span>}
     </div>
@@ -255,8 +254,7 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 function PasskeyRow({ passkeys, error, setError }: { passkeys: { id: string; label: string; createdAt: string; lastUsedAt?: string }[]; error: string | null; setError: (e: string | null) => void }) {
-  const { t, lang } = useT();
-  const urdu = lang === "ur";
+  const { t } = useT();
   const on = passkeys.length > 0;
   const setUp = async () => {
     setError(null);
@@ -273,8 +271,8 @@ function PasskeyRow({ passkeys, error, setError }: { passkeys: { id: string; lab
           <Fingerprint size={16} />
         </span>
         <div className="min-w-0 flex-1">
-          <p className={cn("text-[14px] font-semibold", urdu && "urdu")}>{on ? t("passkeyReady") : t("setUpPasskey")}</p>
-          <p className={cn("text-[12px] text-ink-3", urdu && "urdu")}>{on ? `${passkeys.map((k) => k.label).join(", ")} · ${t("passkeySigns")}` : t("passkeySigns")}</p>
+          <p className={cn("text-[14px] font-semibold")}>{on ? t("passkeyReady") : t("setUpPasskey")}</p>
+          <p className={cn("text-[12px] text-ink-3")}>{on ? `${passkeys.map((k) => k.label).join(", ")} · ${t("passkeySigns")}` : t("passkeySigns")}</p>
         </div>
         {!on && passkeysSupported() && (
           <button onClick={setUp} className="shrink-0 rounded-full bg-ink px-3 py-1.5 text-[12.5px] font-semibold text-bg hover:bg-brand">
@@ -299,14 +297,13 @@ const WITHHELD_LABEL: Record<string, string> = {
 
 /** Privacy firewall: what was withheld from the AI, and the exact text it was sent last time. */
 function PrivacyCard({ lastPrompt }: { lastPrompt?: { at: string; caseId: string; text: string; withheld: Record<string, number> } }) {
-  const { t, lang } = useT();
-  const urdu = lang === "ur";
+  const { t } = useT();
   const [open, setOpen] = useState(false);
   const kinds = Object.entries(lastPrompt?.withheld ?? {});
   return (
     <section>
       <SectionTitle>
-        <span className={cn(urdu && "urdu normal-case tracking-normal")}>{t("privacyTitle")}</span>
+        <span>{t("privacyTitle")}</span>
       </SectionTitle>
       <Card className="space-y-3 p-4">
         <div className="flex items-start gap-3">
@@ -314,8 +311,8 @@ function PrivacyCard({ lastPrompt }: { lastPrompt?: { at: string; caseId: string
             <EyeOff size={18} />
           </span>
           <div className="min-w-0 flex-1">
-            <p className={cn("text-[14px] font-semibold", urdu && "urdu")}>{t("privacyHeadline")}</p>
-            <p className={cn("text-[12px] leading-relaxed text-ink-3", urdu && "urdu")}>{t("privacyHint")}</p>
+            <p className={cn("text-[14px] font-semibold")}>{t("privacyHeadline")}</p>
+            <p className={cn("text-[12px] leading-relaxed text-ink-3")}>{t("privacyHint")}</p>
           </div>
         </div>
         {kinds.length > 0 && (

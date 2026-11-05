@@ -54,20 +54,10 @@ export interface Vault {
 
 const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const isLatin = (s: string) => /^[\p{Script=Latin}\d\s.'-]+$/u.test(s);
-const isHan = (s: string) => /^\p{Script=Han}+$/u.test(s);
-
-/** Name spellings that should be hidden: the full name, each part, and Chinese given names. */
+/** Name spellings that should be hidden: the full name and each part of it. */
 export function nameForms(name: string): string[] {
   const forms = new Set<string>([name]);
-  for (const part of name.split(/\s+/)) {
-    if (isHan(part)) {
-      forms.add(part);
-      if (part.length >= 3) forms.add(part.slice(1)); // 林雨萱 → 雨萱
-    } else if (part.length >= 3) forms.add(part);
-  }
-  // "林伟 Lin Wei": both the Chinese and the Latin spelling on their own
-  const latin = name.split(/\s+/).filter((p) => isLatin(p));
-  if (latin.length >= 2) forms.add(latin.join(" "));
+  for (const part of name.split(/\s+/)) if (part.length >= 3) forms.add(part);
   return [...forms];
 }
 
@@ -81,15 +71,15 @@ export function buildVault(w: World, caseId: string): Vault {
     entries.push({ token: `[${kind}_${counters[kind]}]`, kind, real, patterns });
   };
 
-  // a name part shared by two people ("Tariq" in Tariq Mahmood and Sana Tariq) goes to the person whose
-  // first name it is, as in "Mr. Tariq"; otherwise to the first person listed. Full names always win.
+  // a name part shared by two people ("Daniel" in Daniel Hart and Sara Hart) goes to the person whose
+  // first name it is, as in "Mr. Daniel"; otherwise to the first person listed. Full names always win.
   const owner = new Map<string, string>();
   for (const p of c.people) if (p.name.split(/\s+/)[0]) owner.set(p.name.split(/\s+/)[0], p.id);
   for (const p of c.people) for (const f of nameForms(p.name)) if (!owner.has(f)) owner.set(f, p.id);
   for (const p of c.people) add("PERSON", p.name, nameForms(p.name).filter((f) => f === p.name || owner.get(f) === p.id));
 
   for (const p of c.people) if (p.passport) add("PASSPORT", p.passport, [p.passport]);
-  // internal IDs can carry names ("p_tariq"): the model gets [PERSON_ID_1] and the tools get the real ID back
+  // internal IDs can carry names ("p_daniel"): the model gets [PERSON_ID_1] and the tools get the real ID back
   for (const p of c.people) add("PERSON_ID", p.id, [p.id]);
 
   const refs = new Set(Object.values(w.invoices).filter((i) => i.caseId === caseId && i.patientRef).map((i) => i.patientRef!));
@@ -108,7 +98,7 @@ export function buildVault(w: World, caseId: string): Vault {
 
   if (c.type === "medical") for (const term of MEDICAL_TERMS) add("MEDICAL", term, [term]);
 
-  // one regex, longest spellings first, so "Tariq Mahmood" wins over "Tariq"
+  // one regex, longest spellings first, so "Daniel Hart" wins over "Daniel"
   const all = entries.flatMap((e) => e.patterns.map((p) => ({ p, e }))).sort((a, b) => b.p.length - a.p.length);
   const byPattern = new Map(all.map(({ p, e }) => [p.toLowerCase(), e]));
   const source = all
@@ -128,26 +118,15 @@ export function buildVault(w: World, caseId: string): Vault {
         })
       : text;
   const tokenRe = /\[(PERSON_ID|PERSON|PATIENT_REF|STUDENT_ID|CARD|PASSPORT|MEDICAL)_\d+\]/g;
-  // a bilingual name ("林雨萱 Lin Yuxuan") comes back in one script: the family's own in what they read,
-  // the Latin spelling in emails and references for institutions abroad
-  const familyScript = c.lang === "zh" ? "han" : "latin";
-  const pick = (e: Entry, script?: "han" | "latin") => {
-    if (e.kind !== "PERSON" || !script) return e.real;
-    const parts = e.real.split(/\s+/);
-    const chosen = script === "han" ? parts.filter(isHan) : parts.filter((x) => !isHan(x));
-    return chosen.length ? chosen.join(" ") : e.real;
-  };
-  const unmaskAs = (text: string, script?: "han" | "latin") =>
+  const unmask = (text: string) =>
     text.replace(tokenRe, (t) => {
       const e = entries.find((x) => x.token === t);
-      return e ? pick(e, script) : t;
+      return e ? e.real : t;
     });
-  const unmask = (text: string) => unmaskAs(text);
-  const FAMILY_FIELDS = new Set(["text", "narration", "rationale"]);
-  const unmaskDeep = <T>(v: T, key?: string): T => {
-    if (typeof v === "string") return unmaskAs(v, key && FAMILY_FIELDS.has(key) ? familyScript : "latin") as T;
-    if (Array.isArray(v)) return v.map((x) => unmaskDeep(x, key)) as T;
-    if (v && typeof v === "object") return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, unmaskDeep(x, k)])) as T;
+  const unmaskDeep = <T>(v: T): T => {
+    if (typeof v === "string") return unmask(v) as T;
+    if (Array.isArray(v)) return v.map((x) => unmaskDeep(x)) as T;
+    if (v && typeof v === "object") return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, unmaskDeep(x)])) as T;
     return v;
   };
 

@@ -29,7 +29,7 @@ function fakeChain(opts: { failFirst?: number } = {}) {
 function boot() {
   const store = new Store();
   store.reset(seedScenario("th-medical"));
-  store.log({ actor: "family", type: "case.opened", caseId: "case_th", narration: "Case opened", data: { brief: "Tariq Mahmood, HN 66-014382" } });
+  store.log({ actor: "family", type: "case.opened", caseId: "case_th", narration: "Case opened", data: { brief: "Daniel Hart, HN 66-014382" } });
   return store;
 }
 
@@ -48,7 +48,7 @@ describe("on-chain anchoring", () => {
     await new Promise((r) => setTimeout(r, 30));
     expect(sent).toHaveLength(1);
     expect(sent[0]).toEqual({ head: store.ledger.at(-1)!.hash, seq: store.ledger.at(-1)!.seq, label: "th-medical:case opened, payment approved" });
-    expect(JSON.stringify(sent)).not.toMatch(/Tariq|66-014382/);
+    expect(JSON.stringify(sent)).not.toMatch(/Daniel|66-014382/);
     const a = store.anchors[0];
     expect(a.chain).toMatchObject({ status: "confirmed", chainId: 71, blockNumber: 1001 });
     expect(a.chain?.explorerUrl).toMatch(/^https:\/\/evmtestnet\.confluxscan\.org\/tx\/0x/);

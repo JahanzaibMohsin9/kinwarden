@@ -2,11 +2,10 @@
 
 import { Loader2, Mic, Square, Volume2, VolumeX } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import type { Lang } from "@/domain/types";
 import { cn } from "@/lib/format";
 
 const MAX_SECONDS = 90;
-const SPEECH_LANG: Record<Lang, string> = { en: "en-GB", zh: "zh-CN", ur: "ur-PK" };
+const SPEECH_LANG = "en-GB";
 
 function pickMime() {
   if (typeof MediaRecorder === "undefined") return undefined;
@@ -17,7 +16,7 @@ function pickMime() {
  * Record a voice note, have it transcribed on the server (OpenAI speech-to-text), and hand back the text.
  * Tap to start, tap again to send.
  */
-export function VoiceButton({ lang, onText, labels }: { lang: Lang; onText: (text: string) => Promise<void> | void; labels: { record: string; stop: string; working: string; note: string } }) {
+export function VoiceButton({ onText, labels }: { onText: (text: string) => Promise<void> | void; labels: { record: string; stop: string; working: string; note: string } }) {
   const [state, setState] = useState<"idle" | "recording" | "sending">("idle");
   const [secs, setSecs] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -51,7 +50,7 @@ export function VoiceButton({ lang, onText, labels }: { lang: Lang; onText: (tex
           const type = r.mimeType || mime || "audio/webm";
           const fd = new FormData();
           fd.set("audio", new Blob(chunks.current, { type }), `voice.${type.includes("mp4") ? "m4a" : type.includes("ogg") ? "ogg" : "webm"}`);
-          fd.set("lang", lang);
+          fd.set("lang", "en");
           const res = await fetch("/api/voice", { method: "POST", body: fd });
           const j = (await res.json()) as { text?: string; error?: string };
           if (!res.ok || !j.text) throw new Error(j.error ?? "Couldn't transcribe the recording.");
@@ -100,7 +99,7 @@ export function VoiceButton({ lang, onText, labels }: { lang: Lang; onText: (tex
 }
 
 /** Read a message aloud with the phone's own voice: nothing leaves the device. */
-export function ListenButton({ text, lang, labels, className }: { text: string; lang: Lang; labels: { listen: string; stop: string }; className?: string }) {
+export function ListenButton({ text, labels, className }: { text: string; labels: { listen: string; stop: string }; className?: string }) {
   const [speaking, setSpeaking] = useState(false);
   const supported = typeof window !== "undefined" && "speechSynthesis" in window;
   useEffect(() => () => {
@@ -116,9 +115,9 @@ export function ListenButton({ text, lang, labels, className }: { text: string; 
     }
     synth.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    const want = SPEECH_LANG[lang];
+    const want = SPEECH_LANG;
     const voice = synth.getVoices().find((v) => v.lang === want) ?? synth.getVoices().find((v) => v.lang.startsWith(want.slice(0, 2)));
-    u.lang = voice?.lang ?? (lang === "ur" ? "en-GB" : want);
+    u.lang = voice?.lang ?? want;
     if (voice) u.voice = voice;
     u.rate = 0.98;
     u.onend = () => setSpeaking(false);

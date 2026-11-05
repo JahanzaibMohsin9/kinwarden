@@ -194,6 +194,8 @@ export function publicState(sid?: string) {
           tokenDecimals: near.deployment.tokenDecimals,
           explorerTx: near.deployment.explorerTx ?? null,
           cases: near.deployment.cases,
+          // institutions whose bank transfers settle through the vault (the rest stay on the simulated rails)
+          payeeInstitutions: Object.keys(near.deployment.payees),
           caseLimits: near.deployment.caseLimits,
           agentKey: near.keyCheck ? (near.keyCheck.ok ? { ok: true as const } : { ok: false as const, reason: near.keyCheck.reason }) : null,
         }
@@ -309,10 +311,9 @@ export function familyMessage(caseId: string, text: string, sid?: string, opts: 
   }
   if (!takeAnswer(sid ?? DEFAULT_SESSION)) {
     const reply = store.nextId("msg");
-    const zh = w.cases[caseId]?.lang === "zh";
-    const text2 = zh ? "今天可以提的问题用完了。在 Director 里切换到 Live 模式，AI 会处理整个案件。" : "That's all the questions for today in this demo. Switch the Director to Live mode to have the AI handle the whole case.";
+    const text2 = "That's all the questions for today in this demo. Switch the Director to Live mode to have the AI handle the whole case.";
     store.mutate((ww) => ww.messages.push({ id: reply, caseId, from: "agent", text: text2, at: ww.now, importance: "info" }));
-    store.log({ actor: "agent", type: "agent.answer", caseId, narration: zh ? "提问次数已用完" : "Question limit reached", data: { messageId: reply, model: null, limit: true } });
+    store.log({ actor: "agent", type: "agent.answer", caseId, narration: "Question limit reached", data: { messageId: reply, model: null, limit: true } });
     return;
   }
   void answerFamily(store, caseId, text);

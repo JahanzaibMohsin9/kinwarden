@@ -27,12 +27,12 @@ export function timeOf(iso: string, tz: string) {
   return new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: tz }).format(new Date(iso));
 }
 
-export function dayLabel(iso: string, tz: string, lang = "en") {
-  return new Intl.DateTimeFormat(lang === "zh" ? "zh-CN" : "en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: tz }).format(new Date(iso));
+export function dayLabel(iso: string, tz: string) {
+  return new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: tz }).format(new Date(iso));
 }
 
-export function dateTime(iso: string, tz: string, lang = "en") {
-  return new Intl.DateTimeFormat(lang === "zh" ? "zh-CN" : "en-GB", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: tz }).format(new Date(iso));
+export function dateTime(iso: string, tz: string) {
+  return new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: tz }).format(new Date(iso));
 }
 
 export function dayKey(iso: string, tz: string) {

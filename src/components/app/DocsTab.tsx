@@ -22,7 +22,7 @@ const ICONS: Record<Doc["kind"], React.ComponentType<{ size?: number }>> = {
 
 export function DocsTab() {
   const { state } = useCarry();
-  const { t, lang } = useT();
+  const { t } = useT();
   const [openId, setOpenId] = useState<string | null>(null);
   if (!state) return null;
   const c = activeCase(state)!;
@@ -53,7 +53,7 @@ export function DocsTab() {
                     <p className="line-clamp-2 text-[13px] font-semibold leading-snug">{d.title}</p>
                     <div className="mt-auto">
                       <OriginBadge origin={d.origin} />
-                      <p className="mt-1 text-[10.5px] text-ink-3">{dateTime(d.createdAt, tz, lang)}</p>
+                      <p className="mt-1 text-[10.5px] text-ink-3">{dateTime(d.createdAt, tz)}</p>
                     </div>
                   </Card>
                 </button>

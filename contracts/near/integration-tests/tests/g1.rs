@@ -337,7 +337,7 @@ async fn invoices_are_canonical_and_bound_to_active_payees() -> anyhow::Result<(
 
     assert!(failure(authorize("inv-bih-0042", CASE, "1").await?).contains("E_INVOICE_EXISTS"));
     assert!(failure(authorize("inv-x", "case-unknown", "1").await?).contains("E_CASE_NOT_FOUND"));
-    assert!(failure(authorize("Ayesha Khan bill", CASE, "1").await?).contains("E_ID_FORMAT"));
+    assert!(failure(authorize("Anna Brooks bill", CASE, "1").await?).contains("E_ID_FORMAT"));
 
     call(
         &env.verifier,

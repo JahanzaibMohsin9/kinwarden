@@ -13,7 +13,7 @@ import { corridorOf } from "@/domain/corridors";
 import { priceRoute } from "@/domain/rules/engine";
 import type { UploadedBill } from "@/domain/types";
 
-const family = { home: "PK" as const, type: "medical" as const, payerName: "Ayesha Khan", subjectName: "Imran Khan", alreadyAbroad: true };
+const family = { home: "PK" as const, type: "medical" as const, payerName: "Anna Brooks", subjectName: "James Brooks", alreadyAbroad: true };
 const bill = (over: Partial<UploadedBill> = {}): UploadedBill => ({ ...sampleDraft(family, new Date("2026-10-15T08:00:00Z")), ...over });
 
 async function boot(b: UploadedBill) {
@@ -102,9 +102,9 @@ describe("Upload your own bill", () => {
   });
 
   it("hides the family's names before the bill's text goes to the AI", async () => {
-    const read = await readBillText({ text: "Patient: IMRAN KHAN\nGuarantor: Ayesha Khan\nTotal SGD 100" });
+    const read = await readBillText({ text: "Patient: JAMES BROOKS\nGuarantor: Anna Brooks\nTotal SGD 100" });
     expect(read.source).toBe("text");
-    const masked = maskNames(read.text, ["Imran Khan", "Ayesha Khan"]);
+    const masked = maskNames(read.text, ["James Brooks", "Anna Brooks"]);
     expect(masked).not.toMatch(/imran|ayesha/i);
     expect(masked).toContain("[PERSON_1]");
   });

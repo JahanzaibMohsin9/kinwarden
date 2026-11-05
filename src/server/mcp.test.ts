@@ -37,7 +37,7 @@ describe("MCP server", () => {
     const cases = call(store, "list_cases", {}).json.cases as { case_id: string }[];
     expect(cases.map((c) => c.case_id)).toContain("case_th");
     const overview = call(store, "get_case_overview", { case_id: "case_th" });
-    expect(overview.content[0].text).not.toMatch(/Tariq|Sana|66-014382/);
+    expect(overview.content[0].text).not.toMatch(/Daniel|Sara|66-014382/);
     expect(overview.content[0].text).toMatch(/\[PERSON_\d+\]/);
   });
 

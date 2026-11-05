@@ -1,10 +1,10 @@
 "use client";
 
-import { Bot, BotOff, FileText, Link2, Loader2, PauseCircle, PlayCircle, Wallet } from "lucide-react";
+import { ArrowUpRight, Bot, BotOff, FileText, Link2, Loader2, PauseCircle, PlayCircle, Wallet } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useCarry } from "@/lib/client";
 import { cn } from "@/lib/format";
-import { nearView, tusdc } from "@/near/rpc";
+import { nearAmount, nearBalance, nearView, tusdc } from "@/near/rpc";
 import { callWithWallet, connectWallet, connectedAccount } from "@/near/wallet";
 import { Card, SectionTitle } from "../ui";
 import { NearOutcomeNote, NearReceiptView } from "./NearReceipt";
@@ -21,7 +21,10 @@ interface VaultCase {
   limits: { per_payment_max: string; rolling_24h_cap: string; lifetime_cap: string };
 }
 
-const STORAGE_DEPOSIT_YOCTO = (BigInt(10) ** BigInt(23)).toString(); // 0.1 NEAR; the vault refunds what storage does not use
+const STORAGE_DEPOSIT = BigInt(10) ** BigInt(23); // 0.1 NEAR; the vault refunds what storage does not use
+const STORAGE_DEPOSIT_YOCTO = STORAGE_DEPOSIT.toString();
+const FEES_HEADROOM = BigInt(10) ** BigInt(22); // 0.01 NEAR for transaction fees
+const explorerAccount = (network: string, account: string) => (network === "testnet" ? `https://testnet.nearblocks.io/address/${account}` : null);
 
 /**
  * The family's case on the NEAR vault, read from the chain. On testnet the family opens, funds and
@@ -35,6 +38,7 @@ export function NearCaseCard({ caseId }: { caseId: string }) {
 
   const [vcase, setVcase] = useState<VaultCase | null | undefined>(undefined);
   const [ownerTokens, setOwnerTokens] = useState<string | null>(null);
+  const [ownerNear, setOwnerNear] = useState<bigint | null | undefined>(undefined);
   const [account, setAccount] = useState<string | null>(null);
   const [amount, setAmount] = useState("30000");
   const [busy, setBusy] = useState<string | null>(null);
@@ -53,6 +57,7 @@ export function NearCaseCard({ caseId }: { caseId: string }) {
     const read = () => {
       void nearView<VaultCase | null>(rpcUrl, vault, "get_case", { case_id: vaultCaseId }).then((c) => alive && setVcase(c)).catch(() => {});
       void nearView<string>(rpcUrl, token, "ft_balance_of", { account_id: owner }).then((b) => alive && setOwnerTokens(b)).catch(() => {});
+      void nearBalance(rpcUrl, owner).then((b) => alive && setOwnerNear(b)).catch(() => {});
     };
     read();
     const t = setInterval(read, 6000);
@@ -96,14 +101,27 @@ export function NearCaseCard({ caseId }: { caseId: string }) {
           <Link2 size={13} /> NEAR vault · {near.network}
         </span>
       </SectionTitle>
-      <Card className="space-y-3 p-4 text-[13px]" dir="ltr">
+      <Card className="space-y-3 p-4 text-[13px]">
+        <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-[12px]">
+          <dt className="text-ink-3">Vault case</dt>
+          <dd className="truncate font-mono text-ink">{link.vaultCaseId}</dd>
+          <dt className="text-ink-3">Owner</dt>
+          <dd className="flex min-w-0 items-center gap-1 font-mono text-ink">
+            <span className="truncate">{link.owner}</span>
+            {explorerAccount(near.network, link.owner) && (
+              <a href={explorerAccount(near.network, link.owner)!} target="_blank" rel="noreferrer" aria-label={`${link.owner} on the explorer`} className="shrink-0 text-brand">
+                <ArrowUpRight size={13} />
+              </a>
+            )}
+          </dd>
+        </dl>
         {vcase === undefined ? (
           <p className="flex items-center gap-2 text-ink-3">
             <Loader2 size={14} className="animate-spin" /> Reading the vault…
           </p>
         ) : vcase === null ? (
           <p className="text-ink-2">
-            Case <code>{link.vaultCaseId}</code> is not open yet. {walletNet ? `${link.owner} opens it from their wallet with these limits.` : "Run scripts/near/sandbox.mjs to open it."}
+            This case is not open on the vault yet. {walletNet ? `${link.owner} opens it from their own wallet, with the limits below.` : "Run scripts/near/sandbox.mjs to open it."}
           </p>
         ) : (
           <>
@@ -148,6 +166,11 @@ export function NearCaseCard({ caseId }: { caseId: string }) {
                 <p className="text-[12px] text-ink-3">
                   Wallet {account} holds {ownerTokens ? tusdc(ownerTokens) : "…"} {near.tokenSymbol}. Each action opens your wallet to confirm.
                 </p>
+                {vcase === null && ownerNear !== undefined && (ownerNear ?? BigInt(0)) < STORAGE_DEPOSIT + FEES_HEADROOM && (
+                  <p className="rounded-xl bg-amber-soft px-2.5 py-2 text-[12px] text-amber-strong">
+                    Opening the case stores it on the vault: your wallet needs about 0.11 testnet NEAR (a 0.1 NEAR storage deposit, partly refunded, plus fees). It holds {nearAmount(ownerNear ?? BigInt(0))} NEAR. Get testnet NEAR from a faucet first.
+                  </p>
+                )}
                 {vcase === null && (
                   <Action busy={busy === "open"} disabled={busy !== null} icon={<Wallet size={15} />} onClick={() => act("open", { receiverId: near.vault, methodName: "create_case", args: { case_id: link.vaultCaseId, limits: near.caseLimits }, gasTgas: 50, depositYocto: STORAGE_DEPOSIT_YOCTO })}>
                     Open case {link.vaultCaseId}
@@ -163,6 +186,7 @@ export function NearCaseCard({ caseId }: { caseId: string }) {
                 )}
                 {vcase && (
                   <Action
+                    secondary
                     busy={busy === "pause"}
                     disabled={busy !== null}
                     icon={vcase.status === "Paused" ? <PlayCircle size={15} /> : <PauseCircle size={15} />}
@@ -173,6 +197,7 @@ export function NearCaseCard({ caseId }: { caseId: string }) {
                 )}
                 {vcase && (
                   <Action
+                    secondary
                     busy={busy === "agent"}
                     disabled={busy !== null}
                     icon={vcase.agent_enabled ? <BotOff size={15} /> : <Bot size={15} />}
@@ -224,9 +249,17 @@ function Stat({ k, v }: { k: string; v: string }) {
   );
 }
 
-function Action({ children, onClick, busy, disabled, icon }: { children: React.ReactNode; onClick: () => void; busy: boolean; disabled: boolean; icon: React.ReactNode }) {
+/** A wallet action. Rare, disruptive ones (pause, switch the agent off) are `secondary`: outlined, not filled. */
+function Action({ children, onClick, busy, disabled, icon, secondary }: { children: React.ReactNode; onClick: () => void; busy: boolean; disabled: boolean; icon: React.ReactNode; secondary?: boolean }) {
   return (
-    <button onClick={onClick} disabled={disabled} className="flex h-10 flex-1 items-center justify-center gap-2 rounded-full bg-ink px-4 text-[13px] font-semibold text-bg hover:bg-brand disabled:opacity-60">
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={cn(
+        "flex min-h-10 w-full flex-1 items-center justify-center gap-2 rounded-full px-4 py-2 text-[13px] font-semibold disabled:opacity-60",
+        secondary ? "border border-line-strong bg-surface text-ink-2 hover:border-danger hover:text-danger" : "bg-ink text-bg hover:bg-brand",
+      )}
+    >
       {busy ? <Loader2 size={15} className="animate-spin" /> : icon}
       {children}
     </button>

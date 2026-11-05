@@ -31,7 +31,7 @@ async function play(id) {
   if (id === "upload") {
     await post("/api/director", { action: "mode", mode: "scripted" });
     const fd = new FormData();
-    for (const [k, v] of Object.entries({ home: "PK", type: "medical", payerName: "Ayesha Khan", subjectName: "Imran Khan", alreadyAbroad: "true", sample: "true" })) fd.set(k, v);
+    for (const [k, v] of Object.entries({ home: "PK", type: "medical", payerName: "Anna Brooks", subjectName: "James Brooks", alreadyAbroad: "true", sample: "true" })) fd.set(k, v);
     const { draft } = await json("/api/upload", { method: "POST", body: fd });
     await post("/api/upload/start", draft);
   } else {

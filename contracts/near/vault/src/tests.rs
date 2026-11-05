@@ -152,7 +152,7 @@ fn case_ids_are_unique() {
 fn case_id_cannot_carry_personal_text() {
     let mut v = vault();
     as_caller(FAMILY, NearToken::from_millinear(100));
-    v.create_case("Ayesha Khan MRN 12345".into(), limits());
+    v.create_case("Anna Brooks MRN 12345".into(), limits());
 }
 
 #[test]

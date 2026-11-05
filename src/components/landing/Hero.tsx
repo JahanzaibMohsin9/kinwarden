@@ -3,7 +3,7 @@ import { ArrowRight, Play, ShieldAlert, Smartphone } from "lucide-react";
 import { SiteNav } from "../SiteNav";
 import { impactNumbers } from "../ImpactPanel";
 import { MoneyMap } from "./MoneyMap";
-import { LiveAnchorCount } from "./LiveAnchorCount";
+import { nearEvidence } from "@/lib/nearEvidence";
 
 const CHOICES = [
   { href: "/demo", icon: Play, title: "Watch a real case", text: "A father's heart treatment in Bangkok, paid start to finish by the AI agent. 4 minutes.", primary: true },
@@ -14,10 +14,11 @@ const CHOICES = [
 /** The first screen: what Kinwarden is, where money goes, and three clear ways in. */
 export function Hero() {
   const n = impactNumbers();
+  const near = nearEvidence();
   const counters = [
-    n.liveRuns.total ? { big: `${n.liveRuns.passed}/${n.liveRuns.total}`, label: "live AI runs passed every check" } : null,
-    n.attacks.total ? { big: `${n.attacks.executed}/${n.attacks.total}`, label: "attacks got through the agent" } : null,
-    { big: <LiveAnchorCount key="a" />, label: "milestones anchored on a public blockchain" },
+    { big: near.payment.amount, label: "paid to a hospital on NEAR testnet after the family's wallet approval" },
+    { big: `${near.bypass.refused}/${near.bypass.total}`, label: "attacks with the agent's real NEAR key refused" },
+    n.attacks.total ? { big: `${n.attacks.executed}/${n.attacks.total}`, label: "prompt-injection attacks got through the agent" } : null,
     n.savedOneCase ? { big: n.savedOneCase, label: "saved on one hospital case vs paying by card" } : null,
   ].filter(Boolean) as { big: React.ReactNode; label: string }[];
 
@@ -31,7 +32,7 @@ export function Hero() {
         </div>
         <div className="relative max-w-xl">
           <p className="inline-flex items-center gap-2 rounded-full border border-[#5ccdb4]/30 bg-[#5ccdb4]/10 px-3 py-1 text-[12.5px] font-semibold text-[#9fd9cb]">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#5ccdb4]" /> AI agent · hospital and university bills abroad
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#5ccdb4]" /> AI agent on NEAR · hospital and university bills abroad
           </p>
           <h1 className="mt-5 text-[44px] font-bold leading-[1.02] tracking-tight sm:text-[64px]">
             Never carry cash
@@ -39,7 +40,7 @@ export function Hero() {
             across borders <span className="text-[#5ccdb4]">again.</span>
           </h1>
           <p className="mt-5 text-[17px] leading-relaxed text-[#c9d6d2]">
-            Kinwarden pays a family&apos;s hospital and university bills abroad under their own country&apos;s rules. It deals with the institution, the bank and the forms, catches fraud, and moves nothing without the family&apos;s fingerprint.
+            Kinwarden pays a family&apos;s hospital and university bills abroad under their own country&apos;s rules. It deals with the institution, the bank and the forms, and catches fraud. The money waits in a NEAR vault that pays only the verified institution, and only after the family approves the exact payment in their own wallet.
           </p>
         </div>
         <div className="md:hidden">
@@ -76,7 +77,7 @@ export function Hero() {
             </div>
           ))}
         </dl>
-        <p className="relative mt-5 text-[12px] text-[#7d918c]">Sandbox with simulated hospitals, universities and banks. No real money moves. Figures are measured on the sandbox scenarios.</p>
+        <p className="relative mt-5 text-[12px] text-[#7d918c]">NEAR testnet and a sandbox of simulated hospitals, universities and banks. tUSDC is a test token; no real money moves. Figures come from the recorded test runs.</p>
       </div>
     </section>
   );

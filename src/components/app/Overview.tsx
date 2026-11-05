@@ -15,14 +15,13 @@ import { Flag } from "../Flag";
 
 export function Overview() {
   const { state } = useCarry();
-  const { t, lang } = useT();
+  const { t } = useT();
   if (!state) return null;
   const c = activeCase(state)!;
   const w = state.world;
   const inst = w.institutions[c.institutionId];
   const m = moneySummary(w, c.id);
   const tz = caseTz(c);
-  const urdu = lang === "ur";
   const items = feed(state, c.id).filter((i) => i.kind !== "message" || i.message.from === "agent").slice(-3).reverse();
   const allow = allowances(w, c.id);
   const savings = savingsVsCash(w, c.id);
@@ -56,7 +55,7 @@ export function Overview() {
           {m.bill ? (
             <>
               <div className="flex items-center justify-between gap-2">
-                <p className={cn("text-[12.5px] font-medium text-ink-3", urdu && "urdu")}>
+                <p className={cn("text-[12.5px] font-medium text-ink-3")}>
                   {m.isFinal ? t("billTotal") : t("estimate")} · {m.bill.number}
                 </p>
                 {m.settled && (
@@ -88,13 +87,13 @@ export function Overview() {
               )}
             </>
           ) : inst.origin === "uploaded_bill" && !inst.verifiedAt ? (
-            <p className={cn("flex items-start gap-1.5 rounded-xl bg-info-soft px-3 py-2 text-[14px] font-semibold text-info", urdu && "urdu")}>
+            <p className={cn("flex items-start gap-1.5 rounded-xl bg-info-soft px-3 py-2 text-[14px] font-semibold text-info")}>
               <ShieldCheck size={16} className="mt-[3px] shrink-0" />
               {t("onHoldUnverified")}
             </p>
           ) : state.world.security.some((s) => s.caseId === c.id && s.kind === "suspicious_message") ? (
             // nothing to pay and a fraud warning on file: say so instead of "waiting for the bill"
-            <p className={cn("flex items-start gap-1.5 rounded-xl bg-amber-soft px-3 py-2 text-[14px] font-semibold text-amber-strong", urdu && "urdu")}>
+            <p className={cn("flex items-start gap-1.5 rounded-xl bg-amber-soft px-3 py-2 text-[14px] font-semibold text-amber-strong")}>
               <ShieldAlert size={16} className="mt-[3px] shrink-0" />
               {t("onHoldFraud")}
             </p>
@@ -109,7 +108,7 @@ export function Overview() {
 
       {pending.length > 0 && (
         <Card className="border-amber/40 bg-amber-soft p-4">
-          <p className={cn("text-[13px] font-semibold text-amber-strong", urdu && "urdu")}>{t("needsYou")}</p>
+          <p className={cn("text-[13px] font-semibold text-amber-strong")}>{t("needsYou")}</p>
           <p className="mt-0.5 text-[15px] font-semibold">
             <ApprovalSummary id={pending[0].id} />
           </p>
@@ -123,11 +122,11 @@ export function Overview() {
         <SectionTitle
           action={
             <Link href="/app/activity" className="inline-flex items-center gap-1 text-[12.5px] font-semibold text-brand">
-              {t("seeAll")} <ArrowRight size={13} className={cn(urdu && "rotate-180")} />
+              {t("seeAll")} <ArrowRight size={13} />
             </Link>
           }
         >
-          <span className={cn(urdu && "urdu normal-case tracking-normal")}>{t("latest")}</span>
+          <span>{t("latest")}</span>
         </SectionTitle>
         <Card className="divide-y divide-line">
           {items.length === 0 && <p className="px-4 py-4 text-[13.5px] text-ink-3">{t("nothingYet")}</p>}
@@ -148,19 +147,19 @@ export function Overview() {
             </div>
             <div>
               <p className="num text-[22px] font-bold leading-tight">{money(savings.saved, savings.currency)}</p>
-              <p className={cn("text-[12.5px] text-ink-3", urdu && "urdu")}>{savings.against === "atm_cash" ? t("savings") : t("savedVsCard")}</p>
+              <p className={cn("text-[12.5px] text-ink-3")}>{savings.against === "atm_cash" ? t("savings") : t("savedVsCard")}</p>
             </div>
           </Card>
         )}
         <section>
           <SectionTitle>
-            <span className={cn(urdu && "urdu normal-case tracking-normal")}>{t("allowances")}</span>
+            <span>{t("allowances")}</span>
           </SectionTitle>
           <Card className="space-y-4 p-4">
             {allow.map((a) => (
               <Meter key={a.label} value={a.used} max={a.cap} label={a.label} sub={`$${Math.round(a.used).toLocaleString()} / $${a.cap.toLocaleString()}`} />
             ))}
-            <p className={cn("text-[11.5px] leading-relaxed text-ink-3", urdu && "urdu")}>{corridorOf(c.corridor).packId === "pk-sbp" ? t("limitsNotePk") : t("limitsNoteCn")}</p>
+            <p className={cn("text-[11.5px] leading-relaxed text-ink-3")}>{corridorOf(c.corridor).packId === "pk-sbp" ? t("limitsNotePk") : t("limitsNoteCn")}</p>
           </Card>
         </section>
       </div>
@@ -198,10 +197,10 @@ function Legend({ swatch, label, value }: { swatch: string; label: string; value
   );
 }
 
-/** Lahore → Bangkok style route card with the money in motion when something is on the way. */
+/** Home → destination route card with the money in motion when something is on the way. */
 export function RouteCard() {
   const { state } = useCarry();
-  const { t, lang } = useT();
+  const { t } = useT();
   if (!state) return null;
   const c = activeCase(state)!;
   const w = state.world;
@@ -215,7 +214,7 @@ export function RouteCard() {
     <Card className="overflow-hidden p-0">
       <div className="flex items-center justify-between px-4 pt-3">
         <SectionTitle className="mb-0 px-0">
-          <span className={cn(lang === "ur" && "urdu normal-case tracking-normal")}>{t("route")}</span>
+          <span>{t("route")}</span>
         </SectionTitle>
         <span className="num text-[11.5px] text-ink-3" dir="ltr">
           1 {dest} = {rate.toFixed(2)} {corridor.sourceCurrency} · sandbox

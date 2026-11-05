@@ -68,15 +68,10 @@ async function idle(maxSec = 180) {
 }
 
 /** One take: a fresh browser, frames streamed into ffmpeg, markers in seconds from the start. */
-async function take(name, fn, { lang = "en" } = {}) {
+async function take(name, fn) {
   fs.mkdirSync(OUT, { recursive: true });
   const browser = await chromium.launch({ executablePath: CHROME, headless: true, args: ["--hide-scrollbars", "--force-color-profile=srgb", "--disable-features=Translate"] });
   const context = await browser.newContext({ viewport: { width: 1600, height: 900 }, deviceScaleFactor: 1.2, colorScheme: "light", locale: "en-GB" });
-  await context.addInitScript((l) => {
-    try {
-      localStorage.setItem("kinwarden.lang", l);
-    } catch {}
-  }, lang);
   await context.addInitScript(CURSOR);
   const page = await context.newPage();
   const cdp = await context.newCDPSession(page);
@@ -158,7 +153,7 @@ const SCENES = {
     await take("s1", async (t) => {
       await t.page.goto(BASE + "/");
       await t.page.waitForSelector('svg[aria-label^="Map of Kinwarden"]');
-      // only the map: the camera pushes into the Lahore → Bangkok route
+      // only the map: the camera pushes into the route between the two cities
       await t.page.addStyleTag({ content: "header, h1, h1 ~ p, section > div > div.relative.max-w-xl, section a, section dl, section dl ~ p { visibility: hidden !important }" });
       await t.start();
       await t.hold(22000);
@@ -261,7 +256,7 @@ const SCENES = {
     });
   },
 
-  // 4 · China: the study agent, on the stage, in Chinese
+  // 4 · China: the study agent, on the stage
   async s4() {
     await api("/api/director", { action: "reset", scenarioId: "cn-admission", mode: "replay" });
     await take(
@@ -280,7 +275,6 @@ const SCENES = {
         await t.hold(3000);
         t.mark("done");
       },
-      { lang: "zh" },
     );
   },
 
@@ -380,8 +374,8 @@ const SCENES = {
       await t.start();
       await t.hold(1000);
       const inputs = t.page.locator("main input:not([type])");
-      await t.type(inputs.nth(0), "Ayesha Khan");
-      await t.type(inputs.nth(1), "Imran Khan");
+      await t.type(inputs.nth(0), "Anna Brooks");
+      await t.type(inputs.nth(1), "James Brooks");
       await t.click(t.page.getByRole("button", { name: "Use a sample bill" }));
       await t.page.getByText("Check what Kinwarden read").waitFor();
       t.mark("read");

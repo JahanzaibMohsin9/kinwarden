@@ -53,7 +53,7 @@ mod tests {
         let too_long = "x".repeat(65);
         for id in [
             "",
-            "Ayesha Khan",
+            "Anna Brooks",
             "MRN 12345",
             "-leading-dash",
             "UPPER",

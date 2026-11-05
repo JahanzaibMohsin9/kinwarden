@@ -38,7 +38,7 @@ function worldWithNearPayment(status: Payment["status"]) {
     route: "bank_transfer",
     amount: 1,
     currency: "THB",
-    payerId: "p_tariq",
+    payerId: "p_daniel",
     reference: "Deposit",
     beneficiary: { accountName: "", accountNumber: "", swift: "", bankName: "" },
     rationale: "",

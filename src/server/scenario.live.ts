@@ -26,7 +26,7 @@ const MAX_STEPS = 45;
 async function playOnce(i: number) {
   const store = new Store();
   // "upload": the sample bill from the upload screen; the bank verifies it once the agent has explained it
-  const family = { home: "PK" as const, type: "medical" as const, payerName: "Ayesha Khan", subjectName: "Imran Khan", alreadyAbroad: true };
+  const family = { home: "PK" as const, type: "medical" as const, payerName: "Anna Brooks", subjectName: "James Brooks", alreadyAbroad: true };
   store.reset(SCENARIO === "upload" ? seedUpload(sampleDraft(family)) : seedScenario(SCENARIO));
   store.world.agent.mode = "live";
   for (const kind of (process.env.LIVE_CHAOS ?? "").split(",").filter(Boolean)) injectChaos(store, kind as ChaosKind);

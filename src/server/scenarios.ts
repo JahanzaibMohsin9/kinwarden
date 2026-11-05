@@ -35,7 +35,7 @@ export const SCENARIOS: ScenarioInfo[] = [
   {
     id: "cn-admission",
     title: "Study agent promises a place",
-    subtitle: "China → United Kingdom · 留学中介 asks for fees and a quota split",
+    subtitle: "China → United Kingdom · a study agent asks for fees and a quota split",
     corridor: "CN-GB",
     caseId: "case_cn",
   },
@@ -92,17 +92,17 @@ function seedThMedical(): World {
     openedAt: start,
     status: "active",
     brief:
-      "My father Tariq Mahmood (62) was admitted to Siam Riverside International Hospital in Bangkok this morning with chest pain. The cardiologist says he needs an angiogram and maybe a stent. I'm with him as his attendant. We brought USD 10,000 cash between us and most of it is already gone on the first tests. We have his Visa debit card and his bank account in Lahore. Please handle the hospital payments.",
+      "My father Daniel Hart (62) was admitted to Siam Riverside International Hospital in Bangkok this morning with chest pain. The cardiologist says he needs an angiogram and maybe a stent. I'm with him as his attendant. We brought USD 10,000 cash between us and most of it is already gone on the first tests. We have his Visa debit card and his bank account at home in Pakistan. Please handle the hospital payments.",
     people: [
       // sandbox passport numbers (fictional): they go on the SBP forms and are never shown to the LLM
-      { id: "p_tariq", name: "Tariq Mahmood", role: "patient", adult: true, abroad: true, passport: "AK4419027" },
-      { id: "p_sana", name: "Sana Tariq", role: "attendant", adult: true, abroad: true, passport: "BM8813564" },
+      { id: "p_daniel", name: "Daniel Hart", role: "patient", adult: true, abroad: true, passport: "AK4419027" },
+      { id: "p_sara", name: "Sara Hart", role: "attendant", adult: true, abroad: true, passport: "BM8813564" },
     ],
     notes: [],
   };
   w.cards = [
-    { personId: "p_tariq", label: "Visa debit •• 4821", annualUsedUSD: 4200, currency: "PKR" },
-    { personId: "p_sana", label: "Mastercard •• 1937", annualUsedUSD: 1100, currency: "PKR" },
+    { personId: "p_daniel", label: "Visa debit •• 4821", annualUsedUSD: 4200, currency: "PKR" },
+    { personId: "p_sara", label: "Mastercard •• 1937", annualUsedUSD: 1100, currency: "PKR" },
   ];
   w.schedule = [
     { id: "s_open", at: at(start, 0, 2, 31), kind: "beat", payload: { beat: "th.open" }, label: "Family opens the case" },
@@ -122,20 +122,20 @@ function seedUkTuition(): World {
     id: "case_uk",
     type: "tuition",
     corridor: "CN-GB",
-    title: "雨萱的硕士学费",
-    lang: "zh",
+    title: "Emily's MSc tuition",
+    lang: "en",
     institutionId: "kgu",
     openedAt: start,
     status: "active",
     brief:
-      "我女儿林雨萱被伦敦 Kingsgate University 录取了（理学硕士，2027年1月入学，学号 KG2601847）。学校要求开学前付第一期学费和住宿费。今年的购汇额度我已经用了大概 3.1 万美元（之前给她交了语言班和押金）。麻烦帮我们把学费付给学校。",
+      "My daughter Emily Lane has been accepted to Kingsgate University in London (MSc, starting January 2027, student ID KG2601847). The university wants the first tuition instalment and the accommodation fee before term starts. I have already used about USD 31,000 of this year's foreign-exchange quota (her language course and deposit). Please pay the fees to the university for us.",
     people: [
-      { id: "p_linwei", name: "林伟 Lin Wei", role: "parent", adult: true, abroad: false, priorFxYearUSD: 31000, passport: "E73420915" },
-      { id: "p_yuxuan", name: "林雨萱 Lin Yuxuan", role: "student", adult: true, abroad: false, passport: "E81236604" },
+      { id: "p_robert", name: "Robert Lane", role: "parent", adult: true, abroad: false, priorFxYearUSD: 31000, passport: "E73420915" },
+      { id: "p_emily", name: "Emily Lane", role: "student", adult: true, abroad: false, passport: "E81236604" },
     ],
     notes: [],
   };
-  w.cards = [{ personId: "p_linwei", label: "UnionPay •• 6620", annualUsedUSD: 0, currency: "CNY" }];
+  w.cards = [{ personId: "p_robert", label: "UnionPay •• 6620", annualUsedUSD: 0, currency: "CNY" }];
   w.schedule = [
     { id: "s_open", at: at(start, 0, 1, 1), kind: "beat", payload: { beat: "uk.open" }, label: "Family opens the case" },
     { id: "s_split", at: at(start, 1, 12, 0), kind: "beat", payload: { beat: "uk.split_request" }, label: "Father asks to use his brother's FX quota" },
@@ -152,20 +152,20 @@ function seedPkAdmission(): World {
     id: "case_pk",
     type: "tuition",
     corridor: "PK-GB",
-    title: "Mariam's MSc offer",
+    title: "Maya's MSc offer",
     lang: "en",
     institutionId: "kgu",
     openedAt: start,
     status: "active",
     brief:
-      "My daughter Mariam got an offer from Kingsgate University London for an MSc starting in January, through an education consultant, Mr. Faraz Siddiqui of Global Pathways Education. He sent the offer letter (I've uploaded it) and says we must pay the first-year tuition of GBP 18,500 plus a GBP 1,200 visa guarantee fee to his company's account by Friday, or her seat goes to someone else. We already gave him PKR 350,000 in cash as a processing fee. Please pay the university fees.",
+      "My daughter Maya got an offer from Kingsgate University London for an MSc starting in January, through an education consultant, Mr. Mark Benson of Global Pathways Education. He sent the offer letter (I've uploaded it) and says we must pay the first-year tuition of GBP 18,500 plus a GBP 1,200 visa guarantee fee to his company's account by Friday, or her seat goes to someone else. We already gave him PKR 350,000 in cash as a processing fee. Please pay the university fees.",
     people: [
-      { id: "p_aslam", name: "Aslam Javed", role: "parent", adult: true, abroad: false, passport: "CK5530418" },
-      { id: "p_mariam", name: "Mariam Aslam", role: "student", adult: true, abroad: false, passport: "DM2081736" },
+      { id: "p_michael", name: "Michael Grant", role: "parent", adult: true, abroad: false, passport: "CK5530418" },
+      { id: "p_maya", name: "Maya Grant", role: "student", adult: true, abroad: false, passport: "DM2081736" },
     ],
     notes: [],
   };
-  w.cards = [{ personId: "p_aslam", label: "Visa debit •• 7302", annualUsedUSD: 900, currency: "PKR" }];
+  w.cards = [{ personId: "p_michael", label: "Visa debit •• 7302", annualUsedUSD: 900, currency: "PKR" }];
   w.schedule = [
     { id: "s_open", at: at(start, 0, 5, 1), kind: "beat", payload: { beat: "pk.open" }, label: "Family opens the case with the consultant's offer letter" },
     { id: "s_pressure", at: at(start, 1, 13, 0), kind: "beat", payload: { beat: "pk.pressure" }, label: "The consultant pressures the family to pay his personal account" },
@@ -175,28 +175,28 @@ function seedPkAdmission(): World {
 }
 
 function seedCnAdmission(): World {
-  // 20:00 in Shenzhen (UTC+8). Fictional family; the pattern (保录取, fees to the agency, 蚂蚁搬家) follows
-  // fake study-agency cases reported in China.
+  // 20:00 in Shenzhen (UTC+8). Fictional family; the pattern ("guaranteed admission", fees paid to the agency,
+  // FX bought in relatives' names) follows fake study-agency cases reported in China.
   const start = "2026-11-02T12:00:00.000Z";
   const w = emptyWorld("cn-admission", start);
   w.cases.case_cn = {
     id: "case_cn",
     type: "tuition",
     corridor: "CN-GB",
-    title: "思雨的留学录取",
-    lang: "zh",
+    title: "Sophie's study-abroad offer",
+    lang: "en",
     institutionId: "kgu",
     openedAt: start,
     status: "active",
     brief:
-      "我女儿陈思雨通过深圳的「英途留学」中介申请了伦敦 Kingsgate University 的金融硕士，明年1月入学。中介的王老师说他们是学校的合作机构，能“保录取”，还帮她拿到了40%的奖学金。录取通知书我已经上传了。他说周五之前要交 3.8 万元保录取服务费，第一年学费 18,500 英镑也得先打到他们公司账户，说是他们会统一转给学校，不然名额就给别人了。之前还交了 2 万元定金。我今年的购汇额度已经用了大概 2.9 万美元。麻烦帮我们把学费付了。",
+      "My daughter Sophie Cole applied to Kingsgate University London for an MSc in Finance starting next January, through BrightPath Study Abroad, an agency in Shenzhen. Their adviser, Mr Ellis, says they are the university's partner, can guarantee her admission and got her a 40% scholarship. I have uploaded the offer letter. He says we must pay a CNY 38,000 guaranteed-admission service fee by Friday, and that the first-year tuition of GBP 18,500 must go to the agency's company account first, which they will pass on to the university, or her place goes to someone else. We already paid a CNY 20,000 deposit. I have used about USD 29,000 of this year's FX quota. Please pay the tuition for us.",
     people: [
-      { id: "p_chenjg", name: "陈建国 Chen Jianguo", role: "parent", adult: true, abroad: false, priorFxYearUSD: 29000, passport: "E52817330" },
-      { id: "p_siyu", name: "陈思雨 Chen Siyu", role: "student", adult: true, abroad: false, passport: "E90364127" },
+      { id: "p_peter", name: "Peter Cole", role: "parent", adult: true, abroad: false, priorFxYearUSD: 29000, passport: "E52817330" },
+      { id: "p_sophie", name: "Sophie Cole", role: "student", adult: true, abroad: false, passport: "E90364127" },
     ],
     notes: [],
   };
-  w.cards = [{ personId: "p_chenjg", label: "UnionPay •• 3058", annualUsedUSD: 0, currency: "CNY" }];
+  w.cards = [{ personId: "p_peter", label: "UnionPay •• 3058", annualUsedUSD: 0, currency: "CNY" }];
   w.schedule = [
     { id: "s_open", at: at(start, 0, 12, 1), kind: "beat", payload: { beat: "cn.open" }, label: "Family opens the case with the agency's offer letter" },
     { id: "s_pressure", at: at(start, 1, 11, 30), kind: "beat", payload: { beat: "cn.pressure" }, label: "The agency pushes for payment to a personal account and FX bought in relatives' names" },
@@ -233,19 +233,18 @@ export function seedUpload(bill: UploadedBill, startAt = new Date().toISOString(
     // the payer is the one holding the phone: first in the list, so the app opens as them
     people.unshift({ id: "p_payer", name: bill.payerName.trim(), role: medical ? "attendant" : "parent", adult: true, abroad: medical && bill.alreadyAbroad, priorFxYearUSD: bill.priorFxYearUSD });
   }
-  const zh = bill.lang === "zh";
   w.cases.case_up = {
     id: "case_up",
     type: bill.type,
     corridor: `${bill.home}-${bill.country}` as CorridorId,
-    title: zh ? `${bill.institution.name} 的账单` : `Bill from ${bill.institution.name}`,
-    lang: bill.lang,
+    title: `Bill from ${bill.institution.name}`,
+    lang: "en",
     institutionId: "upl",
     openedAt: start,
     status: "active",
     brief:
       bill.note?.trim() ||
-      (zh ? "我上传了一张账单，麻烦按我们国家的规定帮我们付款。" : "I've uploaded a bill. Please pay it for us under our country's rules."),
+      ("I've uploaded a bill. Please pay it for us under our country's rules."),
     people,
     notes: [],
   };

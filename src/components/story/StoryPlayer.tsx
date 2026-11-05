@@ -109,7 +109,7 @@ export function StoryPlayer() {
                 <p className="text-[12px] font-semibold uppercase tracking-[0.1em] text-[#5ccdb4]">A real case · about 4 minutes</p>
                 <h1 className="text-[32px] font-bold leading-[1.1] tracking-tight">{CHAPTER_TITLES.intro}</h1>
                 <p className="text-[15px] leading-relaxed text-[#c9d6d2]">
-                  Tariq, 62, is in a Bangkok hospital with chest pain. His daughter Sana is with him. They brought USD 10,000 in cash and it is almost gone. Pakistan&apos;s rules allow up to USD 50,000 to be sent straight to the hospital, but nobody told them.
+                  Daniel, 62, is in a Bangkok hospital with chest pain. His daughter Sara is with him. They brought USD 10,000 in cash and it is almost gone. Pakistan&apos;s rules allow up to USD 50,000 to be sent straight to the hospital, but nobody told them.
                 </p>
                 <p className="text-[13.5px] leading-relaxed text-[#9fb2ad]">
                   Watch Kinwarden&apos;s AI agent handle the whole case. This replays a recorded run of the real agent: every email, check and payment happens for real in your own private sandbox. No real money moves.

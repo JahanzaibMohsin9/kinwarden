@@ -11,11 +11,11 @@ function setup() {
   store.reset(seedScenario("th-medical"));
   const triggers: { reason: string; detail?: string }[] = [];
   store.on("trigger", (t) => triggers.push(t));
-  const inv = issueInvoice(store, { caseId: "case_th", institutionId: "srh", kind: "deposit_request", title: "Deposit", patientName: "Mr. Tariq Mahmood", patientRef: "HN 66-014382", lineItems: [{ description: "Deposit", amount: 160000 }], dueInHours: 40 });
+  const inv = issueInvoice(store, { caseId: "case_th", institutionId: "srh", kind: "deposit_request", title: "Deposit", patientName: "Mr. Daniel Hart", patientRef: "HN 66-014382", lineItems: [{ description: "Deposit", amount: 160000 }], dueInHours: 40 });
   const b = INSTITUTIONS.srh.bank;
   const tool = (name: string, input: Record<string, unknown>) => JSON.parse(executeTool(name, { narration: "test", ...input }, { store, caseId: "case_th" }));
   const propose = (route: string) =>
-    tool("propose_payment", { invoice_id: inv.id, route, amount: 160000, payer_id: "p_tariq", reference: "HN 66-014382", beneficiary: { account_name: b.accountName, account_number: b.accountNumber, swift: b.swift, bank_name: b.bankName }, rationale: "test rationale" });
+    tool("propose_payment", { invoice_id: inv.id, route, amount: 160000, payer_id: "p_daniel", reference: "HN 66-014382", beneficiary: { account_name: b.accountName, account_number: b.accountNumber, swift: b.swift, bank_name: b.bankName }, rationale: "test rationale" });
   const approve = (paymentId: string) => {
     store.mutate((w) => (w.payments[paymentId].status = "approved"));
     submitPayment(store, store.world.payments[paymentId]);
@@ -26,7 +26,7 @@ function setup() {
 describe("chaos mode", () => {
   it("a bank outage bounces the next transfer once, and it can be resent unchanged", () => {
     const { store, tool, propose, approve, inv, triggers } = setup();
-    tool("prepare_documents", { kinds: ["remittance_application", "self_declaration"], invoice_id: inv.id, payer_id: "p_tariq", amount: 160000 });
+    tool("prepare_documents", { kinds: ["remittance_application", "self_declaration"], invoice_id: inv.id, payer_id: "p_daniel", amount: 160000 });
     injectChaos(store, "bank_outage");
     const p = propose("bank_transfer");
     approve(p.payment_id);

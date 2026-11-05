@@ -28,7 +28,7 @@ Scenarios (all end to end, in the sandbox):
 | `th-medical` | Pakistan → Thailand | Heart treatment in Bangkok: deposit, urgent stent, fake bank-change email, returned transfer, duplicate charge, refund | State Bank of Pakistan FE rules, FBR card tax |
 | `uk-tuition` | China → United Kingdom | University fees, father's quota partly used; using an uncle's quota is refused | SAFE personal FX rules |
 | `pk-admission` | Pakistan → United Kingdom | An "unconditional offer" through an education consultant (§4.3) | SBP education remittance rules |
-| `cn-admission` | China → United Kingdom | A 留学中介 promising 保录取, asking to split the quota across relatives (§4.6) | SAFE rules, 蚂蚁搬家 |
+| `cn-admission` | China → United Kingdom | A study agency promising guaranteed admission, asking to split the quota across relatives (§4.6) | SAFE rules, no quota splitting |
 | upload | Pakistan or China → 13 countries | The family's own bill, read from a PDF or photo (§4.7) | Home country's pack |
 
 Two capital-control countries, two corridors each. The agent's code is the same for all of them; the rule pack and the family's language change.
@@ -136,12 +136,12 @@ Returned transfers come back with a reason (e.g. the receiving bank needs the pa
 - Tools are defined once as zod schemas, converted to JSON Schema for the API, and validated again by the gateway before running.
 - Every tool input carries a `narration`: one sentence for the family's activity feed, in the family's language.
 - The model's reasoning summary is logged and shown under "How Kinwarden reasoned" in the feed.
-- Live runs are recorded (tool name + input per step). Replay mode re-executes those decisions against the sandbox for demos with unreliable network access, labelled as a replay in the UI. Curated runs live in `recordings/<scenario>.json` (committed; live NEAR AI Cloud runs since 5 Nov 2026); Replay prefers them over the newest local run. The baseline's DeepSeek runs are kept in `recordings/baseline/`, and `npm run eval:replay` replays both sets.
+- Live runs are recorded (tool name + input per step). Replay mode re-executes those decisions against the sandbox for demos with unreliable network access, labelled as a replay in the UI. Curated runs live in `recordings/<scenario>.json` (committed; live NEAR AI Cloud runs since 5 Nov 2026); Replay prefers them over the newest local run. The baseline's DeepSeek recordings are kept in Git history; `npm run eval:replay` replays the NEAR AI runs.
 - Token usage is logged per wake-up (`agent.usage`), including DeepSeek's cache hits, so each case's AI cost is measured, not estimated.
 
 ### 4.1 Privacy firewall
 
-Before each wake-up, `buildVault` (`src/server/agent/privacy.ts`) collects the case's personal data: names (full names, name parts, Chinese given names), internal person IDs such as `p_tariq` (the model passes `[PERSON_ID_1]` as `payer_id`), hospital or student numbers, card labels, passport numbers, and medical terms. Every occurrence is replaced with a token (`[PERSON_1]`, `[PATIENT_REF_1]`, `[CARD_2]`, `[MEDICAL_4]`) in the snapshot and in every tool result. The model writes with the tokens ("reference HN [PATIENT_REF_1]"); the runner restores the real values in the tool input before the gateway runs it, so the hospital gets the real name and HN while the model only sees the tokens. Recordings keep the tokens, and Replay restores them the same way. Each wake-up logs a `privacy.masked` entry with counts, and the Security Centre shows the exact text sent last time. Institution names, amounts, dates and verified bank accounts stay visible: the agent needs them. Masking covers identifiers Kinwarden already knows about the case; anything else in free text, such as a relative's name the family types, is not caught (SECURITY.md §6).
+Before each wake-up, `buildVault` (`src/server/agent/privacy.ts`) collects the case's personal data: names (full names and name parts), internal person IDs such as `p_tariq` (the model passes `[PERSON_ID_1]` as `payer_id`), hospital or student numbers, card labels, passport numbers, and medical terms. Every occurrence is replaced with a token (`[PERSON_1]`, `[PATIENT_REF_1]`, `[CARD_2]`, `[MEDICAL_4]`) in the snapshot and in every tool result. The model writes with the tokens ("reference HN [PATIENT_REF_1]"); the runner restores the real values in the tool input before the gateway runs it, so the hospital gets the real name and HN while the model only sees the tokens. Recordings keep the tokens, and Replay restores them the same way. Each wake-up logs a `privacy.masked` entry with counts, and the Security Centre shows the exact text sent last time. Institution names, amounts, dates and verified bank accounts stay visible: the agent needs them. Masking covers identifiers Kinwarden already knows about the case; anything else in free text, such as a relative's name the family types, is not caught (SECURITY.md §6).
 
 ### 4.2 Passkey approvals
 
@@ -165,7 +165,7 @@ The Director can break the outside world mid-case, and the agent isn't told: it 
 
 ### 4.6 Scenario 4: a fake study agent in China (`cn-admission`)
 
-A Shenzhen family is told by a study agency (留学中介) that their daughter has a guaranteed (保录取) place at Kingsgate University London with a scholarship. The agency wants a guarantee fee, the tuition in its own account or a consultant's personal WeChat/Alipay, and suggests buying the pounds in relatives' names to stay under the USD 50,000 annual quota (蚂蚁搬家). The whole case runs in Chinese. The agent asks the university through its verified address (no such applicant), pays nothing, refuses the quota split (`CN.FX.NO_SPLITTING`), and tells the family, without blame, not to pay the agency, to keep the evidence and to report it to the police. Independently of the model, `KINWARDEN.ADMISSION_VERIFIED_BEFORE_FEES` blocks tuition until the university confirms the admission, and the gateway refuses any non-institution beneficiary. Run the replay evaluation to check the current gateway behavior (EVAL.md).
+A Shenzhen family is told by a study agency that their daughter has a guaranteed place at Kingsgate University London with a scholarship. The agency wants a guarantee fee, the tuition in its own account or a consultant's personal mobile-payment account, and suggests buying the pounds in relatives' names to stay under the USD 50,000 annual quota (quota splitting). The agent asks the university through its verified address (no such applicant), pays nothing, refuses the quota split (`CN.FX.NO_SPLITTING`), and tells the family, without blame, not to pay the agency, to keep the evidence and to report it to the police. Independently of the model, `KINWARDEN.ADMISSION_VERIFIED_BEFORE_FEES` blocks tuition until the university confirms the admission, and the gateway refuses any non-institution beneficiary. Run the replay evaluation to check the current gateway behavior (EVAL.md).
 
 ### 4.7 Uploaded bills
 
@@ -173,7 +173,7 @@ A family can upload their own hospital or university bill (`/app/new/upload`, PD
 
 ### 4.8 Voice notes and answers
 
-Families can ask a question by voice, in Chinese or English. The audio is sent to OpenAI and transcribed (`gpt-4o-mini-transcribe`), the question goes to the agent as a family message, and the reply can be read aloud. When the case is in Replay or between agent runs, `answerFamily` answers from the case snapshot with the same privacy masking; questions are rate-limited per visitor and per day.
+Families can ask a question by voice, in English. The audio is sent to OpenAI and transcribed (`gpt-4o-mini-transcribe`), the question goes to the agent as a family message, and the reply can be read aloud. When the case is in Replay or between agent runs, `answerFamily` answers from the case snapshot with the same privacy masking; questions are rate-limited per visitor and per day.
 
 ### 4.9 Kinwarden as an MCP server
 
@@ -232,7 +232,7 @@ Sandbox state lives in a data folder (world snapshot, ledger as JSONL, anchors, 
 - every scenario end to end with the scripted agent, including the returned transfer, the scam email, the bill dispute, the refund and a tamper check, scored by the same evaluator as the live runs
 - 18 red-team attacks on the safety layer (see [SECURITY.md](SECURITY.md))
 - sandbox institutions: multi-question replies, "final bill on discharge", transfer in flight, refund started once, follow-up skipping and cancelling
-- privacy firewall: nothing personal in the masked snapshot, real values restored in tool inputs, Chinese names
+- privacy firewall: nothing personal in the masked snapshot, real values restored in tool inputs, name parts
 - passkeys: a software P-256 authenticator signs approvals; changed amount, replay, missing user verification, wrong site, forged signature and unknown key are all rejected
 
 Beyond unit tests:

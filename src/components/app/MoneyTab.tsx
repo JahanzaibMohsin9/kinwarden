@@ -22,14 +22,13 @@ const INV_LABEL: Record<Invoice["kind"], string> = {
 
 export function MoneyTab() {
   const { state } = useCarry();
-  const { t, lang } = useT();
+  const { t } = useT();
   if (!state) return null;
   const c = activeCase(state)!;
   const w = state.world;
   const tz = caseTz(c);
   const invoices = caseInvoices(w, c.id).reverse();
   const payments = casePayments(w, c.id).reverse();
-  const urdu = lang === "ur";
 
   return (
     <div className="space-y-6 px-4 pb-10 pt-4">
@@ -37,7 +36,7 @@ export function MoneyTab() {
       {state.near?.cases[c.id] && <NearCaseCard caseId={c.id} />}
       <section>
         <SectionTitle>
-          <span className={cn(urdu && "urdu normal-case tracking-normal")}>{t("payments")}</span>
+          <span>{t("payments")}</span>
         </SectionTitle>
         {payments.length === 0 ? (
           <Card>
@@ -46,7 +45,7 @@ export function MoneyTab() {
         ) : (
           <div className="space-y-3">
             {payments.map((p) => (
-              <PaymentCard key={p.id} p={p} tz={tz} lang={lang} />
+              <PaymentCard key={p.id} p={p} tz={tz} />
             ))}
           </div>
         )}
@@ -54,7 +53,7 @@ export function MoneyTab() {
 
       <section>
         <SectionTitle>
-          <span className={cn(urdu && "urdu normal-case tracking-normal")}>{t("invoices")}</span>
+          <span>{t("invoices")}</span>
         </SectionTitle>
         <div className="space-y-3">
           {invoices.length === 0 && (
@@ -63,7 +62,7 @@ export function MoneyTab() {
             </Card>
           )}
           {invoices.map((inv) => (
-            <InvoiceCard key={inv.id} inv={inv} tz={tz} lang={lang} />
+            <InvoiceCard key={inv.id} inv={inv} tz={tz} />
           ))}
         </div>
       </section>
@@ -78,7 +77,7 @@ const STEPS: { status: PaymentStatus[]; label: string }[] = [
   { status: ["completed"], label: "Received" },
 ];
 
-function PaymentCard({ p, tz, lang }: { p: Payment; tz: string; lang: string }) {
+function PaymentCard({ p, tz }: { p: Payment; tz: string }) {
   const order = ["awaiting_approval", "approved", "submitted", "processing", "completed"];
   const idx = order.indexOf(p.status);
   const terminalBad = p.status === "cancelled" || p.status === "rejected";
@@ -130,7 +129,7 @@ function PaymentCard({ p, tz, lang }: { p: Payment; tz: string; lang: string }) 
         <ul className="mt-1.5 space-y-1">
           {p.statusHistory.map((h, i) => (
             <li key={i} className="flex gap-2">
-              <span className="num w-28 shrink-0">{dateTime(h.at, tz, lang)}</span>
+              <span className="num w-28 shrink-0">{dateTime(h.at, tz)}</span>
               <span className="text-ink-2">{h.note ?? h.status}</span>
             </li>
           ))}
@@ -159,7 +158,7 @@ function StatusBadge({ status, attempts }: { status: PaymentStatus; attempts: nu
   );
 }
 
-function InvoiceCard({ inv, tz, lang }: { inv: Invoice; tz: string; lang: string }) {
+function InvoiceCard({ inv, tz }: { inv: Invoice; tz: string }) {
   const seen = new Set<string>();
   const dupIds = new Set<string>();
   for (const li of inv.lineItems) {
@@ -174,7 +173,7 @@ function InvoiceCard({ inv, tz, lang }: { inv: Invoice; tz: string; lang: string
         <div>
           <p className="text-[14px] font-semibold">{INV_LABEL[inv.kind]}</p>
           <p className="font-mono text-[11px] text-ink-3">
-            {inv.number} · {dateTime(inv.issuedAt, tz, lang)}
+            {inv.number} · {dateTime(inv.issuedAt, tz)}
           </p>
         </div>
         <Badge tone={inv.status === "paid" ? "success" : superseded ? "neutral" : inv.status === "disputed" ? "amber" : "info"}>
@@ -197,7 +196,7 @@ function InvoiceCard({ inv, tz, lang }: { inv: Invoice; tz: string; lang: string
         <span className="font-semibold">{inv.amountDue !== inv.total ? "Requested now" : "Total"}</span>
         <span className="num text-[15px] font-bold">{money(inv.amountDue, inv.currency)}</span>
       </div>
-      {inv.dueAt && inv.status === "open" && <p className="px-4 pb-2.5 text-[11.5px] text-ink-3">Due {dateTime(inv.dueAt, tz, lang)}</p>}
+      {inv.dueAt && inv.status === "open" && <p className="px-4 pb-2.5 text-[11.5px] text-ink-3">Due {dateTime(inv.dueAt, tz)}</p>}
     </Card>
   );
 }

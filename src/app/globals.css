@@ -132,7 +132,6 @@
   --color-info-soft: var(--info-soft);
   --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, "Microsoft YaHei", "PingFang SC", sans-serif;
   --font-mono: var(--font-jbmono), ui-monospace, SFMono-Regular, Menlo, monospace;
-  --font-urdu: var(--font-nastaliq), "Noto Nastaliq Urdu", serif;
   --shadow-card: var(--shadow-sm);
   --shadow-pop: var(--shadow-md);
   --shadow-float: var(--shadow-lg);
@@ -151,12 +150,6 @@ body {
 
 .num {
   font-variant-numeric: tabular-nums;
-}
-
-[lang="ur"] .i18n,
-.urdu {
-  font-family: var(--font-urdu);
-  line-height: 2.1;
 }
 
 ::selection {

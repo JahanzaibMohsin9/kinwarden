@@ -160,7 +160,7 @@ export async function draftFromBill(
     home: family.home,
     type: family.type,
     country,
-    lang: (family.home === "CN" ? "zh" : "en") as Lang,
+    lang: "en" as Lang,
     payerName: family.payerName,
     subjectName: family.subjectName,
     alreadyAbroad: family.alreadyAbroad,
@@ -194,7 +194,7 @@ export const UploadedBillSchema = z
     home: z.enum(["PK", "CN"]),
     type: z.enum(["medical", "tuition"]),
     country: z.string().refine((c) => c in DESTINATIONS, "Choose a supported country."),
-    lang: z.enum(["en", "ur", "zh"]),
+    lang: z.literal("en"),
     payerName: z.string().trim().min(2).max(80),
     subjectName: z.string().trim().min(2).max(80),
     alreadyAbroad: z.boolean(),
@@ -230,7 +230,7 @@ export function sampleDraft(family: { home: "PK" | "CN"; type: CaseType; payerNa
     ...family,
     type: "medical",
     country: "SG",
-    lang: family.home === "CN" ? "zh" : "en",
+    lang: "en",
     institution: {
       name: "Harbourfront Medical Centre",
       city: "Singapore",
@@ -290,6 +290,6 @@ export function sampleBill(home: "PK" | "CN", patient: string, today = new Date(
     "  Account number: 712-338104-9",
     "  SWIFT: SHBKSGSG",
     "Please quote the MRN as the payment reference. Card payments accepted at the cashier.",
-    home === "CN" ? "外籍患者服务热线 +65 6100 2200" : "International Patient Centre +65 6100 2200",
+    "International Patient Centre +65 6100 2200",
   ].join("\n");
 }

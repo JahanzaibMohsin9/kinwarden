@@ -1,7 +1,7 @@
 // Assembles the demo video from the raw takes (record.mjs) and the voice (tts.mjs).
-//   node scripts/video/edit.mjs            -> video/out/kinwarden-demo-clean.mp4 (no burned subtitles, en+zh tracks; for YouTube)
-//                                             video/out/kinwarden-demo-zh-en.mp4 (bilingual subtitles in a band below the picture)
-//                                             + subtitles.en.srt, subtitles.zh.srt, subtitles.bilingual.srt
+//   node scripts/video/edit.mjs            -> video/out/kinwarden-demo-clean.mp4 (no burned subtitles, an English track)
+//                                             video/out/kinwarden-demo-captioned.mp4 (English subtitles in a band below the picture)
+//                                             + subtitles.en.srt
 //   node scripts/video/edit.mjs --voice video/out/voice-gemini --tag gemini
 //                                          -> another voice (any .wav/.mp3 per part, silence trimmed): kinwarden-demo-gemini.mp4
 // Each narration part gets a stretch of a take between two markers, sped up to fit the voice (or held
@@ -180,7 +180,7 @@ for (const p of parts) {
   filters.push(`setpts=(PTS-STARTPTS)/${speed.toFixed(4)}`, `fps=${FPS}`);
   if (shown < p.length) filters.push(`tpad=stop_mode=clone:stop_duration=${(p.length - shown + 0.1).toFixed(3)}`);
   filters.push(`trim=duration=${p.length.toFixed(3)}`);
-  // a slow push into the map, centred between Lahore and Bangkok, kept inside the frame
+  // a slow push into the map, centred between the two cities on the route, kept inside the frame
   if (e.pushIn) filters.push(`zoompan=z='min(1+0.0012*on,1.45)':x='min(iw-iw/zoom,max(0,iw*0.70-iw/zoom/2))':y='min(ih-ih/zoom,max(0,ih*0.33-ih/zoom/2))':d=1:s=1920x1080:fps=${FPS}`);
   if (p.firstInScene) filters.push("fade=t=in:st=0:d=0.35");
   if (p.lastInScene) filters.push(`fade=t=out:st=${(p.length - 0.35).toFixed(3)}:d=0.35`);
@@ -202,39 +202,34 @@ ff([...voiceInputs, "-filter_complex", `${delays};${parts.map((_, i) => `[v${i}]
 music(total, path.join(WORK, "music.wav"));
 ff(["-i", "voice.wav", "-i", "music.wav", "-filter_complex", "[1:a]volume=0.32[m];[m][0:a]sidechaincompress=threshold=0.015:ratio=6:attack=40:release=600[md];[0:a][md]amix=inputs=2:normalize=0,loudnorm=I=-16:TP=-1.5:LRA=11,aresample=48000[a]", "-map", "[a]", "-t", String(total), "mix.wav"], WORK);
 
-// subtitles: English; Chinese and 中英双语 from scripts/video/subtitles.zh.json (same timings)
+// subtitles: English
 const cues = cuesOf(parts);
-const zh = JSON.parse(fs.readFileSync(path.join(ROOT, "scripts", "video", "subtitles.zh.json"), "utf8"));
-const missing = cues.filter((c) => !zh[c.text]).map((c) => c.text);
-if (missing.length) console.warn(`No Chinese for ${missing.length} cue(s); add them to scripts/video/subtitles.zh.json:\n  ${missing.join("\n  ")}`);
 writeSrt(cues, path.join(WORK, "subtitles.en.srt"));
-writeSrt(cues, path.join(WORK, "subtitles.zh.srt"), (c) => zh[c.text] ?? c.text);
-writeSrt(cues, path.join(WORK, "subtitles.bilingual.srt"), (c) => `${zh[c.text] ?? ""}\n${c.text}`.trim());
-for (const f of ["subtitles.en.srt", "subtitles.zh.srt", "subtitles.bilingual.srt"]) fs.copyFileSync(path.join(WORK, f), path.join(OUT, TAG ? f.replace(".srt", `${TAG}.srt`) : f));
+fs.copyFileSync(path.join(WORK, "subtitles.en.srt"), path.join(OUT, TAG ? `subtitles.en${TAG}.srt` : "subtitles.en.srt"));
 
-// 1. clean, for YouTube: no burned subtitles, so nothing covers the app; English and Chinese ride along as
-//    switchable tracks (and the .srt files are uploaded to YouTube as captions)
+// 1. clean, for YouTube and X: no burned subtitles, so nothing covers the app; English rides along as a
+//    switchable track (and the .srt file is uploaded as captions)
 const clean = `kinwarden-demo-clean${TAG}.mp4`;
 ff(
   [
-    ...["-i", "picture.mp4", "-i", "mix.wav", "-i", "subtitles.en.srt", "-i", "subtitles.zh.srt"],
-    ...["-map", "0:v", "-map", "1:a", "-map", "2:s", "-map", "3:s"],
+    ...["-i", "picture.mp4", "-i", "mix.wav", "-i", "subtitles.en.srt"],
+    ...["-map", "0:v", "-map", "1:a", "-map", "2:s"],
     ...["-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-c:s", "mov_text"],
-    ...["-metadata:s:s:0", "language=eng", "-metadata:s:s:0", "title=English", "-metadata:s:s:1", "language=chi", "-metadata:s:s:1", "title=中文"],
-    // no -shortest here: the subtitle tracks end before the end card
+    ...["-metadata:s:s:0", "language=eng", "-metadata:s:s:0", "title=English"],
+    // no -shortest here: the subtitle track ends before the end card
     ...["-movflags", "+faststart", "-t", total.toFixed(3), path.join(OUT, clean)],
   ],
   WORK,
 );
 
-// 2. bilingual, for Bilibili and the file we send: the picture a little smaller, the subtitles in a band below it
+// 2. captioned, for players without subtitle tracks: the picture a little smaller, English subtitles in a band below it
 const BAND = { w: 1600, h: 900, color: "0x0b1412" };
-const band = `kinwarden-demo-zh-en${TAG}.mp4`;
-const style = "FontName=Microsoft YaHei,FontSize=11,PrimaryColour=&H00F4F1EA,OutlineColour=&H00000000,BorderStyle=1,Outline=0.5,Shadow=0,Alignment=2,MarginV=6,MarginL=28,MarginR=28";
+const band = `kinwarden-demo-captioned${TAG}.mp4`;
+const style = "FontName=Arial,FontSize=12,PrimaryColour=&H00F4F1EA,OutlineColour=&H00000000,BorderStyle=1,Outline=0.5,Shadow=0,Alignment=2,MarginV=8,MarginL=28,MarginR=28";
 ff(
   [
     ...["-i", "picture.mp4", "-i", "mix.wav"],
-    ...["-vf", `scale=${BAND.w}:${BAND.h}:flags=lanczos,pad=1920:1080:${(1920 - BAND.w) / 2}:0:color=${BAND.color},subtitles=subtitles.bilingual.srt:force_style='${style}'`],
+    ...["-vf", `scale=${BAND.w}:${BAND.h}:flags=lanczos,pad=1920:1080:${(1920 - BAND.w) / 2}:0:color=${BAND.color},subtitles=subtitles.en.srt:force_style='${style}'`],
     ...["-c:v", "libx264", "-preset", "slow", "-crf", "19", "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", "-shortest", path.join(OUT, band)],
   ],
   WORK,

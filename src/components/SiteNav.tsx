@@ -14,6 +14,7 @@ export const MAIN = [
   { href: "/demo", label: "Watch the demo" },
   { href: "/app", label: "Family app" },
   { href: "/attack", label: "Try to fool it" },
+  { href: "/#near", label: "On NEAR" },
   { href: "/#how", label: "How it works" },
 ];
 
@@ -24,7 +25,7 @@ export const BEHIND = [
   { href: "/bank", label: "Payment rails", hint: "The sandbox bank and card network moving the money" },
   { href: "/bank/officer", label: "Bank officer", hint: "The bank's view: a remittance package ready to approve" },
   { href: "/pack", label: "Case pack", hint: "Every bill, receipt and form, printable" },
-  { href: "https://github.com/JahanzaibMohsin9/kinwarden/tree/main/docs/evidence", label: "Evidence & source code", hint: "Source code and instructions for collecting execution evidence", external: true },
+  { href: "https://github.com/JahanzaibMohsin9/kinwarden/blob/main/docs/redteam/ONCHAIN.md", label: "On-chain evidence & source", hint: "NEAR testnet transactions, the red-team report and the source code", external: true },
 ];
 
 export function SiteNav({ tone = "light", className }: { tone?: "light" | "dark"; className?: string }) {

@@ -8,7 +8,6 @@ const MAX_BYTES = 2 * 1024 * 1024; // about two minutes of compressed speech
 const PER_VISITOR = Number(process.env.KINWARDEN_VOICE_PER_VISITOR ?? 15);
 const g = globalThis as unknown as { __kinwardenVoice?: { day: string; by: Map<string, number> } };
 const used = (g.__kinwardenVoice ??= { day: "", by: new Map() });
-const LANG: Record<string, string> = { zh: "zh", en: "en", ur: "ur" };
 
 export async function POST(request: Request) {
   const cfg = providerConfig("openai");
@@ -22,7 +21,7 @@ export async function POST(request: Request) {
   const audio = form?.get("audio");
   if (!(audio instanceof File) || audio.size === 0) return Response.json({ error: "No recording received." }, { status: 400 });
   if (audio.size > MAX_BYTES) return Response.json({ error: "That recording is too long. Keep voice notes under two minutes." }, { status: 413 });
-  const language = LANG[String(form?.get("lang") ?? "")];
+  const language = "en";
 
   used.by.set(sid, (used.by.get(sid) ?? 0) + 1);
   const client = new OpenAI({ apiKey: cfg.apiKey, timeout: 60_000, maxRetries: 1 });

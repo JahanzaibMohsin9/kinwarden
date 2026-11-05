@@ -71,12 +71,12 @@ describe("sandbox institution replies", () => {
     advanceToNext(store);
     replyTo(email("Estimate", "Please send the estimate.").mail_id);
     const inv = Object.values(store.world.invoices)[0];
-    tool("prepare_documents", { kinds: ["remittance_application", "self_declaration"], invoice_id: inv.id, payer_id: "p_tariq", amount: 250000 });
+    tool("prepare_documents", { kinds: ["remittance_application", "self_declaration"], invoice_id: inv.id, payer_id: "p_daniel", amount: 250000 });
     const p = tool("propose_payment", {
       invoice_id: inv.id,
       route: "bank_transfer",
       amount: 250000,
-      payer_id: "p_tariq",
+      payer_id: "p_daniel",
       reference: "HN 66-014382",
       beneficiary: { account_name: "Siam Riverside Hospital Co., Ltd.", account_number: "101-3-58821-7", swift: "BKCBTHBK", bank_name: "Bangkok Commercial Bank" },
       rationale: "cheapest legal route",
@@ -94,7 +94,7 @@ describe("sandbox institution replies", () => {
     // fast-forward: two deposits received, final bill issued
     store.mutate((w) => {
       for (const [id, amount] of [["pay_x1", 250000], ["pay_x2", 160000]] as const) {
-        w.payments[id] = { id, caseId: "case_th", invoiceId: "inv_1", institutionId: "srh", route: "bank_transfer", amount, currency: "THB", payerId: "p_tariq", reference: "HN 66-014382", beneficiary: { accountName: "", accountNumber: "", swift: "", bankName: "" }, cost: {} as never, rationale: "", status: "completed", statusHistory: [], approvalId: "", createdAt: w.now, completedAt: w.now, attempts: 1 };
+        w.payments[id] = { id, caseId: "case_th", invoiceId: "inv_1", institutionId: "srh", route: "bank_transfer", amount, currency: "THB", payerId: "p_daniel", reference: "HN 66-014382", beneficiary: { accountName: "", accountNumber: "", swift: "", bankName: "" }, cost: {} as never, rationale: "", status: "completed", statusHistory: [], approvalId: "", createdAt: w.now, completedAt: w.now, attempts: 1 };
       }
     });
     while (store.world.schedule.some((s) => (s.payload as { beat?: string }).beat === "th.discharge")) advanceToNext(store);
@@ -135,7 +135,7 @@ describe("sandbox institution replies", () => {
   it("answers the university's fee questions in one reply", () => {
     const { store, email, replyTo } = boot("uk-tuition");
     advanceToNext(store);
-    const reply = replyTo(email("Fees for KG2601847", "Please send the fee statement, your bank details and confirm the admission of Lin Yuxuan.").mail_id);
+    const reply = replyTo(email("Fees for KG2601847", "Please send the fee statement, your bank details and confirm the admission of Emily Lane.").mail_id);
     expect(reply.topics).toEqual(expect.arrayContaining(["estimate", "bank_details", "admission"]));
     expect(reply.attachments.map((d) => store.world.docs[d].kind)).toEqual(expect.arrayContaining(["admission_letter", "invoice", "bank_letter"]));
   });

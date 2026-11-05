@@ -38,12 +38,12 @@ beforeEach(() => {
   removePasskeys();
   store = new Store();
   store.reset(seedScenario("th-medical"));
-  const inv = issueInvoice(store, { caseId: "case_th", institutionId: "srh", kind: "deposit_request", title: "Deposit", patientName: "Mr. Tariq Mahmood", patientRef: "HN 66-014382", lineItems: [{ description: "Deposit", amount: 160000 }], dueInHours: 20 });
+  const inv = issueInvoice(store, { caseId: "case_th", institutionId: "srh", kind: "deposit_request", title: "Deposit", patientName: "Mr. Daniel Hart", patientRef: "HN 66-014382", lineItems: [{ description: "Deposit", amount: 160000 }], dueInHours: 20 });
   const b = INSTITUTIONS.srh.bank;
   const r = JSON.parse(
     executeTool(
       "propose_payment",
-      { invoice_id: inv.id, route: "card_payment", amount: 160000, payer_id: "p_tariq", reference: "HN 66-014382", beneficiary: { account_name: b.accountName, account_number: b.accountNumber, swift: b.swift, bank_name: b.bankName }, rationale: "card is instant", narration: "test" },
+      { invoice_id: inv.id, route: "card_payment", amount: 160000, payer_id: "p_daniel", reference: "HN 66-014382", beneficiary: { account_name: b.accountName, account_number: b.accountNumber, swift: b.swift, bank_name: b.bankName }, rationale: "card is instant", narration: "test" },
       { store, caseId: "case_th" },
     ),
   );

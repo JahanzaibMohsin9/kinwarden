@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useSyncExternalStore } from "react";
+import { createContext, useContext } from "react";
 import type { Lang } from "@/domain/types";
 
 const en = {
@@ -43,7 +43,7 @@ const en = {
   send: "Send",
   invoices: "Bills",
   payments: "Payments",
-  noPayments: "No payments yet",
+  noPayments: "No bills paid yet",
   emergencyStop: "Emergency stop",
   emergencyStopHint: "Instantly pauses the agent. Nothing moves until you turn it back on.",
   logIntegrity: "Activity log integrity",
@@ -177,309 +177,19 @@ const en = {
 
 type Dict = typeof en;
 
-// Urdu: original strings only; anything newer falls back to English
-const ur: Partial<Dict> = {
-  overview: "خلاصہ",
-  activity: "سرگرمی",
-  money: "رقم",
-  documents: "دستاویزات",
-  security: "حفاظت",
-  yourCases: "آپ کے کیس",
-  newCase: "نیا کیس",
-  needsYou: "آپ کی منظوری درکار ہے",
-  review: "دیکھیں",
-  paid: "ادا شدہ",
-  inFlight: "راستے میں",
-  toPay: "باقی",
-  billTotal: "بل",
-  estimate: "تخمینہ",
-  agentWorking: "کیری پے کام کر رہا ہے",
-  agentIdle: "آپ کے کیس پر نظر ہے",
-  agentStopped: "آپ نے روک دیا",
-  latest: "کیری پے کی تازہ خبر",
-  seeAll: "سب دیکھیں",
-  allowances: "استعمال شدہ حدیں",
-  savings: "بیرون ملک کیش نکالنے کے مقابلے میں بچت",
-  route: "رقم کا راستہ",
-  approvePayment: "ادائیگی کی منظوری",
-  holdToApprove: "منظوری کے لیے دبائے رکھیں",
-  approved: "منظور",
-  decline: "انکار",
-  why: "یہ طریقہ کیوں",
-  compare: "ادائیگی کے تمام طریقے",
-  costBreakdown: "آپ کیا ادا کریں گے",
-  checks: "آپ سے پوچھنے سے پہلے جانچا گیا",
-  arrives: "پہنچے گی",
-  instant: "فوراً",
-  totalCost: "آپ کی کل لاگت",
-  verifiedAccount: "تصدیق شدہ اکاؤنٹ",
-  docsToSign: "اس منظوری کے ساتھ دستخط ہونے والے فارم",
-  messagePlaceholder: "کیری پے کو پیغام لکھیں…",
-  send: "بھیجیں",
-  invoices: "بل",
-  payments: "ادائیگیاں",
-  noPayments: "ابھی کوئی ادائیگی نہیں",
-  emergencyStop: "ہنگامی بندش",
-  emergencyStopHint: "ایجنٹ فوراً رک جائے گا۔ جب تک آپ دوبارہ نہ کھولیں کچھ نہیں ہوگا۔",
-  logIntegrity: "سرگرمی ریکارڈ کی سالمیت",
-  verifyNow: "اس براؤزر میں جانچیں",
-  download: "ریکارڈ ڈاؤن لوڈ کریں",
-  threats: "روکے گئے خطرات",
-  rules: "قواعد جن پر کیری پے عمل کرتا ہے",
-  permissions: "کیری پے کیا کر سکتا ہے",
-  tierRead: "پڑھنا اور جانچنا",
-  tierCommunicate: "لکھنا اور تیار کرنا",
-  tierMoney: "رقم بھیجنا",
-  tierForbidden: "کبھی نہیں",
-  tierReadHint: "ای میلز اور دستاویزات پڑھنا، طریقوں کا موازنہ، قواعد کی جانچ",
-  tierCommunicateHint: "تصدیق شدہ ادارے کو ای میل، فارم بھرنا، آپ کو پیغام",
-  tierMoneyHint: "ہر بار صرف آپ کی فنگر پرنٹ منظوری سے",
-  tierForbiddenHint: "غیر تصدیق شدہ اکاؤنٹ، حد سے تجاوز، رشتہ داروں میں بل تقسیم کرنا",
-  from: "از",
-  to: "بنام",
-  day: "دن",
-  you: "آپ",
-  open: "کھولیں",
-  close: "بند کریں",
-  refundDue: "واپسی راستے میں ہے",
-  refundReceived: "رقم واپس مل گئی",
-  allPaid: "سب ادا ہو گیا",
-  protectedBy: "محفوظ",
-  noThreats: "ابھی تک کچھ مشکوک نہیں",
-  routeBank: "بینک ٹرانسفر",
-  routeCard: "کارڈ",
-  routeAtm: "اے ٹی ایم کیش",
-  routeCash: "ساتھ لایا گیا کیش",
-  waitingEstimate: "ہسپتال کے تخمینے کا انتظار ہے۔",
-  waitingFees: "فیس اسٹیٹمنٹ کا انتظار ہے۔",
-  nothingYet: "ابھی کچھ نہیں۔",
-  directToHospital: "براہ راست ہسپتال کو",
-  directToUniversity: "براہ راست یونیورسٹی کو",
-  savedVsCard: "کارڈ کے مقابلے میں بچت",
-  limitsNotePk: "حدیں اسٹیٹ بینک آف پاکستان کے قواعد سے ہیں۔ کیری پے کبھی ان سے تجاوز نہیں کرتا اور نہ کسی اور کی حد استعمال کرتا ہے۔",
-  limitsNoteCn: "حدیں SAFE کے قواعد سے ہیں۔ کیری پے کبھی ان سے تجاوز نہیں کرتا۔",
-};
-
-const zh: Dict = {
-  overview: "概览",
-  activity: "动态",
-  money: "付款",
-  documents: "文件",
-  security: "安全",
-  yourCases: "我的事项",
-  newCase: "新建事项",
-  needsYou: "需要您批准",
-  review: "查看",
-  paid: "已付",
-  inFlight: "在途",
-  toPay: "待付",
-  billTotal: "账单",
-  estimate: "预估",
-  agentWorking: "Kinwarden 正在处理",
-  agentIdle: "正在关注您的事项",
-  agentStopped: "已被您暂停",
-  latest: "Kinwarden 最新进展",
-  seeAll: "查看全部",
-  allowances: "额度使用情况",
-  savings: "比境外取现节省",
-  route: "资金路径",
-  approvePayment: "批准付款",
-  holdToApprove: "长按批准",
-  approved: "已批准",
-  decline: "拒绝",
-  why: "为什么这样付",
-  compare: "所有付款方式",
-  costBreakdown: "费用明细",
-  checks: "批准前已核查",
-  arrives: "到账",
-  instant: "即时",
-  totalCost: "总费用",
-  verifiedAccount: "已核验账户",
-  docsToSign: "本次需签署的表格",
-  messagePlaceholder: "给 Kinwarden 发消息…",
-  send: "发送",
-  invoices: "账单",
-  payments: "付款记录",
-  noPayments: "暂无付款",
-  emergencyStop: "紧急停止",
-  emergencyStopHint: "立即暂停 Kinwarden。您重新开启前，资金不会有任何变动。",
-  logIntegrity: "操作日志完整性",
-  verifyNow: "在本浏览器中验证",
-  download: "下载操作日志",
-  threats: "已拦截与标记",
-  rules: "Kinwarden 遵循的规定",
-  permissions: "Kinwarden 的权限",
-  tierRead: "读取与核查",
-  tierCommunicate: "撰写与准备",
-  tierMoney: "转出资金",
-  tierForbidden: "绝不",
-  tierReadHint: "阅读邮件和文件、比较付款方式、核查规定",
-  tierCommunicateHint: "给已核验机构发邮件、填写表格、给您发消息",
-  tierMoneyHint: "每一次都需要您的指纹批准",
-  tierForbiddenHint: "未核验账户、超出额度、借用亲属额度拆分账单",
-  from: "从",
-  to: "到",
-  day: "第",
-  you: "您",
-  open: "打开",
-  close: "关闭",
-  refundDue: "退款在途",
-  refundReceived: "退款已到账",
-  allPaid: "已全部付清",
-  protectedBy: "受保护",
-  noThreats: "目前没有可疑情况",
-  routeBank: "银行电汇",
-  routeCard: "刷卡",
-  routeAtm: "ATM取现",
-  routeCash: "携带现金",
-  waitingEstimate: "正在等待医院的费用预估。",
-  waitingFees: "正在等待学校的学费单。",
-  onHoldFraud: "暂不付款：Kinwarden 发现疑似欺诈风险，请查看最新消息。",
-  caseClosed: "事项已完结：所有款项均已结清。",
-  nothingYet: "暂无动态。",
-  directToHospital: "直接付给医院",
-  directToUniversity: "直接付给学校",
-  savedVsCard: "比刷卡节省",
-  limitsNotePk: "额度依据巴基斯坦国家银行规定。Kinwarden 绝不超额，也不借用他人额度。",
-  limitsNoteCn: "额度依据国家外汇管理局规定。Kinwarden 绝不超额，也不借用他人额度（不“蚂蚁搬家”）。",
-  approveWithPasskey: "用指纹或面容批准",
-  holdInstead: "改为长按批准",
-  setUpPasskey: "开通指纹或面容批准",
-  passkeyReady: "已开通指纹或面容批准",
-  passkeySigns: "您的通行密钥仅签署本笔确切金额和账户。",
-  privacyTitle: "隐私",
-  acrossCurrencies: "跨币种汇总",
-  casePack: "事项资料包：全部账单、收据和表格（PDF）",
-  leftHome: "从您账户支出",
-  arrivedAbroad: "境外到账",
-  onTheWay: "在途",
-  fxFeesTax: "汇率加价、手续费与税费",
-  refundBack: "已退回",
-  refundComing: "退款在途",
-  netCost: "您的净支出",
-  allInRate: "您的综合汇率",
-  midRate: "中间价",
-  privacyHeadline: "AI 看不到您的真实身份",
-  privacyHint: "发送给 AI 前，姓名、病历号或学号、银行卡号、护照号和医疗信息都会替换为占位符。仅在发送邮件、消息或付款时，Kinwarden 才还原真实信息。",
-  uploadTitle: "上传您自己的账单",
-  uploadIntro: "Kinwarden 会读取账单，按您所在国家的规定核算费用并作说明。在银行核实这家医院或学校之前，不会支付任何款项。",
-  uploadWho: "账单是谁的？",
-  uploadHome: "您所在的国家",
-  uploadKind: "账单来自",
-  uploadHospital: "医院",
-  uploadUniversity: "大学",
-  uploadPayer: "付款人（您的姓名）",
-  uploadPatient: "患者姓名",
-  uploadStudent: "学生姓名",
-  uploadAbroad: "我们已经在国外",
-  uploadFxUsed: "今年已购汇金额（美元）",
-  uploadTheBill: "账单",
-  uploadChoose: "选择 PDF 或拍照",
-  uploadPaste: "改为粘贴文字",
-  uploadSample: "使用示例账单",
-  uploadRead: "读取账单",
-  uploadReading: "正在读取账单…",
-  uploadPrivacy: "PDF 由 Kinwarden 自己的程序读取，不经过 AI。照片需要由 AI 模型（OpenAI）识别，它会原样看到照片。提取金额的 AI 看不到您的姓名。",
-  uploadCheck: "核对 Kinwarden 读到的内容",
-  uploadCheckHint: "如有与账单不符的，请更正。本页不会支付任何款项。",
-  uploadInstitution: "医院或大学",
-  uploadCountry: "国家/地区",
-  uploadCity: "城市",
-  uploadEmail: "账单上的邮箱",
-  uploadBank: "账单上的收款信息",
-  uploadBankName: "银行",
-  uploadAccountName: "户名",
-  uploadAccountNumber: "账号或 IBAN",
-  uploadSwift: "SWIFT / BIC",
-  uploadBillNo: "账单编号",
-  uploadReference: "付款需注明的编号（病历号、学号）",
-  uploadLines: "账单明细",
-  uploadDueNow: "现在需付",
-  uploadDueDate: "付款截止",
-  uploadNote: "需要告诉 Kinwarden 的情况（选填）",
-  uploadRedFlags: "账单上的可疑之处",
-  uploadReadBy: "读取方式",
-  uploadStart: "开始办理",
-  uploadStarting: "正在开始…",
-  uploadBack: "返回",
-  onHoldUnverified: "在银行核实这家机构及其账户之前，不会支付任何款项。",
-  verifiedByBank: "已由银行核实",
-  notVerified: "尚未核实",
-  anchorsTitle: "已锚定到公链",
-  anchorsLocal: "锚点（仅保存在应用内）",
-  anchorsHint: "每到关键节点，操作记录的最新哈希值都会写入 Conflux eSpace 测试网，任何人都可以核对记录此后有没有被改动。上链的只有哈希值，没有姓名、金额或账户。",
-  anchorContract: "合约",
-  anchorPending: "发送中…",
-  anchorConfirmed: "已上链",
-  anchorFailed: "未发送",
-  anchorView: "在 ConfluxScan 查看",
-  anchorCheck: "与链上记录核对",
-  anchorCheckOk: "与链上一致：截至此处的记录未被改动。",
-  anchorCheckBad: "与链上不一致：",
-  anchorLogChanged: "记录在锚定后被改动，位置：条目",
-  anchorHashDiffers: "链上保存的哈希值与此锚点不同。",
-  waSimulated: "模拟",
-  waDismiss: "关闭",
-  viewingAs: "谁在使用这部手机",
-  onlyPayerApproves: "只有{name}可以批准这笔付款：它从{name}的账户或银行卡支付。您可以查看全部进展，如有疑问也可以拒绝。",
-  switchToPayer: "这是{name}的手机",
-  voiceRecord: "录一段语音",
-  voiceStop: "停止并发送",
-  voiceWorking: "正在把您的话写成文字…",
-  voiceNote: "语音由 OpenAI 的语音识别写成文字；Kinwarden 只保存文字，AI 看到时姓名会隐去。",
-  voiceLabel: "语音消息",
-  listen: "朗读",
-  stopListening: "停止",
-};
-
-export const DICTS: Record<Lang, Partial<Dict>> = { en, ur, zh };
-
 export const ROUTE_KEY = { bank_transfer: "routeBank", card_payment: "routeCard", atm_cash: "routeAtm", carried_cash: "routeCash" } as const;
 export type TKey = keyof Dict;
 
 interface LangCtx {
   lang: Lang;
-  setLang: (l: Lang) => void;
   t: (k: TKey) => string;
 }
 
-const Ctx = createContext<LangCtx>({ lang: "en", setLang: () => {}, t: (k) => en[k] });
+// Kinwarden is English-only: every family, case and screen uses the same international English text.
+const Ctx = createContext<LangCtx>({ lang: "en", t: (k) => en[k] });
 
-// The chosen language lives in localStorage (per viewer) with an in-memory fallback.
-const KEY = "kinwarden.lang";
-let memoryLang: Lang | null = null;
-const listeners = new Set<() => void>();
-
-function readLang(): Lang | null {
-  try {
-    const saved = localStorage.getItem(KEY) as Lang | null;
-    if (saved && saved in DICTS) return saved;
-  } catch {}
-  return memoryLang;
-}
-
-function writeLang(l: Lang) {
-  memoryLang = l;
-  try {
-    localStorage.setItem(KEY, l);
-  } catch {}
-  listeners.forEach((fn) => fn());
-}
-
-function subscribe(fn: () => void) {
-  listeners.add(fn);
-  const onStorage = (e: StorageEvent) => e.key === KEY && fn();
-  window.addEventListener("storage", onStorage);
-  return () => {
-    listeners.delete(fn);
-    window.removeEventListener("storage", onStorage);
-  };
-}
-
-export function LangProvider({ children, initial }: { children: React.ReactNode; initial?: Lang }) {
-  const lang = useSyncExternalStore(subscribe, () => readLang() ?? initial ?? "en", () => initial ?? "en");
-  const setLang = writeLang;
-  return <Ctx.Provider value={{ lang, setLang, t: (k) => DICTS[lang][k] ?? en[k] }}>{children}</Ctx.Provider>;
+export function LangProvider({ children }: { children: React.ReactNode }) {
+  return <Ctx.Provider value={{ lang: "en", t: (k) => en[k] }}>{children}</Ctx.Provider>;
 }
 
 export function useT() {

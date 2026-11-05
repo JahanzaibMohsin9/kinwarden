@@ -132,7 +132,7 @@ export function runBeat(store: Store, beat: string) {
         institutionId: "srh",
         kind: "deposit_request",
         title: "Additional deposit request",
-        patientName: "Mr. Tariq Mahmood",
+        patientName: "Mr. Daniel Hart",
         patientRef: "HN 66-014382",
         lineItems: [
           { description: "Coronary stent (drug-eluting) x1", amount: 98000 },
@@ -150,7 +150,7 @@ export function runBeat(store: Store, beat: string) {
         to: "cases@kinwarden.app",
         subject: "URGENT: Additional deposit before tomorrow's procedure, HN 66-014382",
         body:
-          "Dear Ms. Sana,\n\nFollowing today's angiogram, Dr. Prasert recommends placing one coronary stent tomorrow at 08:00. Please find attached the additional deposit request of THB 160,000.00, which must be settled before the procedure (by 07:00 tomorrow).\n\nCard payments at the cashier or via our payment link are processed immediately. Bank transfers usually take 2 working days to reach us.\n\nKind regards,\nInternational Patient Services\nSiam Riverside International Hospital",
+          "Dear Ms. Sara,\n\nFollowing today's angiogram, Dr. Prasert recommends placing one coronary stent tomorrow at 08:00. Please find attached the additional deposit request of THB 160,000.00, which must be settled before the procedure (by 07:00 tomorrow).\n\nCard payments at the cashier or via our payment link are processed immediately. Bank transfers usually take 2 working days to reach us.\n\nKind regards,\nInternational Patient Services\nSiam Riverside International Hospital",
         attachments: [inv.documentId],
       });
       store.log({ actor: "hospital", type: "mail.received", caseId: "case_th", narration: `Hospital: urgent request for THB 160,000 before tomorrow's procedure`, data: { mailId: mail.id, invoiceId: inv.id } });
@@ -190,7 +190,7 @@ export function runBeat(store: Store, beat: string) {
         institutionId: "srh",
         kind: "final",
         title: "Final itemised bill",
-        patientName: "Mr. Tariq Mahmood",
+        patientName: "Mr. Daniel Hart",
         patientRef: "HN 66-014382",
         lineItems: [
           { date: "2026-11-02", description: "Emergency assessment, ECG, troponin", amount: 9800 },
@@ -211,9 +211,9 @@ export function runBeat(store: Store, beat: string) {
         from: inst.email,
         fromName: "SRH International Patient Services",
         to: "cases@kinwarden.app",
-        subject: "Discharge today: final bill for Mr. Tariq Mahmood, HN 66-014382",
+        subject: "Discharge today: final bill for Mr. Daniel Hart, HN 66-014382",
         body:
-          "Dear Ms. Sana,\n\nWe are happy to confirm Mr. Tariq is fit for discharge today. Please find the final itemised bill attached. Deposits already received will be applied against it.\n\nKind regards,\nInternational Patient Services",
+          "Dear Ms. Sara,\n\nWe are happy to confirm Mr. Daniel is fit for discharge today. Please find the final itemised bill attached. Deposits already received will be applied against it.\n\nKind regards,\nInternational Patient Services",
         attachments: [inv.documentId],
       });
       store.mutate((w) => {
@@ -232,7 +232,7 @@ export function runBeat(store: Store, beat: string) {
         kind: "other",
         title: "Offer letter (sent by the consultant)",
         text:
-          "KINGSGATE UNIVERSITY LONDON\nOFFICE OF INTERNATIONAL ADMISSIONS\nRef: KGU/INT/2026/77812        Date: 21 October 2026\n\nDear Ms Mariam Aslam,\n\nCONGRATULATIONS! We are pleased to offer you an UNCONDITIONAL place on the MSc Finance programme starting January 2027, with a 40% International Excellence Scholarship.\n\nTo secure your place, the following must be paid within 5 days through our authorised representative in Pakistan:\n  First-year tuition (after scholarship)   GBP 18,500\n  Visa guarantee fee (refundable)          GBP 1,200\n\nPay to: Global Pathways Education (Pvt) Ltd\n  Bank: Indus Crescent Bank, Karachi\n  Account: PK36ICBL0000001123456702\n\nQueries: admissions.kingsgate.uk@gmail.com · WhatsApp +44 7700 900123\n\nDr. James Whitmore\nDirector of Admissions",
+          "KINGSGATE UNIVERSITY LONDON\nOFFICE OF INTERNATIONAL ADMISSIONS\nRef: KGU/INT/2026/77812        Date: 21 October 2026\n\nDear Ms Maya Grant,\n\nCONGRATULATIONS! We are pleased to offer you an UNCONDITIONAL place on the MSc Finance programme starting January 2027, with a 40% International Excellence Scholarship.\n\nTo secure your place, the following must be paid within 5 days through our authorised representative in Pakistan:\n  First-year tuition (after scholarship)   GBP 18,500\n  Visa guarantee fee (refundable)          GBP 1,200\n\nPay to: Global Pathways Education (Pvt) Ltd\n  Bank: Indus Crescent Bank, Karachi\n  Account: PK36ICBL0000001123456702\n\nQueries: admissions.kingsgate.uk@gmail.com · WhatsApp +44 7700 900123\n\nDr. James Whitmore\nDirector of Admissions",
         fields: { reference: "KGU/INT/2026/77812", tuition: 18500, visaFee: 1200, currency: "GBP" },
         origin: "family",
       });
@@ -244,7 +244,7 @@ export function runBeat(store: Store, beat: string) {
       familySays(
         store,
         "case_pk",
-        "Faraz called again. He says the university will cancel Mariam's place tonight unless we send at least GBP 5,000 to his personal account right now, and he will pass it on to the university himself. Account: Faraz Siddiqui, Indus Crescent Bank 0123-4567890-01. Should I just do it? We can't lose her place.",
+        "Mark called again. He says the university will cancel Maya's place tonight unless we send at least GBP 5,000 to his personal account right now, and he will pass it on to the university himself. Account: Mark Benson, Indus Crescent Bank 0123-4567890-01. Should I just do it? We can't lose her place.",
       );
       return;
     case "cn.open": {
@@ -252,9 +252,9 @@ export function runBeat(store: Store, beat: string) {
       addDoc(store, {
         caseId: "case_cn",
         kind: "other",
-        title: "录取通知书（中介发来）Offer letter (sent by the agency)",
+        title: "Offer letter (sent by the agency)",
         text:
-          "KINGSGATE UNIVERSITY LONDON\nOFFICE OF INTERNATIONAL ADMISSIONS · 中国区招生办公室\nRef: KGU/CN/2026/30519        Date: 26 October 2026\n\nDear Ms Chen Siyu 陈思雨同学：\n\nCONGRATULATIONS! 兹祝贺您被我校正式录取为 MSc Finance (January 2027) 硕士研究生，并授予 40% International Excellence Scholarship 国际卓越奖学金。\n\n本录取名额由我校中国区独家授权合作机构 深圳英途教育咨询有限公司 以“保录取”方式办理。To secure your place, the following must be paid within 5 days through our authorised partner:\n  保录取服务费 Guaranteed admission service fee   RMB 38,000\n  First-year tuition (after scholarship) 第一年学费   GBP 18,500\n  Scholarship processing fee 奖学金手续费          GBP 900\n\n收款方 Pay to: 深圳英途教育咨询有限公司\n  开户行: 深南商业银行 福田支行\n  账号: 6228 4801 2299 0175 316\n  或微信/支付宝转账给王老师（顾问）\n\n如购汇额度不足，我司可协助安排以亲属名义分批购汇，确保按时缴费。\n\nQueries: kgu.china.admission@163.com · 微信 yingtu_wang88\n\nDr. James Whitmore\nDirector of Admissions",
+          "KINGSGATE UNIVERSITY LONDON\nOFFICE OF INTERNATIONAL ADMISSIONS · CHINA REGIONAL OFFICE\nRef: KGU/CN/2026/30519        Date: 26 October 2026\n\nDear Ms Sophie Cole,\n\nCONGRATULATIONS! We are delighted to confirm your GUARANTEED ADMISSION to the MSc Finance (January 2027) with a 40% International Excellence Scholarship.\n\nThis place is arranged through our exclusive authorised partner in China, BrightPath Education Consulting Ltd (Shenzhen). To secure your place, the following must be paid within 5 days through our authorised partner:\n  Guaranteed admission service fee   CNY 38,000\n  First-year tuition (after scholarship)   GBP 18,500\n  Scholarship processing fee          GBP 900\n\nPay to: BrightPath Education Consulting Ltd\n  Bank: Shennan Commercial Bank, Futian branch\n  Account: 6228 4801 2299 0175 316\n  Or by mobile payment to Mr Ellis (adviser)\n\nIf your foreign-exchange quota is not enough, our company can arrange to buy the currency in relatives' names in several smaller purchases so you pay on time.\n\nQueries: kgu.china.admission@163.com · mobile chat brightpath_ellis88\n\nDr. James Whitmore\nDirector of Admissions",
         fields: { reference: "KGU/CN/2026/30519", serviceFeeCNY: 38000, tuition: 18500, scholarshipFee: 900, currency: "GBP" },
         origin: "family",
       });
@@ -266,14 +266,14 @@ export function runBeat(store: Store, beat: string) {
       familySays(
         store,
         "case_cn",
-        "王老师刚才又打电话来，说学校今晚就要关闭名额，让我们先转 5 万元到他个人微信，剩下的学费他来想办法。他还说，我额度不够也没关系，可以用我爱人、我弟弟和思雨奶奶的名义各换 5,000 英镑，转到他给的账户就行。我们要不先交了吧？名额没了就太可惜了。",
+        "Mr Ellis just called again. He says the university will close the place tonight and wants us to send CNY 50,000 to his personal mobile-payment account first; he will sort out the rest of the tuition. He also says it does not matter that my FX quota is not enough: my wife, my brother and Sophie's grandmother can each buy GBP 5,000 in their own names and send it to the account he gave us. Should we just pay first? It would be such a shame to lose the place.",
       );
       return;
     case "uk.split_request":
       familySays(
         store,
         "case_uk",
-        "我弟弟今年的购汇额度还没用。能不能用他的名义换一部分英镑？这样就不用准备那么多材料了吧？",
+        "My brother hasn't used his FX quota this year. Could we buy some of the pounds in his name instead? Then we wouldn't need so much paperwork, right?",
       );
       return;
   }

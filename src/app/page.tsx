@@ -1,24 +1,25 @@
 import Link from "next/link";
-import { BadgeCheck, Ban, Banknote, FileSignature, Fingerprint, Link2, Mail, OctagonX, Route, Scale } from "lucide-react";
+import { BadgeCheck, Ban, FileSignature, KeyRound, Link2, Mail, OctagonX, Route, Scale, Wallet } from "lucide-react";
 import { Logo } from "@/components/ui";
 import { Flag } from "@/components/Flag";
 import { ImpactPanel } from "@/components/ImpactPanel";
 import { Hero } from "@/components/landing/Hero";
+import { NearProof } from "@/components/landing/NearProof";
 
 const STEPS = [
   { icon: Mail, title: "It talks to the institution", text: "Emails the hospital or university's verified desk, gets the estimate, the deposit deadline and the bank details." },
   { icon: Scale, title: "It knows the rules", text: "Checks your home country's regulations: limits, required forms, direct-to-institution rules. Every rule links to its source." },
   { icon: Route, title: "It picks the best route", text: "Compares bank transfer, card and cash on total cost and arrival time, and explains the trade-off in one sentence." },
-  { icon: Fingerprint, title: "You approve, it handles the rest", text: "Nothing moves without your fingerprint. Then it tracks the money, fixes returned transfers, checks the final bill and claims refunds." },
+  { icon: Wallet, title: "You approve, it handles the rest", text: "Nothing moves until you approve the exact payment in your own wallet. Then it tracks the money, checks the final bill and claims refunds." },
 ];
 
 const SAFETY = [
   { icon: BadgeCheck, title: "Verified accounts only", text: "Bank details from any email or document are checked against a verified record before money can move." },
   { icon: Ban, title: "Untrusted content stays data", text: "Instructions hidden in invoices or look-alike emails are flagged, never followed." },
   { icon: FileSignature, title: "Rules as code", text: "Limits and forms live in versioned rule files, so a policy change is one line, not a new app." },
-  { icon: Link2, title: "Tamper-evident log", text: "Every action is SHA-256 hash-chained and anchored on a public blockchain at each milestone. Anyone can verify it." },
-  { icon: Banknote, title: "Money needs you", text: "A separate safety layer re-checks every payment the AI proposes. The AI cannot override it." },
-  { icon: OctagonX, title: "Emergency stop", text: "One switch pauses everything instantly." },
+  { icon: Link2, title: "Tamper-evident log", text: "Every action is SHA-256 hash-chained, and the chain's head is anchored on the NEAR vault at each milestone. Any later edit is detected." },
+  { icon: KeyRound, title: "A key that can only propose", text: "The agent's NEAR key may call three vault methods. It cannot approve, withdraw, move tokens, add payees or change its own permissions." },
+  { icon: OctagonX, title: "Emergency stop", text: "Pause the vault or switch the agent off from your wallet. Pending proposals are released at once." },
 ];
 
 export default function Landing() {
@@ -57,12 +58,14 @@ export default function Landing() {
         </div>
       </section>
 
+      <NearProof />
+
       <ImpactPanel />
 
       <section className="bg-[#0b1312] text-[#e9f1ee]">
         <div className="mx-auto max-w-6xl px-5 py-16">
           <h2 className="text-[28px] font-bold tracking-tight">Safe by construction</h2>
-          <p className="mt-2 max-w-2xl text-[15px] text-[#a6b8b3]">The AI proposes. Deterministic code and your fingerprint decide.</p>
+          <p className="mt-2 max-w-2xl text-[15px] text-[#a6b8b3]">The AI proposes. Deterministic code, the NEAR vault and your own wallet decide.</p>
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {SAFETY.map((s) => (
               <div key={s.title} className="rounded-[var(--radius)] border border-[#213230] bg-[#111b1a] p-5">
@@ -80,9 +83,9 @@ export default function Landing() {
         <p className="mt-2 max-w-2xl text-[15px] text-ink-2">Each country&apos;s regulations are a rules file. The agent stays the same.</p>
         <div className="mt-8 grid gap-4 md:grid-cols-2">
           <Corridor from="PK" to="TH" title="Pakistan → Thailand · medical treatment" rules="SBP: USD 50,000 per case direct to hospital, Appendix V-68 form, card tax 0.5% from July 2026" />
-          <Corridor from="CN" to="GB" title="China → United Kingdom · university fees" rules="SAFE: USD 50,000 yearly quota, above it with proof of tuition, no 蚂蚁搬家 splitting" />
+          <Corridor from="CN" to="GB" title="China → United Kingdom · university fees" rules="SAFE: USD 50,000 yearly quota, above it with proof of tuition, no splitting across relatives' quotas" />
           <Corridor from="PK" to="GB" title="Pakistan → United Kingdom · an offer through an agent" rules="No tuition until the university itself confirms the admission; fees only to its own account" />
-          <Corridor from="CN" to="GB" title="China → United Kingdom · a 留学中介 promises 保录取" rules="Same check, plus no buying pounds in relatives' names to dodge the quota" />
+          <Corridor from="CN" to="GB" title="China → United Kingdom · a study agent promises guaranteed admission" rules="Same check, plus no buying pounds in relatives' names to dodge the quota" />
         </div>
         <p className="mt-4 text-[13.5px] text-ink-2">
           Or upload any hospital or university bill from 13 countries: Kinwarden prices it under your home country&apos;s rules at once, and pays only after the bank has verified the institution.
@@ -92,7 +95,7 @@ export default function Landing() {
       <footer className="border-t border-line">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-3 px-5 py-6 text-[12.5px] text-ink-3">
           <Logo mark />
-          <span>Kinwarden sandbox. Institutions are fictional; rates are illustrative. Regulations are cited with their sources and status.</span>
+          <span>Kinwarden on NEAR testnet. Institutions are fictional, tUSDC has no value and rates are illustrative. Regulations are cited with their sources and status.</span>
           <span className="ml-auto flex gap-3">
             <Link href="/hospital" className="hover:text-ink">
               Institution desk

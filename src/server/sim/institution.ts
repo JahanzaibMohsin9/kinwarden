@@ -39,8 +39,8 @@ interface Profile {
 }
 
 const PROFILES: Record<string, Profile> = {
-  srh: { desk: "SRH International Patient Services", billing: "Patient Billing", tz: "Asia/Bangkok", subjectName: "Mr. Tariq Mahmood", subjectRef: "HN 66-014382", refLabel: "HN" },
-  kgu: { desk: "Kingsgate Student Finance", billing: "Student Finance Office", tz: "Europe/London", subjectName: "Lin Yuxuan", subjectRef: "KG2601847", refLabel: "Student ID" },
+  srh: { desk: "SRH International Patient Services", billing: "Patient Billing", tz: "Asia/Bangkok", subjectName: "Mr. Daniel Hart", subjectRef: "HN 66-014382", refLabel: "HN" },
+  kgu: { desk: "Kingsgate Student Finance", billing: "Student Finance Office", tz: "Europe/London", subjectName: "Emily Lane", subjectRef: "KG2601847", refLabel: "Student ID" },
 };
 
 const money = (cur: string, n: number) => `${cur} ${n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -199,7 +199,7 @@ const HANDLERS: Record<Intent, (c: ReplyCtx) => Answer | null> = {
       caseId: c.caseId,
       kind: "admission_letter",
       title: "Offer of admission: MSc Data Science",
-      text: "KINGSGATE UNIVERSITY: UNCONDITIONAL OFFER OF ADMISSION\nStudent: Lin Yuxuan   Student ID: KG2601847\nProgramme: MSc Data Science (full-time, 12 months)\nStart date: 18 January 2027\nThis letter confirms your place on the programme.",
+      text: "KINGSGATE UNIVERSITY: UNCONDITIONAL OFFER OF ADMISSION\nStudent: Emily Lane   Student ID: KG2601847\nProgramme: MSc Data Science (full-time, 12 months)\nStart date: 18 January 2027\nThis letter confirms your place on the programme.",
       fields: { studentId: "KG2601847", programme: "MSc Data Science" },
       origin: "institution",
     });
@@ -208,7 +208,7 @@ const HANDLERS: Record<Intent, (c: ReplyCtx) => Answer | null> = {
       institutionId: "kgu",
       kind: "fee_statement",
       title: "Fee statement",
-      patientName: "Lin Yuxuan",
+      patientName: "Emily Lane",
       patientRef: "KG2601847",
       lineItems: [
         { description: "Tuition fee 2026/27, instalment 1 of 2", amount: 14875 },
