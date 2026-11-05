@@ -19,12 +19,12 @@
     "reserved": "0",
     "in_flight": "0",
     "paid": "0",
-    "created_at": "1793890908398363777",
+    "created_at": "1793905499149446294",
     "pending": [],
     "window": [
       {
         "proposal_id": 1,
-        "at": "1793890909930213109",
+        "at": "1793905500659090827",
         "amount": "7000000000",
         "group": "Hospital",
         "counted": false
@@ -43,12 +43,12 @@
     "amount": "7000000000",
     "purpose_group": "Hospital",
     "ttl_seconds": 3600,
-    "created_at": "1793890909930213109",
-    "expires_at": "1793894509930213109",
+    "created_at": "1793905500659090827",
+    "expires_at": "1793909100659090827",
     "policy_version": 1,
     "payee_version": 2,
     "status": "Invalidated",
     "status_reason": "E_AGENT_DISABLED",
-    "updated_at": "1793890911074007355"
+    "updated_at": "1793905501802687190"
   }
 }

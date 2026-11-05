@@ -1,15 +1,15 @@
 {
   "network": "sandbox",
   "vault": "vault.sandbox",
-  "ranAt": "2026-11-05T15:01:50.820Z",
+  "ranAt": "2026-11-05T19:05:01.548Z",
   "permissions": {
     "account": "agent.sandbox",
     "observedAt": {
-      "blockHeight": 67,
-      "blockHash": "4uZbNe32oQ4eaJzHWks7Fh1bW3XCQ2HUoNh1K76CncVY"
+      "blockHeight": 64,
+      "blockHash": "Fu3YvAwqLAqN4Wgjh5wYPBw9bRb8xT1jsKS6TsLQsawv"
     },
     "appKey": {
-      "publicKey": "ed25519:4htKri9GZidc8NSbh1YDetPUHbskyumJwe4MmpC7DuZr",
+      "publicKey": "ed25519:8M7N4jpPXxHwjpCU183gf8vQxx4iDDEa8sgW8EBrFwTP",
       "kind": "FunctionCall",
       "receiver": "vault.sandbox",
       "methods": [
@@ -22,7 +22,7 @@
     },
     "otherKeys": [
       {
-        "publicKey": "ed25519:J3B5yBABNqFdn3AJ7ZStk6XwLZnxW2kChEVdhdUXG6dT",
+        "publicKey": "ed25519:8sr6SQo2smES8i6Rf6xGKSEE3KXAturaS4NBVomtoDbt",
         "kind": "FullAccess",
         "note": "Setup key held by the deployment tooling (.near/keys.json), never by the app server. It can do anything this account can, including deleting the app's key."
       }

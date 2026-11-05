@@ -1,26 +1,26 @@
 {
   "anchor": {
-    "id": "anc_mw3obn41_1",
+    "id": "anc_mw3x0vkv_1",
     "seq": 2,
-    "hash": "13313e049dcb1291ea30e683b66cda99feafc5539624f94c2d172062927b66b7",
-    "at": "2026-11-05T15:01:37.345Z",
+    "hash": "747b4d57df6625116a801964885858540fc99b57d4e2ede63950be943439e8d4",
+    "at": "2026-11-05T19:05:11.648Z",
     "simAt": "2026-11-02T02:30:00.000Z",
     "note": "payment approved",
     "chain": {
       "chainId": "near:sandbox",
       "contract": "vault.sandbox",
       "status": "confirmed",
-      "txHash": "bUKqywGxe3fEa1fqUZeXf3TLXNdrLr3aVceKotoNmrF",
-      "blockNumber": 66
+      "txHash": "tJipHaghP6QYSDccs4U5wzG1oFAAsMDtNxfq5xLevto",
+      "blockNumber": 63
     }
   },
   "clean": {
     "ok": true,
     "onChain": {
-      "head": "13313e049dcb1291ea30e683b66cda99feafc5539624f94c2d172062927b66b7",
+      "head": "747b4d57df6625116a801964885858540fc99b57d4e2ede63950be943439e8d4",
       "seq": 2,
       "label": "run001:th-medical:payment approved",
-      "blockNumber": 66,
+      "blockNumber": 63,
       "contract": "vault.sandbox"
     },
     "log": {
@@ -30,10 +30,10 @@
   "tampered": {
     "ok": false,
     "onChain": {
-      "head": "13313e049dcb1291ea30e683b66cda99feafc5539624f94c2d172062927b66b7",
+      "head": "747b4d57df6625116a801964885858540fc99b57d4e2ede63950be943439e8d4",
       "seq": 2,
       "label": "run001:th-medical:payment approved",
-      "blockNumber": 66,
+      "blockNumber": 63,
       "contract": "vault.sandbox"
     },
     "log": {

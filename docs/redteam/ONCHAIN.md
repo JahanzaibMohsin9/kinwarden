@@ -7,7 +7,7 @@ NEAR sandbox tests and the mutation checks. Do not edit by hand.
 Networks: **sandbox** is a local NEAR node (neard 2.14.0) started by the tests;
 **testnet** is the public NEAR testnet. Test tokens have no value.
 
-Tested commit: `c6e3c3c`. Vault WASM sha256: `732efbe16dc736a12e1a6be3d3edffade747439cbe259695d37c4ce229f95ff4`; token WASM sha256: `243798d400c1039b95a02c9a235fb43812872400d90b371d876d17de9322cd7f`.
+Tested commit: `0ef1291`. Vault WASM sha256: `732efbe16dc736a12e1a6be3d3edffade747439cbe259695d37c4ce229f95ff4`; token WASM sha256: `243798d400c1039b95a02c9a235fb43812872400d90b371d876d17de9322cd7f`.
 
 The testnet vault `vault.kinwarden-demo.testnet` runs code with sha256 `732efbe16dc736a12e1a6be3d3edffade747439cbe259695d37c4ce229f95ff4` (on-chain code hash `8kdSQbhVeafAumSKocaCVLn66Hkx7SkkJvF1KjmMSxYB`, read 2026-11-04): **the same build** the sandbox tests and mutation checks ran against.
 
@@ -16,12 +16,12 @@ The testnet vault `vault.kinwarden-demo.testnet` runs code with sha256 `732efbe1
 The agent's real function-call key, used directly against NEAR with Kinwarden's
 app and safety gateway bypassed, as an attacker who owns the app server would.
 
-**Key permissions** on `agent.sandbox`, read at block 67 (`4uZbNe32oQ4eaJzHWks7Fh1bW3XCQ2HUoNh1K76CncVY`):
+**Key permissions** on `agent.sandbox`, read at block 64 (`Fu3YvAwqLAqN4Wgjh5wYPBw9bRb8xT1jsKS6TsLQsawv`):
 
 | Key | Kind | May call | Gas allowance | Note |
 |---|---|---|---|---|
-| `ed25519:4htKri9GZidc8NSbh1YDetPUHbskyumJwe4MmpC7DuZr` | FunctionCall | propose_payment, sweep, anchor_log on vault.sandbox | 0.250 NEAR | The app server's key. |
-| `ed25519:J3B5yBABNqFdn3AJ7ZStk6XwLZnxW2kChEVdhdUXG6dT` | FullAccess | anything | — | Setup key held by the deployment tooling (.near/keys.json), never by the app server. It can do anything this account can, including deleting the app's key. |
+| `ed25519:8M7N4jpPXxHwjpCU183gf8vQxx4iDDEa8sgW8EBrFwTP` | FunctionCall | propose_payment, sweep, anchor_log on vault.sandbox | 0.250 NEAR | The app server's key. |
+| `ed25519:8sr6SQo2smES8i6Rf6xGKSEE3KXAturaS4NBVomtoDbt` | FullAccess | anything | — | Setup key held by the deployment tooling (.near/keys.json), never by the app server. It can do anything this account can, including deleting the app's key. |
 
 The allowance only pays transaction fees. What the agent can spend is set by the family's case limits in the vault, and nothing moves without the family's wallet approval.
 
@@ -116,7 +116,7 @@ A confirmed failure credits the hospital nothing and returns the amount and its 
 
 ## Activity-log anchor and tamper check (sandbox)
 
-The app anchored log entry #2 (head `13313e049dcb1291ea30e683b66cda99feafc5539624f94c2d172062927b66b7`) on `vault.sandbox` with the agent key: status `confirmed`, block 66.
+The app anchored log entry #2 (head `747b4d57df6625116a801964885858540fc99b57d4e2ede63950be943439e8d4`) on `vault.sandbox` with the agent key: status `confirmed`, block 63.
 Check before any edit: `ok: true`. After editing entry #2: `ok: false`, "The log was changed after it was anchored (entry #2)."
 
 ## Activity-log anchor and tamper check (testnet)
@@ -149,7 +149,7 @@ The model flagged the look-alike "new bank details" email; payments naming the f
 
 ## Targeted mutation checks
 
-Each mutation removes one hard check from the vault; `cargo test -p kinwarden-vault --quiet` must fail with it applied (commit `c6e3c3c`). This shows these tests cover these controls; it is not an audit or a coverage guarantee.
+Each mutation removes one hard check from the vault; `cargo test -p kinwarden-vault --quiet` must fail with it applied (commit `0ef1291`). This shows these tests cover these controls; it is not an audit or a coverage guarantee.
 
 | Control | Mutation caught | Failing tests |
 |---|---|---|
