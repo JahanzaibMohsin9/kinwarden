@@ -37,6 +37,7 @@
   },
   "devDependencies": {
     "@modelcontextprotocol/sdk": "^1.32.1",
+    "@phala/dcap-qvl": "0.7.0",
     "@tailwindcss/turbopack": "^4",
     "@types/d3-geo": "^3.1.0",
     "@types/node": "^24.19.2",

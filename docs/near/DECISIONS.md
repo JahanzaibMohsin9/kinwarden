@@ -282,3 +282,31 @@ Checked against the live API on 5 Nov 2026 with the team's key.
   saved in `recordings/` (model name and date inside) and replayed by
   `npm run eval:replay` through today's tools and safety gateway without
   calling a model.
+
+## D-13 Provenance of the recorded NEAR AI decisions
+
+Checked against the live API on 5 Nov 2026; the verifier is `scripts/near/verify-model.mjs`.
+
+- **Why.** Replay re-executes decisions recorded from live runs. Without proof, a reader cannot tell
+  them from decisions written by hand. NEAR AI signs each answer of its TEE-hosted models, so the
+  recordings can carry that proof.
+- **What is recorded.** For every chat completion of a NEAR AI run: the exact response bytes, the
+  SHA-256 of the exact request bytes (requests are large and repeat the prompt), and NEAR AI's
+  signature (`GET /v1/signature/{id}`, `signing_algo=ecdsa`). The client sends `x-no-aliasing: true`
+  and `Accept-Encoding: identity` and keeps the bytes before parsing, as NEAR AI's docs require. Once
+  per recording: the model's attestation report (`GET /v1/attestation/report`, `provider=near`) with
+  nonce `sha256("kinwarden:<scenario>:<recording start>")`, so it cannot be reused for another recording.
+- **What is checked.** The signed text is `model:sha256(request):sha256(answer)` for the recorded
+  answer; the EIP-191 signature recovers to the signing key (viem); that key and the nonce are the
+  report data of the model's Intel TDX quote; debug mode is off; the quote's signature chain and TCB
+  status verify against Intel's collateral (`@phala/dcap-qvl` 0.7.0, pinned; online only); and every
+  replayed tool call, with its exact arguments, is a tool call of the signed answer it points at.
+  `npm test` runs the offline part on the curated recordings.
+- **Limits, stated.** NVIDIA's GPU evidence is not checked. The request bytes are not kept, so the
+  check proves what the model answered, not the full prompt it saw. Instances of a model share one
+  signing key, so a signature does not identify the serving instance. The quote shows the key was in
+  an up-to-date TDX enclave when the recording was made; it does not prove what software ran beyond
+  what the quote measures.
+- **Effect on D-12.** D-12 said Kinwarden does not verify attestation. For the recorded runs it now
+  does, within the limits above. The privacy guarantee is unchanged: the app's gateway masks personal
+  data before any provider call.

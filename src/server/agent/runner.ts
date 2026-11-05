@@ -10,6 +10,7 @@ import { anthropicToolDefs, executeTool } from "./tools";
 import { SCRIPTS } from "./scripted";
 import { fallbackConfig, hasProviderKey, providerConfig, type ProviderConfig } from "./llm";
 import { buildVault, type Vault } from "./privacy";
+import { attestationNonce, capturingFetch, fetchAttestation, fetchSignature, type ModelAttestation, type SignedResponse } from "./provenance";
 
 /** Label of the model that Live mode will use, e.g. "DeepSeek · deepseek-v4-pro". */
 export const MODEL = providerConfig().label;
@@ -24,11 +25,15 @@ export interface RecordedStep {
   tool: string;
   input: Record<string, unknown>;
   thinking?: string;
+  /** index into the run's `signed` answers: the model answer this tool call came from (NEAR AI runs) */
+  call?: number;
 }
 export interface RecordedRun {
   triggers: { reason: string; detail?: string }[];
   steps: RecordedStep[];
   finalText?: string;
+  /** every model answer of this run with NEAR AI's signature (NEAR AI runs only) */
+  signed?: SignedResponse[];
 }
 export interface Recording {
   scenarioId: string;
@@ -36,6 +41,8 @@ export interface Recording {
   createdAt: string;
   note?: string;
   runs: RecordedRun[];
+  /** the model's attestation report, fetched once per recording with attestationNonce(scenarioId, createdAt) */
+  attestation?: ModelAttestation;
 }
 
 export function hasApiCredentials(): boolean {
@@ -172,7 +179,16 @@ export class AgentRunner {
 
   /** NEAR AI Cloud, DeepSeek and OpenAI via the Chat Completions API with function calling. */
   private async runLiveOpenAICompatible(caseId: string, triggers: Trigger[], cfg: ProviderConfig) {
-    const client = new OpenAI({ apiKey: cfg.apiKey, baseURL: cfg.baseURL, timeout: 180_000, maxRetries: 2 });
+    // NEAR AI answers are kept byte for byte with the signature its model TEE made over them
+    const capture = cfg.provider === "nearai" ? capturingFetch() : null;
+    const client = new OpenAI({
+      apiKey: cfg.apiKey,
+      baseURL: cfg.baseURL,
+      timeout: 180_000,
+      maxRetries: 2,
+      ...(capture ? { fetch: capture.fetch, defaultHeaders: { "x-no-aliasing": "true", "accept-encoding": "identity" } } : {}),
+    });
+    if (capture) await this.ensureAttestation(cfg);
     const tools: OpenAI.Chat.Completions.ChatCompletionTool[] = anthropicToolDefs().map((t) => ({
       type: "function",
       function: { name: t.name, description: t.description, parameters: t.input_schema as Record<string, unknown> },
@@ -188,7 +204,7 @@ export class AgentRunner {
 
     const usage = { calls: 0, inputTokens: 0, cachedInputTokens: 0, outputTokens: 0 };
     try {
-      await this.loopOpenAICompatible(caseId, client, cfg, tools, messages, run, usage, vault);
+      await this.loopOpenAICompatible(caseId, client, cfg, tools, messages, run, usage, vault, capture);
     } finally {
       if (usage.calls) this.store.log({ actor: "system", type: "agent.usage", caseId, data: { model: cfg.label, ...usage } });
       this.logWithheld(caseId, vault);
@@ -205,6 +221,7 @@ export class AgentRunner {
     run: RecordedRun,
     usage: { calls: number; inputTokens: number; cachedInputTokens: number; outputTokens: number },
     vault: Vault,
+    capture: ReturnType<typeof capturingFetch> | null = null,
   ) {
     for (let step = 0; step < MAX_STEPS; step++) {
       if (this.store.world.agent.killSwitch) break;
@@ -229,6 +246,15 @@ export class AgentRunner {
       usage.inputTokens += u?.prompt_tokens ?? 0;
       usage.cachedInputTokens += u?.prompt_cache_hit_tokens ?? u?.prompt_tokens_details?.cached_tokens ?? 0;
       usage.outputTokens += u?.completion_tokens ?? 0;
+      // keep the exact answer and NEAR AI's signature over it, so the recording can be checked later
+      let signedCall: number | undefined;
+      const exchange = capture?.take(response.id);
+      if (exchange) {
+        const signed = await fetchSignature(cfg.baseURL!, cfg.apiKey!, cfg.model, response.id);
+        run.signed ??= [];
+        run.signed.push({ chat_id: response.id, ...exchange, ...signed });
+        signedCall = run.signed.length - 1;
+      }
       const choice = response.choices[0];
       const msg = choice.message as OpenAI.Chat.Completions.ChatCompletionMessage & { reasoning_content?: string; reasoning?: string };
       // DeepSeek names the model's reasoning reasoning_content; several NEAR AI models call it reasoning
@@ -258,7 +284,7 @@ export class AgentRunner {
         try {
           // recorded as the model wrote it (tokens, no personal data); real values only for execution
           const input = JSON.parse(call.function.arguments || "{}") as Record<string, unknown>;
-          run.steps.push({ tool: call.function.name, input, thinking: thinking || undefined });
+          run.steps.push({ tool: call.function.name, input, thinking: thinking || undefined, ...(signedCall !== undefined ? { call: signedCall } : {}) });
           output = vault.mask(executeTool(call.function.name, vault.unmaskDeep(input), { store: this.store, caseId }));
         } catch {
           output = JSON.stringify({ error: "INVALID_JSON: the tool arguments were not valid JSON. Call the tool again with valid JSON." });
@@ -348,6 +374,22 @@ export class AgentRunner {
 
   /** Where this session's recording is saved (set once a live run has been recorded). */
   recordingFile?: string;
+
+  /**
+   * NEAR AI's attestation report for the model, once per recording, with a nonce anyone can recompute from
+   * the recording: it ties the key that signs the answers to an Intel TDX enclave at recording time.
+   */
+  private async ensureAttestation(cfg: ProviderConfig) {
+    if (!this.recording) this.resetSession();
+    const rec = this.recording!;
+    if (rec.attestation) return;
+    const att = await fetchAttestation(cfg.baseURL!, cfg.apiKey!, cfg.model, attestationNonce(rec.scenarioId, rec.createdAt));
+    if ("unavailable" in att) {
+      this.store.log({ actor: "system", type: "agent.attestation_unavailable", data: { model: cfg.label, reason: att.unavailable } });
+      return;
+    }
+    rec.attestation = att;
+  }
 
   private saveRun(run: RecordedRun, model: string) {
     if (!this.recording) this.resetSession();

@@ -39,7 +39,7 @@ can take outside `propose_payment`, `sweep` and `anchor_log`.
 They are stated rather than hidden: see "Not implemented yet" in the [README](README.md) and "What
 these tests do not show" in [docs/near/CLAIMS.md](docs/near/CLAIMS.md). In short: no recovery path
 if a settlement callback never runs; who controls the family account and whether an enrolled account
-really belongs to a hospital are off-chain questions; NEAR AI's TEE attestation is not verified.
+really belongs to a hospital are off-chain questions; NEAR AI's GPU attestation is not checked (the TDX quote behind its response signatures is).
 
 ## What is tested
 

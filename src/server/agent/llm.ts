@@ -18,7 +18,7 @@ export interface ProviderConfig {
 }
 
 const DEFAULT_MODEL: Record<Provider, string> = {
-  // NEAR AI's own deployment, which NEAR AI lists as served from its TEE infrastructure (Kinwarden does not verify attestation)
+  // NEAR AI's own deployment, served from its TEE infrastructure; its signed answers and TDX attestation are checked by scripts/near/verify-model.mjs (D-13)
   nearai: "deepseek-ai/DeepSeek-V4.1-Flash-1017",
   deepseek: "deepseek-v4-pro",
   openai: "gpt-5.4-mini",
