@@ -159,7 +159,7 @@ export function NearCaseCard({ caseId }: { caseId: string }) {
                 className="flex h-10 w-full items-center justify-center gap-2 rounded-full bg-ink text-[13px] font-semibold text-bg hover:bg-brand disabled:opacity-60"
               >
                 {busy === "connect" ? <Loader2 size={15} className="animate-spin" /> : <Wallet size={15} />}
-                {account ? `Connected as ${account}; connect ${link.owner}` : `Connect ${link.owner}'s wallet`}
+                {account ? "Connect the case owner's wallet" : "Connect your NEAR wallet"}
               </button>
             ) : (
               <>

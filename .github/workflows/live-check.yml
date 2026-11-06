@@ -37,6 +37,12 @@ jobs:
           set +e
           node scripts/near/verify.mjs
           code=$?
+          if [ "$code" -ne 1 ]; then
+            # the live NEAR AI run of 6 Nov (the demo video): its receipt and fraud-flag anchor
+            node scripts/near/verify.mjs --receipt docs/near/evidence/2026-11-06-live-receipt.json --anchor docs/near/evidence/2026-11-06-live-anchor.json
+            live=$?
+            if [ "$live" -eq 1 ] || [ "$code" -eq 0 ]; then code=$live; fi
+          fi
           set -e
           if [ "$code" -eq 2 ]; then
             # an RPC outage is not a project failure: warn and pass

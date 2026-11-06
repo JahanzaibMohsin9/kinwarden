@@ -3,6 +3,13 @@
 // stopped it (the NEAR protocol, because of the key's permissions, or the vault contract) and the
 // reason, and the run checks that no balance an attacker could gain from changed.
 import { Account, actions, JsonRpcProvider, KeyPair, type KeyPairString } from "near-api-js";
+import {
+  AccessKeyDepositWithFunctionCallActionError,
+  AccessKeyMethodNameMismatchActionError,
+  AccessKeyNotEnoughAllowanceActionError,
+  AccessKeyReceiverMismatchActionError,
+  AccessKeyRequiresFullAccessActionError,
+} from "near-api-js/rpc-errors";
 import type { NearDeployment } from "./config";
 import { refusalCode } from "./vault";
 
@@ -11,6 +18,17 @@ const YOCTO_PER_NEAR = BigInt(10) ** BigInt(24);
 
 /** Protocol-level refusals of a function-call access key, as nearcore names them. */
 const PROTOCOL_REFUSALS = ["DepositWithFunctionCall", "MethodNameMismatch", "ReceiverMismatch", "RequiresFullAccess", "NotEnoughAllowance"];
+/**
+ * The same refusals as near-api-js reports them. Matched by class, because a minified production
+ * build renames the classes and the message is free text (the RPC's raw error name is not kept).
+ */
+const PROTOCOL_ERROR_CLASSES: [new (...args: never[]) => Error, string][] = [
+  [AccessKeyDepositWithFunctionCallActionError, "DepositWithFunctionCall"],
+  [AccessKeyMethodNameMismatchActionError, "MethodNameMismatch"],
+  [AccessKeyReceiverMismatchActionError, "ReceiverMismatch"],
+  [AccessKeyRequiresFullAccessActionError, "RequiresFullAccess"],
+  [AccessKeyNotEnoughAllowanceActionError, "NotEnoughAllowance"],
+];
 
 export interface KeyReport {
   publicKey: string;
@@ -193,7 +211,9 @@ export interface BypassResult {
   tx?: string;
 }
 
-function classify(err: unknown): { refusedBy: BypassResult["refusedBy"]; reason: string; tx?: string } {
+export function classify(err: unknown): { refusedBy: BypassResult["refusedBy"]; reason: string; tx?: string } {
+  const byClass = PROTOCOL_ERROR_CLASSES.find(([cls]) => err instanceof cls)?.[1];
+  if (byClass) return { refusedBy: "protocol", reason: byClass };
   const text = err instanceof Error ? `${err.message} ${JSON.stringify(err)}` : String(err);
   const protocol = PROTOCOL_REFUSALS.find((p) => text.includes(p));
   if (protocol) return { refusedBy: "protocol", reason: protocol };

@@ -168,10 +168,23 @@ export function NearApproval({ paymentId, onDone }: { paymentId: string; onDone:
       {pending && walletNet && (
         <div className="space-y-2">
           {!rightAccount ? (
-            <button onClick={connect} disabled={busy !== null} className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink text-[14px] font-semibold text-bg hover:bg-brand disabled:opacity-60">
-              {busy === "connect" ? <Loader2 size={16} className="animate-spin" /> : <Wallet size={16} />}
-              {account ? `Connected as ${account}; connect ${owner}` : `Connect ${owner ?? "the case owner"}'s wallet`}
-            </button>
+            <>
+              <button onClick={connect} disabled={busy !== null} className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink text-[14px] font-semibold text-bg hover:bg-brand disabled:opacity-60">
+                {busy === "connect" ? <Loader2 size={16} className="animate-spin" /> : <Wallet size={16} />}
+                {account ? "Connect the case owner's wallet" : "Connect your NEAR wallet"}
+              </button>
+              <p className="break-all text-center text-[11.5px] leading-snug text-ink-3">
+                {account ? (
+                  <>
+                    Connected as <code className="text-ink-2">{account}</code>; only <code className="text-ink-2">{owner}</code> can approve.
+                  </>
+                ) : (
+                  <>
+                    Case owner: <code className="text-ink-2">{owner ?? "unknown"}</code>
+                  </>
+                )}
+              </p>
+            </>
           ) : (
             <button onClick={() => run("approve")} disabled={!canDecide || busy !== null} className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink text-[14px] font-semibold text-bg hover:bg-brand disabled:opacity-60">
               {busy === "approve" ? <Loader2 size={16} className="animate-spin" /> : <Wallet size={16} />}

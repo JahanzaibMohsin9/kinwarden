@@ -3,6 +3,7 @@
 //
 //   node scripts/near/verify.mjs
 //   node scripts/near/verify.mjs --receipt docs/near/evidence/2026-11-03-testnet-receipt.json
+//   node scripts/near/verify.mjs --receipt docs/near/evidence/2026-11-06-live-receipt.json --anchor docs/near/evidence/2026-11-06-live-anchor.json
 //   node scripts/near/verify.mjs --rpc <url> --archival-rpc <url>
 //
 // It checks, and says what each check does not show:
@@ -31,6 +32,7 @@ const RPC = arg("rpc", "https://near-testnet.drpc.org");
 const ARCHIVAL = arg("archival-rpc", "https://archival-rpc.testnet.fastnear.com");
 const RECEIPT = path.resolve(ROOT, arg("receipt", "docs/near/evidence/2026-11-03-testnet-receipt.json"));
 const EVIDENCE = path.join(ROOT, "docs/redteam/near");
+const ANCHOR = path.resolve(ROOT, arg("anchor", path.join(EVIDENCE, "anchor-testnet.json")));
 const readJson = (file) => JSON.parse(fs.readFileSync(file, "utf8"));
 
 // ---- encodings (independent of the app's code, which imports npm packages) ----
@@ -127,7 +129,7 @@ let config;
 let caseInfo;
 
 console.log(`Kinwarden NEAR evidence check — ${network}, vault ${vault}`);
-console.log(`Receipt: ${path.relative(ROOT, RECEIPT)}`);
+console.log(`Receipt: ${path.relative(ROOT, RECEIPT).replaceAll("\\", "/")}`);
 console.log(`RPC: ${RPC} (state), ${ARCHIVAL} (archived transactions)\n`);
 
 await check(
@@ -247,7 +249,7 @@ await check(
   "Activity-log anchor from the evidence is stored on the vault",
   async () => {
     config ??= await view(vault, "get_config");
-    const recorded = readJson(path.join(EVIDENCE, "anchor-testnet.json"));
+    const recorded = readJson(ANCHOR);
     const head = recorded.anchor.hash;
     const count = Number(await view(vault, "get_anchor_count", { case_id: proposal.case_id }));
     const anchors = [];

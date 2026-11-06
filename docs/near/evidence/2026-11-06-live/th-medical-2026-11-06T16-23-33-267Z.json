@@ -1,0 +1,379 @@
+{
+  "scenarioId": "th-medical",
+  "model": "NEAR AI · deepseek-ai/DeepSeek-V4.1-Flash-1017",
+  "createdAt": "2026-11-06T16:23:33.267Z",
+  "runs": [
+    {
+      "triggers": [
+        {
+          "reason": "family_message",
+          "detail": "My father [PERSON_1] (62) was admitted to Siam Riverside International Hospital in Bangkok this morning with [MEDICAL_1]. The [MEDICAL_9] says he needs an [MEDICAL_4] and maybe a [MEDICAL_7]. I'm with him as his attendant. We brought USD 10,000 cash between us and most of it is already gone on the first tests. We have his Visa debit card and his bank account at home in Pakistan. Please handle the hospital payments."
+        }
+      ],
+      "steps": [
+        {
+          "tool": "send_email",
+          "input": {
+            "to": "international@siamriverside.co.th",
+            "subject": "Admission of [PERSON_1] — fee estimate, deposit and bank details requested",
+            "body": "Dear International Patient Office,\n\nKinwarden writes on behalf of the family of [PERSON_1], a 62-year-old patient admitted to Siam Riverside International Hospital this morning with [MEDICAL_1]. The treating [MEDICAL_9] has indicated that he needs an [MEDICAL_4] and possibly a [MEDICAL_7]. His attendant, [PERSON_2], is with him at the hospital.\n\nKinwarden will handle all payments to the hospital on the family's behalf. In one reply, please send us:\n\n1. An estimate or fee statement for the planned treatment ([MEDICAL_4] and, if applicable, [MEDICAL_7]), itemised where possible.\n2. Any deposit required before treatment, with the amount and the deadline.\n3. The hospital's bank details on official letterhead: account name, account number, bank name and SWIFT/BIC.\n4. The patient's hospital number (HN), which your bank requires as the payment reference.\n5. Whether card payment is accepted and whether any surcharge applies.\n\nIf a final bill will only be issued on discharge, please confirm that and we will wait for it rather than asking again.\n\nThank you for your help — the family is with the patient and we would like to settle everything promptly.\n\nKind regards,\nKinwarden, on behalf of the family",
+            "narration": "I'm emailing the hospital's verified international office to ask for the treatment estimate, deposit and deadline, their bank details and Dad's hospital number."
+          },
+          "thinking": "The case just opened. I should contact the hospital right away through its verified email address, asking for the estimate/fee statement, deposit and deadline, bank details on official letterhead, and the reference their bank needs (HN). Then message the family briefly about what I've started and the legal route.\n\nLet me send the email to the hospital.\n\nNote: email should be one email with all questions.\n\nThen message family and add case note, schedule follow-up with skip_if institution_replied.\n\nLet me do it. First send_email to international@siamriverside.co.th.\n\nThen message_family, add_case_note, schedule_followup. These are somewhat independent but let me do email first, then the rest in one block.\n\nActually, the message family text should mention legal route: bank remittance from Pakistan under SBP medical remittance rules. Keep it short.\n\nLet me write the email.\n\nSubject: Admission of [PERSON_1] — request for fee estimate, deposit and bank details\n\nBody:\nDear Siam Riverside International Hospital International Patient Office,\n\nKinwarden writes on behalf of the family of [PERSON_1], a 62-year-old patient admitted to your hospital this morning with [MEDICAL_1]. The treating [MEDICAL_9] has indicated that he needs an [MEDICAL_4] and possibly a [MEDICAL_7].\n\nWe will handle all payments to the hospital on the family's behalf. To do this, please send us in a single reply:\n1. An estimate or fee statement for the planned treatment ([MEDICAL_4] and, if applicable, [MEDICAL_7]), itemised where possible.\n2. Any deposit you require before treatment, the amount and the deadline.\n3. The hospital's bank details on official letterhead (account name, account number, bank name, SWIFT/BIC).\n4. The patient's hospital number (HN), which your bank requires as the payment reference.\n5. Whether the hospital accepts card payment at the counter, and any surcharge.\n\nIf a final bill will only be issued at discharge, please confirm that and we will wait for it.\n\nPlease reply to this address. Thank you.\n\nKind regards,\nKinwarden, on behalf of the family\n\nGood.\n\nNow the family message: brief — we've contacted the hospital's verified international office asking for estimate, deposit, deadline, bank details and HN. Legal route: bank remittance from Pakistan under SBP medical remittance rules (up to USD 50,000 per case, needs a medical remittance application and self-declaration signed by your father in the app). We'll tell you the exact cost and what to approve once the hospital sends the estimate.\n\nAlso mention: don't pay the hospital in cash from what's left; keep receipts. Hmm, may be OK briefly.\n\nAlso the card: he has Visa debit card — could be a route. We'll compare.\n\nKeep it short under 800 chars.\n\nNote for memory.\n\nSchedule follow-up: hospital may not reply; schedule in ~24 hours with skip_if institution_replied.\n\nLet me do email first (needs to exist), then rest.",
+          "call": 0
+        },
+        {
+          "tool": "message_family",
+          "input": {
+            "text": "I've started. I've emailed Siam Riverside International Hospital's international patient office (their verified address) asking for the itemised estimate for the [MEDICAL_4] and possible [MEDICAL_7], any deposit and its deadline, their bank details on official letterhead, and Dad's hospital number (HN) which the payment must quote.\n\nPlease don't hand over any more of your cash unless the hospital asks at the counter — I'll manage the bill from here.\n\nHow we'll pay: from Dad's bank account in Pakistan, by bank transfer straight to the hospital's verified account. Under Pakistan's State Bank rules that needs a medical remittance application and a self-declaration, which I'll fill in for him and he signs in the app when he approves the payment. His Visa debit card is a backup if speed matters. Nothing moves without his approval on your phone.",
+            "importance": "action",
+            "narration": "I'm telling the family what I've started, what the legal payment route will be, and that no more cash needs to be spent."
+          },
+          "thinking": "Now message the family and add case notes.",
+          "call": 1
+        },
+        {
+          "tool": "add_case_note",
+          "input": {
+            "note": "- 2026-11-02: Case opened by family. Patient [PERSON_1] (62) at Siam Riverside Intl Hospital, Bangkok, [MEDICAL_1]; needs [MEDICAL_4], maybe [MEDICAL_7]. Attendant [PERSON_2] is with him. Family has ~USD 10k cash, mostly spent on first tests. Card [CARD_1] (patient, USD 4200 card spend this year), [CARD_2] (attendant, USD 1100).\n- Sent email mail_1 to international@siamriverside.co.th (verified) asking for: itemised estimate, deposit + deadline, bank details on official letterhead, patient HN, card/surcharge info. AWAITING REPLY.\n- No invoices in system yet; no payments proposed. Route plan: SBP medical bank remittance from Dad's PKR account (cap USD 50k this case), forms: remittance_application + self_declaration, prepared before proposing. Card is fallback. Must verify beneficiary details from hospital letterhead doc before transfer.\n- Next: read reply, then compare routes, prepare docs, propose payment.",
+            "narration": "I'm recording what I've asked the hospital and what I'm waiting for, so I don't repeat myself later."
+          },
+          "thinking": "Now message the family and add case notes.",
+          "call": 1
+        },
+        {
+          "tool": "message_family",
+          "input": {
+            "importance": "action",
+            "narration": "I'm telling the family what I've started and that no more cash needs to be spent.",
+            "text": "I've started. I emailed Siam Riverside International Hospital's verified international office asking for the itemised estimate for the [MEDICAL_4] and possible [MEDICAL_7], any deposit and its deadline, their bank details on official letterhead, and Dad's hospital number (HN) for the payment reference.\n\nPlease don't spend more of your cash unless the hospital asks at the counter — I'll handle the bill from here.\n\nHow we'll pay: a bank transfer from Dad's account in Pakistan straight to the hospital's verified account. Pakistan's State Bank requires a medical remittance form and a self-declaration — I'll fill those in and Dad signs them in the app when he approves. His Visa debit card is the backup if speed matters. Nothing moves without his approval."
+          },
+          "thinking": "Shorten the family message to under 800 chars.",
+          "call": 2
+        },
+        {
+          "tool": "schedule_followup",
+          "input": {
+            "in_hours": 20,
+            "reason": "Chase the hospital's international office if they haven't answered my request for the estimate, deposit, bank details and patient HN.",
+            "skip_if": "institution_replied",
+            "narration": "I'm setting a reminder to check back with the hospital if they haven't replied."
+          },
+          "call": 3
+        }
+      ],
+      "signed": [
+        {
+          "chat_id": "chatcmpl-9a332228-dc0c-44e1-a5d4-b84c790e19d4",
+          "request_sha256": "c5486753b1ac9d3aea8ea7c1a8d5a76f5d6745115f239f1aef88dee0e95ac94a",
+          "response_body": "{\"id\":\"chatcmpl-9a332228-dc0c-44e1-a5d4-b84c790e19d4\",\"object\":\"chat.completion\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":null,\"reasoning_content\":\"The case just opened. I should contact the hospital right away through its verified email address, asking for the estimate/fee statement, deposit and deadline, bank details on official letterhead, and the reference their bank needs (HN). Then message the family briefly about what I've started and the legal route.\\n\\nLet me send the email to the hospital.\\n\\nNote: email should be one email with all questions.\\n\\nThen message family and add case note, schedule follow-up with skip_if institution_replied.\\n\\nLet me do it. First send_email to international@siamriverside.co.th.\\n\\nThen message_family, add_case_note, schedule_followup. These are somewhat independent but let me do email first, then the rest in one block.\\n\\nActually, the message family text should mention legal route: bank remittance from Pakistan under SBP medical remittance rules. Keep it short.\\n\\nLet me write the email.\\n\\nSubject: Admission of [PERSON_1] — request for fee estimate, deposit and bank details\\n\\nBody:\\nDear Siam Riverside International Hospital International Patient Office,\\n\\nKinwarden writes on behalf of the family of [PERSON_1], a 62-year-old patient admitted to your hospital this morning with [MEDICAL_1]. The treating [MEDICAL_9] has indicated that he needs an [MEDICAL_4] and possibly a [MEDICAL_7].\\n\\nWe will handle all payments to the hospital on the family's behalf. To do this, please send us in a single reply:\\n1. An estimate or fee statement for the planned treatment ([MEDICAL_4] and, if applicable, [MEDICAL_7]), itemised where possible.\\n2. Any deposit you require before treatment, the amount and the deadline.\\n3. The hospital's bank details on official letterhead (account name, account number, bank name, SWIFT/BIC).\\n4. The patient's hospital number (HN), which your bank requires as the payment reference.\\n5. Whether the hospital accepts card payment at the counter, and any surcharge.\\n\\nIf a final bill will only be issued at discharge, please confirm that and we will wait for it.\\n\\nPlease reply to this address. Thank you.\\n\\nKind regards,\\nKinwarden, on behalf of the family\\n\\nGood.\\n\\nNow the family message: brief — we've contacted the hospital's verified international office asking for estimate, deposit, deadline, bank details and HN. Legal route: bank remittance from Pakistan under SBP medical remittance rules (up to USD 50,000 per case, needs a medical remittance application and self-declaration signed by your father in the app). We'll tell you the exact cost and what to approve once the hospital sends the estimate.\\n\\nAlso mention: don't pay the hospital in cash from what's left; keep receipts. Hmm, may be OK briefly.\\n\\nAlso the card: he has Visa debit card — could be a route. We'll compare.\\n\\nKeep it short under 800 chars.\\n\\nNote for memory.\\n\\nSchedule follow-up: hospital may not reply; schedule in ~24 hours with skip_if institution_replied.\\n\\nLet me do email first (needs to exist), then rest.\",\"tool_calls\":[{\"id\":\"chatcmpl-tool-bf2b0e6aa6ad12f1\",\"type\":\"function\",\"function\":{\"name\":\"send_email\",\"arguments\":\"{\\\"to\\\": \\\"international@siamriverside.co.th\\\", \\\"subject\\\": \\\"Admission of [PERSON_1] — fee estimate, deposit and bank details requested\\\", \\\"body\\\": \\\"Dear International Patient Office,\\\\n\\\\nKinwarden writes on behalf of the family of [PERSON_1], a 62-year-old patient admitted to Siam Riverside International Hospital this morning with [MEDICAL_1]. The treating [MEDICAL_9] has indicated that he needs an [MEDICAL_4] and possibly a [MEDICAL_7]. His attendant, [PERSON_2], is with him at the hospital.\\\\n\\\\nKinwarden will handle all payments to the hospital on the family's behalf. In one reply, please send us:\\\\n\\\\n1. An estimate or fee statement for the planned treatment ([MEDICAL_4] and, if applicable, [MEDICAL_7]), itemised where possible.\\\\n2. Any deposit required before treatment, with the amount and the deadline.\\\\n3. The hospital's bank details on official letterhead: account name, account number, bank name and SWIFT/BIC.\\\\n4. The patient's hospital number (HN), which your bank requires as the payment reference.\\\\n5. Whether card payment is accepted and whether any surcharge applies.\\\\n\\\\nIf a final bill will only be issued on discharge, please confirm that and we will wait for it rather than asking again.\\\\n\\\\nThank you for your help — the family is with the patient and we would like to settle everything promptly.\\\\n\\\\nKind regards,\\\\nKinwarden, on behalf of the family\\\", \\\"narration\\\": \\\"I'm emailing the hospital's verified international office to ask for the treatment estimate, deposit and deadline, their bank details and Dad's hospital number.\\\"}\"}}]},\"finish_reason\":\"tool_calls\",\"logprobs\":null}],\"model\":\"deepseek-ai/DeepSeek-V4.1-Flash-1017\",\"created\":1793982267,\"usage\":{\"prompt_tokens\":6581,\"total_tokens\":7645,\"completion_tokens\":1064,\"prompt_tokens_details\":{\"cached_tokens\":0,\"created_cache_tokens\":6528},\"completion_tokens_details\":{\"reasoning_tokens\":648}},\"system_fingerprint\":\"vllm-0.32.0-dp4-ep-94283194\"}",
+          "signature": {
+            "text": "deepseek-ai/DeepSeek-V4.1-Flash-1017:c5486753b1ac9d3aea8ea7c1a8d5a76f5d6745115f239f1aef88dee0e95ac94a:af061aeab7e36d069c63f5308b83b781ee82d7c390a2faa2eed8382fa9bda541",
+            "signature": "0x7193dfd0a0ceeb054363d9d9d0f3acdafbbfe8c570616bd1760ff03aa0b0342c5da3589896f7fd22be29b65da424acf0dcfdfb6671312a4285c94a09ecfcf5791b",
+            "signing_address": "0xfe0071895500a9755c18044948ab4f4e1a7f337e",
+            "signing_algo": "ecdsa",
+            "signature_kind": "provider_tee"
+          }
+        },
+        {
+          "chat_id": "chatcmpl-cee870b0-b723-442d-85d2-b20ba8cbbaae",
+          "request_sha256": "614701d86dc00ed8d99aadb2d633a4619b6183340babde1ef93fed75d961f4ec",
+          "response_body": "{\"id\":\"chatcmpl-cee870b0-b723-442d-85d2-b20ba8cbbaae\",\"object\":\"chat.completion\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":null,\"reasoning_content\":\"Now message the family and add case notes.\",\"tool_calls\":[{\"id\":\"chatcmpl-tool-875986b8a25a13c7\",\"type\":\"function\",\"function\":{\"name\":\"message_family\",\"arguments\":\"{\\\"text\\\": \\\"I've started. I've emailed Siam Riverside International Hospital's international patient office (their verified address) asking for the itemised estimate for the [MEDICAL_4] and possible [MEDICAL_7], any deposit and its deadline, their bank details on official letterhead, and Dad's hospital number (HN) which the payment must quote.\\\\n\\\\nPlease don't hand over any more of your cash unless the hospital asks at the counter — I'll manage the bill from here.\\\\n\\\\nHow we'll pay: from Dad's bank account in Pakistan, by bank transfer straight to the hospital's verified account. Under Pakistan's State Bank rules that needs a medical remittance application and a self-declaration, which I'll fill in for him and he signs in the app when he approves the payment. His Visa debit card is a backup if speed matters. Nothing moves without his approval on your phone.\\\", \\\"importance\\\": \\\"action\\\", \\\"narration\\\": \\\"I'm telling the family what I've started, what the legal payment route will be, and that no more cash needs to be spent.\\\"}\"}},{\"id\":\"chatcmpl-tool-9e0cb7767839b6a7\",\"type\":\"function\",\"function\":{\"name\":\"add_case_note\",\"arguments\":\"{\\\"note\\\": \\\"- 2026-11-02: Case opened by family. Patient [PERSON_1] (62) at Siam Riverside Intl Hospital, Bangkok, [MEDICAL_1]; needs [MEDICAL_4], maybe [MEDICAL_7]. Attendant [PERSON_2] is with him. Family has ~USD 10k cash, mostly spent on first tests. Card [CARD_1] (patient, USD 4200 card spend this year), [CARD_2] (attendant, USD 1100).\\\\n- Sent email mail_1 to international@siamriverside.co.th (verified) asking for: itemised estimate, deposit + deadline, bank details on official letterhead, patient HN, card/surcharge info. AWAITING REPLY.\\\\n- No invoices in system yet; no payments proposed. Route plan: SBP medical bank remittance from Dad's PKR account (cap USD 50k this case), forms: remittance_application + self_declaration, prepared before proposing. Card is fallback. Must verify beneficiary details from hospital letterhead doc before transfer.\\\\n- Next: read reply, then compare routes, prepare docs, propose payment.\\\", \\\"narration\\\": \\\"I'm recording what I've asked the hospital and what I'm waiting for, so I don't repeat myself later.\\\"}\"}}]},\"finish_reason\":\"tool_calls\",\"logprobs\":null}],\"model\":\"deepseek-ai/DeepSeek-V4.1-Flash-1017\",\"created\":1793982289,\"usage\":{\"prompt_tokens\":7020,\"total_tokens\":7622,\"completion_tokens\":602,\"prompt_tokens_details\":{\"cached_tokens\":6528,\"created_cache_tokens\":448},\"completion_tokens_details\":{\"reasoning_tokens\":9}},\"system_fingerprint\":\"vllm-0.32.0-dp4-ep-94283194\"}",
+          "signature": {
+            "text": "deepseek-ai/DeepSeek-V4.1-Flash-1017:614701d86dc00ed8d99aadb2d633a4619b6183340babde1ef93fed75d961f4ec:7d4cafeb26857ce83123e5c7d828d99b24ad05f7b34fd1c34f9dc1d9546ec3d2",
+            "signature": "0x68bc6bd38588c4ab6c6fba6ccb196037bcd17bb94b9b739cc52c873f18ee1c7972851919cfb6867f1679ab045a77850e1efd30f84b69e0855839e0f8461241c91b",
+            "signing_address": "0xfe0071895500a9755c18044948ab4f4e1a7f337e",
+            "signing_algo": "ecdsa",
+            "signature_kind": "provider_tee"
+          }
+        },
+        {
+          "chat_id": "chatcmpl-a13ff7b0-b09a-4897-a7bb-81a904470d5d",
+          "request_sha256": "3d31aa8712816afb8df658982123af8098ebd9f4ce8921b6adc96297dfe39c10",
+          "response_body": "{\"id\":\"chatcmpl-a13ff7b0-b09a-4897-a7bb-81a904470d5d\",\"object\":\"chat.completion\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":null,\"reasoning_content\":\"Shorten the family message to under 800 chars.\",\"tool_calls\":[{\"id\":\"chatcmpl-tool-b6684ac7df270a18\",\"type\":\"function\",\"function\":{\"name\":\"message_family\",\"arguments\":\"{\\\"importance\\\": \\\"action\\\", \\\"narration\\\": \\\"I'm telling the family what I've started and that no more cash needs to be spent.\\\", \\\"text\\\": \\\"I've started. I emailed Siam Riverside International Hospital's verified international office asking for the itemised estimate for the [MEDICAL_4] and possible [MEDICAL_7], any deposit and its deadline, their bank details on official letterhead, and Dad's hospital number (HN) for the payment reference.\\\\n\\\\nPlease don't spend more of your cash unless the hospital asks at the counter — I'll handle the bill from here.\\\\n\\\\nHow we'll pay: a bank transfer from Dad's account in Pakistan straight to the hospital's verified account. Pakistan's State Bank requires a medical remittance form and a self-declaration — I'll fill those in and Dad signs them in the app when he approves. His Visa debit card is the backup if speed matters. Nothing moves without his approval.\\\"}\"}}]},\"finish_reason\":\"tool_calls\",\"logprobs\":null}],\"model\":\"deepseek-ai/DeepSeek-V4.1-Flash-1017\",\"created\":1793982303,\"usage\":{\"prompt_tokens\":7661,\"total_tokens\":7920,\"completion_tokens\":259,\"prompt_tokens_details\":{\"cached_tokens\":6976,\"created_cache_tokens\":640},\"completion_tokens_details\":{\"reasoning_tokens\":11}},\"system_fingerprint\":\"vllm-0.32.0-dp4-ep-94283194\"}",
+          "signature": {
+            "text": "deepseek-ai/DeepSeek-V4.1-Flash-1017:3d31aa8712816afb8df658982123af8098ebd9f4ce8921b6adc96297dfe39c10:c9817221c2b0db04ebe43195b7a99b5391e87b8eabe7f33f4f0e22b863ffec97",
+            "signature": "0x87563e7f1746a445312baa497ea99bbdd11fbe6d11dc45174907420765ac982638ba5cf80b28dd316bbca47258a63470db63fa6ed4f530cc65bb35655bb11b211c",
+            "signing_address": "0xfe0071895500a9755c18044948ab4f4e1a7f337e",
+            "signing_algo": "ecdsa",
+            "signature_kind": "provider_tee"
+          }
+        },
+        {
+          "chat_id": "chatcmpl-cb390dbe-8802-4c6e-b21f-dbe6381c048c",
+          "request_sha256": "b9052c54f7a27f51ffdd7acfc1a74a03235f26b527e87f8fd3f16e295b3ba983",
+          "response_body": "{\"id\":\"chatcmpl-cb390dbe-8802-4c6e-b21f-dbe6381c048c\",\"object\":\"chat.completion\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":null,\"tool_calls\":[{\"id\":\"chatcmpl-tool-b42d4b0d461a36ac\",\"type\":\"function\",\"function\":{\"name\":\"schedule_followup\",\"arguments\":\"{\\\"in_hours\\\": 20, \\\"reason\\\": \\\"Chase the hospital's international office if they haven't answered my request for the estimate, deposit, bank details and patient HN.\\\", \\\"skip_if\\\": \\\"institution_replied\\\", \\\"narration\\\": \\\"I'm setting a reminder to check back with the hospital if they haven't replied.\\\"}\"}}]},\"finish_reason\":\"tool_calls\",\"logprobs\":null}],\"model\":\"deepseek-ai/DeepSeek-V4.1-Flash-1017\",\"created\":1793982309,\"usage\":{\"prompt_tokens\":7933,\"total_tokens\":8070,\"completion_tokens\":137,\"prompt_tokens_details\":{\"cached_tokens\":7616,\"created_cache_tokens\":256},\"completion_tokens_details\":{\"reasoning_tokens\":0}},\"system_fingerprint\":\"vllm-0.32.0-dp4-ep-94283194\"}",
+          "signature": {
+            "text": "deepseek-ai/DeepSeek-V4.1-Flash-1017:b9052c54f7a27f51ffdd7acfc1a74a03235f26b527e87f8fd3f16e295b3ba983:991b2db73ad2855abefcb4ce6a5ec2c9b19a19d0cfb4c90e26e324225e5d9867",
+            "signature": "0xf5be7fb0ddc4fd226f626a96fb176c43198fb6a0aa6477b77b3ca34b721c39874d90f448729098491df84e42f91683be4756748369d00be81d66cf857c3eb2ef1b",
+            "signing_address": "0xfe0071895500a9755c18044948ab4f4e1a7f337e",
+            "signing_algo": "ecdsa",
+            "signature_kind": "provider_tee"
+          }
+        },
+        {
+          "chat_id": "chatcmpl-4fda2d78-3729-4b7e-b3db-0f443d8acc63",
+          "request_sha256": "dc791bee4a657528f0adf7e20211b35d04cc64ad441e2b9cff50284fb317852f",
+          "response_body": "{\"id\":\"chatcmpl-4fda2d78-3729-4b7e-b3db-0f443d8acc63\",\"object\":\"chat.completion\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I've opened Dad's case and started the work.\\n\\n**What I did:** emailed the hospital's verified international patient office in one go, asking for the itemised estimate (the [MEDICAL_4] and any [MEDICAL_7]), the deposit and its deadline, their bank details on official letterhead, and Dad's hospital number (HN) — which their bank needs as the payment reference. I told the family briefly what to expect, asked them to stop spending their own cash at the counter, and explained the route: a State Bank of Pakistan medical remittance from Dad's account, with the application and self-declaration forms prepared for his signature in the app, and his Visa debit card as backup if speed matters.\\n\\n**Waiting on:** the hospital's reply. I've scheduled one follow-up for ~20 hours from now, which will skip automatically if they answer first.\\n\\n**Next when they reply:** read the estimate, compare payment routes (cheapest legal route that arrives before the deposit deadline), verify the hospital's bank details against the registry using their letterhead document, prepare the SBP forms, and propose the payment for Dad's biometric approval.\"},\"finish_reason\":\"stop\",\"logprobs\":null}],\"model\":\"deepseek-ai/DeepSeek-V4.1-Flash-1017\",\"created\":1793982312,\"usage\":{\"prompt_tokens\":8119,\"total_tokens\":8357,\"completion_tokens\":238,\"prompt_tokens_details\":{\"cached_tokens\":8064,\"created_cache_tokens\":0},\"completion_tokens_details\":{\"reasoning_tokens\":0}},\"system_fingerprint\":\"vllm-0.32.0-dp4-ep-94283194\"}",
+          "signature": {
+            "text": "deepseek-ai/DeepSeek-V4.1-Flash-1017:dc791bee4a657528f0adf7e20211b35d04cc64ad441e2b9cff50284fb317852f:35328e12a1ff1eb771591acebf2a3fb5a5df401cdf57ac5aad7eb9520c87e1ab",
+            "signature": "0x54867af3b0e6d1e6f4c08a6aa4e7cdff417beb8d0e2dd3677877230455f3f6f2784120f6358c331be552075d19481ea8b0c7d8c2dbd3f26cd1dfa51f2840d6541b",
+            "signing_address": "0xfe0071895500a9755c18044948ab4f4e1a7f337e",
+            "signing_algo": "ecdsa",
+            "signature_kind": "provider_tee"
+          }
+        }
+      ],
+      "finalText": "I've opened Dad's case and started the work.\n\n**What I did:** emailed the hospital's verified international patient office in one go, asking for the itemised estimate (the [MEDICAL_4] and any [MEDICAL_7]), the deposit and its deadline, their bank details on official letterhead, and Dad's hospital number (HN) — which their bank needs as the payment reference. I told the family briefly what to expect, asked them to stop spending their own cash at the counter, and explained the route: a State Bank of Pakistan medical remittance from Dad's account, with the application and self-declaration forms prepared for his signature in the app, and his Visa debit card as backup if speed matters.\n\n**Waiting on:** the hospital's reply. I've scheduled one follow-up for ~20 hours from now, which will skip automatically if they answer first.\n\n**Next when they reply:** read the estimate, compare payment routes (cheapest legal route that arrives before the deposit deadline), verify the hospital's bank details against the registry using their letterhead document, prepare the SBP forms, and propose the payment for Dad's biometric approval."
+    },
+    {
+      "triggers": [
+        {
+          "reason": "mail_received",
+          "detail": "Re: Admission of [PERSON_1] — fee estimate, deposit and bank details requested"
+        }
+      ],
+      "steps": [
+        {
+          "tool": "read_email",
+          "input": {
+            "mail_id": "mail_2",
+            "narration": "Reading the hospital's reply about the estimate, deposit and bank details."
+          },
+          "call": 0
+        },
+        {
+          "tool": "read_document",
+          "input": {
+            "document_id": "doc_1",
+            "narration": "Reading the hospital's treatment estimate and deposit request."
+          },
+          "call": 0
+        },
+        {
+          "tool": "read_document",
+          "input": {
+            "document_id": "doc_2",
+            "narration": "Reading the hospital's bank account confirmation letter."
+          },
+          "call": 0
+        },
+        {
+          "tool": "verify_beneficiary",
+          "input": {
+            "account_name": "Siam Riverside Hospital Co., Ltd.",
+            "account_number": "101-3-58821-7",
+            "swift": "BKCBTHBK",
+            "source_document_id": "doc_2",
+            "narration": "Checking the hospital's bank account against the verified registry before any money is sent."
+          },
+          "thinking": "Now verify beneficiary details and compare payment routes.",
+          "call": 1
+        },
+        {
+          "tool": "compare_payment_routes",
+          "input": {
+            "invoice_id": "inv_1",
+            "payer_id": "[PERSON_ID_1]",
+            "amount": 250000,
+            "narration": "Comparing the legal ways to pay the THB 250,000 deposit and what each costs."
+          },
+          "thinking": "Now verify beneficiary details and compare payment routes.",
+          "call": 1
+        },
+        {
+          "tool": "prepare_documents",
+          "input": {
+            "kinds": [
+              "remittance_application",
+              "self_declaration"
+            ],
+            "invoice_id": "inv_1",
+            "payer_id": "[PERSON_ID_1]",
+            "amount": 250000,
+            "narration": "Filling in Pakistan's medical remittance form and self-declaration for Dad to sign in the app."
+          },
+          "thinking": "Bank details verified. Bank transfer is cheapest (PKR 2,176,624) and arrives 4 Nov — meets 5 Nov deadline. Good.\n\nNow prepare documents (remittance_application + self_declaration) then propose payment.\n\nLet me prepare documents.",
+          "call": 2
+        },
+        {
+          "tool": "propose_payment",
+          "input": {
+            "invoice_id": "inv_1",
+            "route": "bank_transfer",
+            "amount": 250000,
+            "payer_id": "[PERSON_ID_1]",
+            "reference": "HN [PATIENT_REF_1]",
+            "beneficiary": {
+              "account_name": "Siam Riverside Hospital Co., Ltd.",
+              "account_number": "101-3-58821-7",
+              "swift": "BKCBTHBK",
+              "bank_name": "Bangkok Commercial Bank"
+            },
+            "rationale": "The hospital's deposit of THB 250,000 is due before the [MEDICAL_4] on 5 November. The bank transfer from Dad's account is the cheapest legal route at about PKR 2,176,624 (≈ USD 7,737) in total and arrives on 4 November, one day before the deadline. It uses about USD 7,625 of his USD 50,000 medical remittance allowance. The Visa card would be about PKR 44,000 more expensive. The hospital's account was checked against the verified registry and matches. Dad signs the Pakistan medical remittance form and self-declaration in the app when he approves.",
+            "narration": "Requesting Dad's approval to send the THB 250,000 hospital deposit by bank transfer from his account."
+          },
+          "thinking": "Now propose payment. Route: bank_transfer, amount 250000 THB, payer [PERSON_ID_1], reference \"HN [PATIENT_REF_1]\", beneficiary details.\n\nRationale in family's language (English).\n\nTotal cost PKR 2,176,624 (~USD 7,737), arrives 4 Nov, before 5 Nov deadline.\n\nLet me propose.",
+          "call": 3
+        },
+        {
+          "tool": "cancel_followup",
+          "input": {
+            "followup_id": "sch_2",
+            "why": "The hospital replied with the estimate, deposit deadline and bank details, so there is nothing to chase.",
+            "narration": "Cancelling the reminder to chase the hospital — they have answered."
+          },
+          "thinking": "Now cancel sch_2 (they replied), message family, add case note, schedule followup for payment not approved? Set skip_if approval_decided with in_hours maybe 20 (before deadline). Actually if approved, payment_completed event wakes me. If declined, approval_decided wakes me. So the followup for approval is somewhat redundant. But if they don't act, nothing wakes me until deadline. Schedule in_hours=20 with skip_if approval_decided — that's 2026-11-03T00:00, before 4 Nov arrival. That leaves time. Good.\n\nThen add case note.",
+          "call": 4
+        },
+        {
+          "tool": "schedule_followup",
+          "input": {
+            "in_hours": 20,
+            "reason": "Check whether Dad has approved the THB 250,000 deposit payment; it needs to be approved soon enough to arrive before the 5 November deadline.",
+            "skip_if": "approval_decided",
+            "narration": "Setting a reminder to make sure the deposit approval does not slip past the deadline."
+          },
+          "thinking": "Now cancel sch_2 (they replied), message family, add case note, schedule followup for payment not approved? Set skip_if approval_decided with in_hours maybe 20 (before deadline). Actually if approved, payment_completed event wakes me. If declined, approval_decided wakes me. So the followup for approval is somewhat redundant. But if they don't act, nothing wakes me until deadline. Schedule in_hours=20 with skip_if approval_decided — that's 2026-11-03T00:00, before 4 Nov arrival. That leaves time. Good.\n\nThen add case note.",
+          "call": 4
+        },
+        {
+          "tool": "message_family",
+          "input": {
+            "text": "Good news — the hospital has answered with everything we asked for.\n\nThe estimate is THB 420,000 in total. They need a deposit of THB 250,000 before Dad's [MEDICAL_4], due by the morning of 5 November, and they confirmed nothing else is due before discharge (expected around 8 November, when they'll send the final bill).\n\nThe cheapest way to pay: a bank transfer from Dad's account in Pakistan, about PKR 2,176,624 in total (≈ USD 7,737). It arrives on 4 November, a day before the deadline. Their bank account matches the verified registry, so it's safe to send to.\n\nI've put the payment on Dad's phone for approval — he just needs to approve it with his fingerprint. The two Pakistan forms are filled in and he signs them at the same time. The Visa card would be about PKR 44,000 more, so it's only the backup.",
+            "importance": "action",
+            "narration": "Telling the family the deposit amount, cost, deadline and that Dad needs to approve it on his phone."
+          },
+          "call": 5
+        },
+        {
+          "tool": "add_case_note",
+          "input": {
+            "note": "- 2026-11-02: Hospital replied (mail_2, verified sender). Estimate SRH-DEP-0001: THB 420,000 total; deposit THB 250,000 due 2026-11-05 02:01 UTC before [MEDICAL_4]. Final itemised bill will come by email on discharge, expected ~8 Nov. Deposits received so far THB 0. Contacts 2 working days for intl transfer.\n- Bank details doc_2 (bank letter): Bangkok Commercial Bank, Siam Riverside Hospital Co., Ltd., 101-3-58821-7, BKCBTHBK. verify_beneficiary = MATCH. Docs say \"we never change our bank details by email\".\n- Routes on THB 250,000: bank_transfer PKR 2,176,624 (cheapest, arrives 4 Nov, meets deadline, needs remittance_application + self_declaration, uses USD 7,625 of USD 50k SBP medical cap); card PKR 2,220,690 (+PKR 44k); carried_cash blocked (patient already abroad, >$5k).\n- Prepared doc_3 (remittance_application V-68) + doc_4 (self_declaration). Proposed pay_1 via bank_transfer, ref \"HN [PATIENT_REF_1]\", payer [PERSON_ID_1]. AWAITING FAMILY APPROVAL (apr_1).\n- Cancelled sch_2 (chase). New sch_3 2026-11-03T00:01 skip_if approval_decided.\n- Next: on approval -> watch payment_completed; on return, fix & resubmit. After discharge final bill: reconcile_bill vs payments, dispute duplicates, refund any excess deposit to source account.",
+            "narration": "Noting the hospital's figures, verified bank details and the payment now waiting for Dad's approval."
+          },
+          "call": 5
+        },
+        {
+          "tool": "message_family",
+          "input": {
+            "text": "The hospital has answered with everything we asked for.\n\nThe estimate is THB 420,000 in total. They need a deposit of THB 250,000 before Dad's [MEDICAL_4], due by the morning of 5 November. Nothing else is due before discharge (~8 November), when they'll send the final bill.\n\nCheapest way: a bank transfer from Dad's account in Pakistan, about PKR 2,176,624 in total (≈ USD 7,737). It arrives on 4 November, a day before the deadline, and their account matches the verified registry. The Visa card would cost about PKR 44,000 more, so it stays the backup.\n\nThe payment is now on Dad's phone — he just needs to approve it with his fingerprint. The two Pakistan forms are filled in and he signs them at the same time.",
+            "importance": "action",
+            "narration": "Telling the family the deposit amount, cost, deadline and that Dad needs to approve it on his phone."
+          },
+          "thinking": "The message was too long. Shorten it.",
+          "call": 6
+        }
+      ],
+      "signed": [
+        {
+          "chat_id": "chatcmpl-5bc35cf2-35e8-40bf-b310-c9ab44e77d32",
+          "request_sha256": "c0999fcbd68b661b73e797ad9d0bbb4fb5890f3d993ac87cbbcae1798c837f03",
+          "response_body": "{\"id\":\"chatcmpl-5bc35cf2-35e8-40bf-b310-c9ab44e77d32\",\"object\":\"chat.completion\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"I'll start by reading the hospital's reply and the attached documents.\\n\\n\",\"tool_calls\":[{\"id\":\"chatcmpl-tool-97cf419598ee926d\",\"type\":\"function\",\"function\":{\"name\":\"read_email\",\"arguments\":\"{\\\"mail_id\\\": \\\"mail_2\\\", \\\"narration\\\": \\\"Reading the hospital's reply about the estimate, deposit and bank details.\\\"}\"}},{\"id\":\"chatcmpl-tool-8025b88b62df5423\",\"type\":\"function\",\"function\":{\"name\":\"read_document\",\"arguments\":\"{\\\"document_id\\\": \\\"doc_1\\\", \\\"narration\\\": \\\"Reading the hospital's treatment estimate and deposit request.\\\"}\"}},{\"id\":\"chatcmpl-tool-838e6574bef8754d\",\"type\":\"function\",\"function\":{\"name\":\"read_document\",\"arguments\":\"{\\\"document_id\\\": \\\"doc_2\\\", \\\"narration\\\": \\\"Reading the hospital's bank account confirmation letter.\\\"}\"}}]},\"finish_reason\":\"tool_calls\",\"logprobs\":null}],\"model\":\"deepseek-ai/DeepSeek-V4.1-Flash-1017\",\"created\":1793982350,\"usage\":{\"prompt_tokens\":7558,\"total_tokens\":7755,\"completion_tokens\":197,\"prompt_tokens_details\":{\"cached_tokens\":0,\"created_cache_tokens\":7552},\"completion_tokens_details\":{\"reasoning_tokens\":0}},\"system_fingerprint\":\"vllm-0.32.0-dp4-ep-94283194\"}",
+          "signature": {
+            "text": "deepseek-ai/DeepSeek-V4.1-Flash-1017:c0999fcbd68b661b73e797ad9d0bbb4fb5890f3d993ac87cbbcae1798c837f03:3f9807d17ea260fc61470941726c85c7c01649288df4a449e3d449e1a578912f",
+            "signature": "0xb1dfe3f8f3b7810e72e249bd0a695b7bd765c773c44c3da859eddece13b3f00c04ef4076d7f346fbf020f14d379a54522b385ba4ac4ec90410290df24e90d4771c",
+            "signing_address": "0xfe0071895500a9755c18044948ab4f4e1a7f337e",
+            "signing_algo": "ecdsa",
+            "signature_kind": "provider_tee"
+          }
+        },
+        {
+          "chat_id": "chatcmpl-8763da21-1ca2-442c-b8e0-4db5c457fa0f",
+          "request_sha256": "701bd79cda9eae43726cc34ee2f4b7cb4887beb8ad6ec0b22275141e8e252b66",
+          "response_body": "{\"id\":\"chatcmpl-8763da21-1ca2-442c-b8e0-4db5c457fa0f\",\"object\":\"chat.completion\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"The hospital's reply answers everything. Now I'll verify their bank details and price the payment routes.\\n\\n\",\"reasoning_content\":\"Now verify beneficiary details and compare payment routes.\",\"tool_calls\":[{\"id\":\"chatcmpl-tool-83748372ee3a0bc4\",\"type\":\"function\",\"function\":{\"name\":\"verify_beneficiary\",\"arguments\":\"{\\\"account_name\\\": \\\"Siam Riverside Hospital Co., Ltd.\\\", \\\"account_number\\\": \\\"101-3-58821-7\\\", \\\"swift\\\": \\\"BKCBTHBK\\\", \\\"source_document_id\\\": \\\"doc_2\\\", \\\"narration\\\": \\\"Checking the hospital's bank account against the verified registry before any money is sent.\\\"}\"}},{\"id\":\"chatcmpl-tool-9755143b7a86a555\",\"type\":\"function\",\"function\":{\"name\":\"compare_payment_routes\",\"arguments\":\"{\\\"invoice_id\\\": \\\"inv_1\\\", \\\"payer_id\\\": \\\"[PERSON_ID_1]\\\", \\\"amount\\\": 250000, \\\"narration\\\": \\\"Comparing the legal ways to pay the THB 250,000 deposit and what each costs.\\\"}\"}}]},\"finish_reason\":\"tool_calls\",\"logprobs\":null}],\"model\":\"deepseek-ai/DeepSeek-V4.1-Flash-1017\",\"created\":1793982360,\"usage\":{\"prompt_tokens\":8747,\"total_tokens\":9028,\"completion_tokens\":281,\"prompt_tokens_details\":{\"cached_tokens\":7552,\"created_cache_tokens\":1152},\"completion_tokens_details\":{\"reasoning_tokens\":9}},\"system_fingerprint\":\"vllm-0.32.0-dp4-ep-94283194\"}",
+          "signature": {
+            "text": "deepseek-ai/DeepSeek-V4.1-Flash-1017:701bd79cda9eae43726cc34ee2f4b7cb4887beb8ad6ec0b22275141e8e252b66:ab9d2530ecf3ea57cc556d86757dcc4cd1b04f3c683b65ae2bf6f3420a1bec09",
+            "signature": "0x1eb574a02c925ba258fa6023dbd70c1720938d89e34c9f4503f16b861520120d231db6ed3e81f2634e155657f3c0e370ae123f36f9bf31b20c982d62183ac7be1b",
+            "signing_address": "0xfe0071895500a9755c18044948ab4f4e1a7f337e",
+            "signing_algo": "ecdsa",
+            "signature_kind": "provider_tee"
+          }
+        },
+        {
+          "chat_id": "chatcmpl-75386d5e-4d72-4336-8406-46f95a1808e5",
+          "request_sha256": "1540920d70ffff53d5cc2d390efeefd8b811085fbdcac60191eb114fa396b2fe",
+          "response_body": "{\"id\":\"chatcmpl-75386d5e-4d72-4336-8406-46f95a1808e5\",\"object\":\"chat.completion\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Bank details check out. The bank transfer is cheapest and arrives in time — I'll prepare the Pakistan regulatory forms.\\n\\n\",\"reasoning_content\":\"Bank details verified. Bank transfer is cheapest (PKR 2,176,624) and arrives 4 Nov — meets 5 Nov deadline. Good.\\n\\nNow prepare documents (remittance_application + self_declaration) then propose payment.\\n\\nLet me prepare documents.\",\"tool_calls\":[{\"id\":\"chatcmpl-tool-b5045b63d7af4798\",\"type\":\"function\",\"function\":{\"name\":\"prepare_documents\",\"arguments\":\"{\\\"kinds\\\": [\\\"remittance_application\\\", \\\"self_declaration\\\"], \\\"invoice_id\\\": \\\"inv_1\\\", \\\"payer_id\\\": \\\"[PERSON_ID_1]\\\", \\\"amount\\\": 250000, \\\"narration\\\": \\\"Filling in Pakistan's medical remittance form and self-declaration for Dad to sign in the app.\\\"}\"}}]},\"finish_reason\":\"tool_calls\",\"logprobs\":null}],\"model\":\"deepseek-ai/DeepSeek-V4.1-Flash-1017\",\"created\":1793982370,\"usage\":{\"prompt_tokens\":10091,\"total_tokens\":10316,\"completion_tokens\":225,\"prompt_tokens_details\":{\"cached_tokens\":8704,\"created_cache_tokens\":1344},\"completion_tokens_details\":{\"reasoning_tokens\":55}},\"system_fingerprint\":\"vllm-0.32.0-dp4-ep-94283194\"}",
+          "signature": {
+            "text": "deepseek-ai/DeepSeek-V4.1-Flash-1017:1540920d70ffff53d5cc2d390efeefd8b811085fbdcac60191eb114fa396b2fe:f3412a046626ca738f964b459001214f014df2f8cad1b7e8798a7c40c32692ca",
+            "signature": "0x7b32c172b7ab2dd757796096baf79286670018b34903fbdef3366b0c4ba4773f451d1c029dc6c946b3c50a7f9bfb5ee47c798feac395106826b84270f8d5c97f1b",
+            "signing_address": "0xfe0071895500a9755c18044948ab4f4e1a7f337e",
+            "signing_algo": "ecdsa",
+            "signature_kind": "provider_tee"
+          }
+        },
+        {
+          "chat_id": "chatcmpl-d0224f7e-6171-4edf-ad11-02a0c109704d",
+          "request_sha256": "ef20f7ce4b9ab87624799970ed07797596b98df134a723ed0b6f17e00444915b",
+          "response_body": "{\"id\":\"chatcmpl-d0224f7e-6171-4edf-ad11-02a0c109704d\",\"object\":\"chat.completion\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":null,\"reasoning_content\":\"Now propose payment. Route: bank_transfer, amount 250000 THB, payer [PERSON_ID_1], reference \\\"HN [PATIENT_REF_1]\\\", beneficiary details.\\n\\nRationale in family's language (English).\\n\\nTotal cost PKR 2,176,624 (~USD 7,737), arrives 4 Nov, before 5 Nov deadline.\\n\\nLet me propose.\",\"tool_calls\":[{\"id\":\"chatcmpl-tool-94adc30e4f44caf4\",\"type\":\"function\",\"function\":{\"name\":\"propose_payment\",\"arguments\":\"{\\\"invoice_id\\\": \\\"inv_1\\\", \\\"route\\\": \\\"bank_transfer\\\", \\\"amount\\\": 250000, \\\"payer_id\\\": \\\"[PERSON_ID_1]\\\", \\\"reference\\\": \\\"HN [PATIENT_REF_1]\\\", \\\"beneficiary\\\": {\\\"account_name\\\": \\\"Siam Riverside Hospital Co., Ltd.\\\", \\\"account_number\\\": \\\"101-3-58821-7\\\", \\\"swift\\\": \\\"BKCBTHBK\\\", \\\"bank_name\\\": \\\"Bangkok Commercial Bank\\\"}, \\\"rationale\\\": \\\"The hospital's deposit of THB 250,000 is due before the [MEDICAL_4] on 5 November. The bank transfer from Dad's account is the cheapest legal route at about PKR 2,176,624 (≈ USD 7,737) in total and arrives on 4 November, one day before the deadline. It uses about USD 7,625 of his USD 50,000 medical remittance allowance. The Visa card would be about PKR 44,000 more expensive. The hospital's account was checked against the verified registry and matches. Dad signs the Pakistan medical remittance form and self-declaration in the app when he approves.\\\", \\\"narration\\\": \\\"Requesting Dad's approval to send the THB 250,000 hospital deposit by bank transfer from his account.\\\"}\"}}]},\"finish_reason\":\"tool_calls\",\"logprobs\":null}],\"model\":\"deepseek-ai/DeepSeek-V4.1-Flash-1017\",\"created\":1793982390,\"usage\":{\"prompt_tokens\":10349,\"total_tokens\":10812,\"completion_tokens\":463,\"prompt_tokens_details\":{\"cached_tokens\":10048,\"created_cache_tokens\":256},\"completion_tokens_details\":{\"reasoning_tokens\":80}},\"system_fingerprint\":\"vllm-0.32.0-dp4-ep-94283194\"}",
+          "signature": {
+            "text": "deepseek-ai/DeepSeek-V4.1-Flash-1017:ef20f7ce4b9ab87624799970ed07797596b98df134a723ed0b6f17e00444915b:f933a231715fe3b3c5c5bdf339f486daf56e2f960889b053456ae2963afb21fb",
+            "signature": "0x407d4ab34119c8009bbd4d594954ec9496e75e611b9381c9142ae12c6e39017e3bce9b26cdc6a657e73f177a86eb11bec0546624b724a95721c77aab894558d41c",
+            "signing_address": "0xfe0071895500a9755c18044948ab4f4e1a7f337e",
+            "signing_algo": "ecdsa",
+            "signature_kind": "provider_tee"
+          }
+        },
+        {
+          "chat_id": "chatcmpl-17b38ebf-e5d7-43d2-b4a5-48be7a32186f",
+          "request_sha256": "bf90519d5e4d6252642e122fbe67fdc4d1f7fd06c67406552d388c216c4a2747",
+          "response_body": "{\"id\":\"chatcmpl-17b38ebf-e5d7-43d2-b4a5-48be7a32186f\",\"object\":\"chat.completion\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":null,\"reasoning_content\":\"Now cancel sch_2 (they replied), message family, add case note, schedule followup for payment not approved? Set skip_if approval_decided with in_hours maybe 20 (before deadline). Actually if approved, payment_completed event wakes me. If declined, approval_decided wakes me. So the followup for approval is somewhat redundant. But if they don't act, nothing wakes me until deadline. Schedule in_hours=20 with skip_if approval_decided — that's 2026-11-03T00:00, before 4 Nov arrival. That leaves time. Good.\\n\\nThen add case note.\",\"tool_calls\":[{\"id\":\"chatcmpl-tool-880162063c3ce7bf\",\"type\":\"function\",\"function\":{\"name\":\"cancel_followup\",\"arguments\":\"{\\\"followup_id\\\": \\\"sch_2\\\", \\\"why\\\": \\\"The hospital replied with the estimate, deposit deadline and bank details, so there is nothing to chase.\\\", \\\"narration\\\": \\\"Cancelling the reminder to chase the hospital — they have answered.\\\"}\"}},{\"id\":\"chatcmpl-tool-a6040695df36be2d\",\"type\":\"function\",\"function\":{\"name\":\"schedule_followup\",\"arguments\":\"{\\\"in_hours\\\": 20, \\\"reason\\\": \\\"Check whether Dad has approved the THB 250,000 deposit payment; it needs to be approved soon enough to arrive before the 5 November deadline.\\\", \\\"skip_if\\\": \\\"approval_decided\\\", \\\"narration\\\": \\\"Setting a reminder to make sure the deposit approval does not slip past the deadline.\\\"}\"}}]},\"finish_reason\":\"tool_calls\",\"logprobs\":null}],\"model\":\"deepseek-ai/DeepSeek-V4.1-Flash-1017\",\"created\":1793982464,\"usage\":{\"prompt_tokens\":10809,\"total_tokens\":11173,\"completion_tokens\":364,\"prompt_tokens_details\":{\"cached_tokens\":10304,\"created_cache_tokens\":448},\"completion_tokens_details\":{\"reasoning_tokens\":128}},\"system_fingerprint\":\"vllm-0.32.0-dp4-ep-94283194\"}",
+          "signature": {
+            "text": "deepseek-ai/DeepSeek-V4.1-Flash-1017:bf90519d5e4d6252642e122fbe67fdc4d1f7fd06c67406552d388c216c4a2747:a1e7dfeb616a3220cfa7217b432987ec46baabd5bbca7cf8c21cb147c63f911a",
+            "signature": "0x072ca10aac8dc26f9d9b84c225fdaf48c7788999b1809375c1f7fedc15e33d0429b1a3adb72cdbc76e4b4f78a5d925f9039126138b5ce878d4bd66b9d30a80ff1c",
+            "signing_address": "0xfe0071895500a9755c18044948ab4f4e1a7f337e",
+            "signing_algo": "ecdsa",
+            "signature_kind": "provider_tee"
+          }
+        },
+        {
+          "chat_id": "chatcmpl-48427eb5-74f6-4f46-8688-ed6ee8eb7909",
+          "request_sha256": "a3983d73ef890b5993275bebbbd3fd9e023ac23a0e4e44c2b65fd9687934049b",
+          "response_body": "{\"id\":\"chatcmpl-48427eb5-74f6-4f46-8688-ed6ee8eb7909\",\"object\":\"chat.completion\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":null,\"tool_calls\":[{\"id\":\"chatcmpl-tool-bc2553d0905e03fc\",\"type\":\"function\",\"function\":{\"name\":\"message_family\",\"arguments\":\"{\\\"text\\\": \\\"Good news — the hospital has answered with everything we asked for.\\\\n\\\\nThe estimate is THB 420,000 in total. They need a deposit of THB 250,000 before Dad's [MEDICAL_4], due by the morning of 5 November, and they confirmed nothing else is due before discharge (expected around 8 November, when they'll send the final bill).\\\\n\\\\nThe cheapest way to pay: a bank transfer from Dad's account in Pakistan, about PKR 2,176,624 in total (≈ USD 7,737). It arrives on 4 November, a day before the deadline. Their bank account matches the verified registry, so it's safe to send to.\\\\n\\\\nI've put the payment on Dad's phone for approval — he just needs to approve it with his fingerprint. The two Pakistan forms are filled in and he signs them at the same time. The Visa card would be about PKR 44,000 more, so it's only the backup.\\\", \\\"importance\\\": \\\"action\\\", \\\"narration\\\": \\\"Telling the family the deposit amount, cost, deadline and that Dad needs to approve it on his phone.\\\"}\"}},{\"id\":\"chatcmpl-tool-9fbde6859926ae23\",\"type\":\"function\",\"function\":{\"name\":\"add_case_note\",\"arguments\":\"{\\\"note\\\": \\\"- 2026-11-02: Hospital replied (mail_2, verified sender). Estimate SRH-DEP-0001: THB 420,000 total; deposit THB 250,000 due 2026-11-05 02:01 UTC before [MEDICAL_4]. Final itemised bill will come by email on discharge, expected ~8 Nov. Deposits received so far THB 0. Contacts 2 working days for intl transfer.\\\\n- Bank details doc_2 (bank letter): Bangkok Commercial Bank, Siam Riverside Hospital Co., Ltd., 101-3-58821-7, BKCBTHBK. verify_beneficiary = MATCH. Docs say \\\\\\\"we never change our bank details by email\\\\\\\".\\\\n- Routes on THB 250,000: bank_transfer PKR 2,176,624 (cheapest, arrives 4 Nov, meets deadline, needs remittance_application + self_declaration, uses USD 7,625 of USD 50k SBP medical cap); card PKR 2,220,690 (+PKR 44k); carried_cash blocked (patient already abroad, >$5k).\\\\n- Prepared doc_3 (remittance_application V-68) + doc_4 (self_declaration). Proposed pay_1 via bank_transfer, ref \\\\\\\"HN [PATIENT_REF_1]\\\\\\\", payer [PERSON_ID_1]. AWAITING FAMILY APPROVAL (apr_1).\\\\n- Cancelled sch_2 (chase). New sch_3 2026-11-03T00:01 skip_if approval_decided.\\\\n- Next: on approval -> watch payment_completed; on return, fix & resubmit. After discharge final bill: reconcile_bill vs payments, dispute duplicates, refund any excess deposit to source account.\\\", \\\"narration\\\": \\\"Noting the hospital's figures, verified bank details and the payment now waiting for Dad's approval.\\\"}\"}}]},\"finish_reason\":\"tool_calls\",\"logprobs\":null}],\"model\":\"deepseek-ai/DeepSeek-V4.1-Flash-1017\",\"created\":1793982473,\"usage\":{\"prompt_tokens\":11110,\"total_tokens\":11849,\"completion_tokens\":739,\"prompt_tokens_details\":{\"cached_tokens\":10752,\"created_cache_tokens\":320},\"completion_tokens_details\":{\"reasoning_tokens\":0}},\"system_fingerprint\":\"vllm-0.32.0-dp4-ep-94283194\"}",
+          "signature": {
+            "text": "deepseek-ai/DeepSeek-V4.1-Flash-1017:a3983d73ef890b5993275bebbbd3fd9e023ac23a0e4e44c2b65fd9687934049b:3b6dbd20c66f3a56ae55835164726d555881e79cb7dc6349f416b6762cde7e5b",
+            "signature": "0x8fa3e8fdb5b5ca1f46fd0a8167243a14f65ac49f87f12901e7c094f096fa15a30d210dd23660b16e79ddc1c29e2c13389dfd94164e37c91d35789fe3568cce6a1b",
+            "signing_address": "0xfe0071895500a9755c18044948ab4f4e1a7f337e",
+            "signing_algo": "ecdsa",
+            "signature_kind": "provider_tee"
+          }
+        },
+        {
+          "chat_id": "chatcmpl-679ac396-132f-4925-ae50-ea6b12d242eb",
+          "request_sha256": "37ba6e036e4a6b0af89a2140f06570cad2a7778bae52e01ab3aee48ebc37b779",
+          "response_body": "{\"id\":\"chatcmpl-679ac396-132f-4925-ae50-ea6b12d242eb\",\"object\":\"chat.completion\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":null,\"reasoning_content\":\"The message was too long. Shorten it.\",\"tool_calls\":[{\"id\":\"chatcmpl-tool-843d0a1dabe4510c\",\"type\":\"function\",\"function\":{\"name\":\"message_family\",\"arguments\":\"{\\\"text\\\": \\\"The hospital has answered with everything we asked for.\\\\n\\\\nThe estimate is THB 420,000 in total. They need a deposit of THB 250,000 before Dad's [MEDICAL_4], due by the morning of 5 November. Nothing else is due before discharge (~8 November), when they'll send the final bill.\\\\n\\\\nCheapest way: a bank transfer from Dad's account in Pakistan, about PKR 2,176,624 in total (≈ USD 7,737). It arrives on 4 November, a day before the deadline, and their account matches the verified registry. The Visa card would cost about PKR 44,000 more, so it stays the backup.\\\\n\\\\nThe payment is now on Dad's phone — he just needs to approve it with his fingerprint. The two Pakistan forms are filled in and he signs them at the same time.\\\", \\\"importance\\\": \\\"action\\\", \\\"narration\\\": \\\"Telling the family the deposit amount, cost, deadline and that Dad needs to approve it on his phone.\\\"}\"}}]},\"finish_reason\":\"tool_calls\",\"logprobs\":null}],\"model\":\"deepseek-ai/DeepSeek-V4.1-Flash-1017\",\"created\":1793982488,\"usage\":{\"prompt_tokens\":11897,\"total_tokens\":12176,\"completion_tokens\":279,\"prompt_tokens_details\":{\"cached_tokens\":11840,\"created_cache_tokens\":0},\"completion_tokens_details\":{\"reasoning_tokens\":10}},\"system_fingerprint\":\"vllm-0.32.0-dp4-ep-94283194\"}",
+          "signature": {
+            "text": "deepseek-ai/DeepSeek-V4.1-Flash-1017:37ba6e036e4a6b0af89a2140f06570cad2a7778bae52e01ab3aee48ebc37b779:55f54ac4d63d763e74ea20c39a64bd0e167b6907f1af10e5f38afaa4ee42a3cc",
+            "signature": "0x93167873419605ddb03abbaa9e2022b44b9df4b32ead55f080895e75e2678d6120945c9f32b1cabe88ff76abc0df7e7fb98a16330afdb1ec449f4345cbcc4b751c",
+            "signing_address": "0xfe0071895500a9755c18044948ab4f4e1a7f337e",
+            "signing_algo": "ecdsa",
+            "signature_kind": "provider_tee"
+          }
+        },
+        {
+          "chat_id": "chatcmpl-d27bf96f-4057-4818-b034-338f6c2a0b05",
+          "request_sha256": "d375cf00e2bd3722949312dbe0122a7c9616cb2dd23dc7971e45d97b554ef688",
+          "response_body": "{\"id\":\"chatcmpl-d27bf96f-4057-4818-b034-338f6c2a0b05\",\"object\":\"chat.completion\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Everything is in motion — I'll stop here and wait for Dad's approval.\\n\\n**What the hospital confirmed**\\n- Estimate: THB 420,000 in total; deposit **THB 250,000** required before the [MEDICAL_4], due by the morning of **5 November**\\n- Final itemised bill on discharge (~8 November); nothing else due before then\\n- Bank details on their signed letter match Kinwarden's verified registry exactly\\n\\n**Payment proposed (waiting for Dad's approval)**\\n- Bank transfer from Dad's PKR account → hospital's Bangkok Commercial Bank account\\n- Cost: **PKR 2,176,624** (≈ USD 7,737); arrives 4 November, a day before the deadline\\n- Reference: `HN [PATIENT_REF_1]` as the hospital requires\\n- Pakistan's Appendix V-68 remittance application and self-declaration prepared for signature in the same approval\\n- Card alternative was ~PKR 44,000 more expensive, so kept as backup only\\n\\nNext wake-up: Dad's decision (reminder set for tomorrow, skipped automatically if he approves sooner).\"},\"finish_reason\":\"stop\",\"logprobs\":null}],\"model\":\"deepseek-ai/DeepSeek-V4.1-Flash-1017\",\"created\":1793982495,\"usage\":{\"prompt_tokens\":12190,\"total_tokens\":12430,\"completion_tokens\":240,\"prompt_tokens_details\":{\"cached_tokens\":11840,\"created_cache_tokens\":320},\"completion_tokens_details\":{\"reasoning_tokens\":0}},\"system_fingerprint\":\"vllm-0.32.0-dp4-ep-94283194\"}",
+          "signature": {
+            "text": "deepseek-ai/DeepSeek-V4.1-Flash-1017:d375cf00e2bd3722949312dbe0122a7c9616cb2dd23dc7971e45d97b554ef688:1427f41e19d67ce42c3eaad9ca8069cd531f856ebe98c983af1ca223b7dc25a7",
+            "signature": "0xa131f6b8043ce4025004ff8f5441a7c795b480561f887e1cb46f87889b9d5a516f3e30fd1742b615e7036a2b17e77a222780b7a1656748c67e00aa3e469b8be01c",
+            "signing_address": "0xfe0071895500a9755c18044948ab4f4e1a7f337e",
+            "signing_algo": "ecdsa",
+            "signature_kind": "provider_tee"
+          }
+        }
+      ],
+      "finalText": "Everything is in motion — I'll stop here and wait for Dad's approval.\n\n**What the hospital confirmed**\n- Estimate: THB 420,000 in total; deposit **THB 250,000** required before the [MEDICAL_4], due by the morning of **5 November**\n- Final itemised bill on discharge (~8 November); nothing else due before then\n- Bank details on their signed letter match Kinwarden's verified registry exactly\n\n**Payment proposed (waiting for Dad's approval)**\n- Bank transfer from Dad's PKR account → hospital's Bangkok Commercial Bank account\n- Cost: **PKR 2,176,624** (≈ USD 7,737); arrives 4 November, a day before the deadline\n- Reference: `HN [PATIENT_REF_1]` as the hospital requires\n- Pakistan's Appendix V-68 remittance application and self-declaration prepared for signature in the same approval\n- Card alternative was ~PKR 44,000 more expensive, so kept as backup only\n\nNext wake-up: Dad's decision (reminder set for tomorrow, skipped automatically if he approves sooner)."
+    }
+  ],
+  "attestation": {
+    "model": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+    "provider": "near",
+    "fetched_at": "2026-11-06T16:24:23.811Z",
+    "nonce": "9e11f6c0ec1d59c5a3e14d2eb086d2b239bfb3103710cb0b9abec99cce567420",
+    "signing_address": "0xfe0071895500a9755c18044948ab4f4e1a7f337e",
+    "signing_algo": "ecdsa",
+    "intel_quote": "040002008100000000000000939a7233f79c4ca9940a0db3957f0607fbabcd45403de16c79e2a2440aa80e34000000000b0104000000000000000000000000007bf063280e94fb051f5dd7b1fc59ce9aac42bb961df8d44b709c9b0ff87a7b4df648657ba6d1189589feab1d5a3c9a9d00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000e702060000000000df4d77c857de652bd0fafa343a2026b51071ee03773d076d283abf1a7d36ff91ffa279ee4a617ac664f7e2a2c8d5891b01ae66f844658a7aee331dcb9fb59bd40323d71d192d37719e022cc4af8389265b000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000bc122d143ab768565ba5c3774ff5f03a63c89a4df7c1f5ea38d3bd173409d14f8cbdcc36d40e703cccb996a9d96875904ae609807c765916a31d724786ed74bcb97e168a9d937b04936aeef2015c907eba5ac352c6bcd749c246fd62ffb659ecbd67ab7554dc27ab03a077bc1447a1a67d0624ff547c4c809a8626f12d6a89712f8ec60e781e99b98208574065d21a71b82e033606007266ad7f92273645be6c06ef5712dc5c110ec1e306d79afd14e1a9e41e092353383cbc189d57768f5b8dfe0071895500a9755c18044948ab4f4e1a7f337e0000000000000000000000009e11f6c0ec1d59c5a3e14d2eb086d2b239bfb3103710cb0b9abec99cce567420cc100000a3c899d2021b4ea763cd15d1ad56c5f9eb58b6ab77733838516a932c7826dd7012ac0f0059772957d72540c1a1f8a5475931ce1ee70382a64c29831d206a7bea6a21416e273c47427013106a5e4c64f44ed1c8d43c7604a7402315966ad619095be3de6234300d68444c577cbee6511c1db9cbe404c6674c673ad7f1c5e706c80600461000000404191b04ff0006000000000000000000000000000000000000000000000000000000000000000000000000000000001500000000000000e700000000000000e5a3a7b5d830c2953b98534c6c59a3a34fdc34e933f7f5898f0a85cf08846bca0000000000000000000000000000000000000000000000000000000000000000dc9e2a7c6f948f17474e34a7fc43ed030f7c1563f1babddf6340c82e0e54a8c500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000818f89efb3b13d4b6bdfcd340b6671b8df53f63d611911743204e9806d40c00500000000000000000000000000000000000000000000000000000000000000009faca555f377ff6bce35635928e01ce024f5a16896a497b20d5f23d92772d0d4ee97f5ceaa8015d3d2c15e3941862dd77418490c01e000f60f320c7acdf1a9a72000000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f05005e0e00002d2d2d2d2d424547494e2043455254494649434154452d2d2d2d2d0a4d49494538544343424a65674177494241674956414b6b4c6569563075667a70476f474c6754797a4534726747626e314d416f4743437147534d343942414d430a4d484178496a416742674e5642414d4d47556c756447567349464e4857434251513073675547786864475a76636d306751304578476a415942674e5642416f4d0a45556c756447567349454e76636e4276636d4630615739754d5251774567594456515148444174545957353059534244624746795954454c4d416b47413155450a4341774351304578437a414a42674e5642415954416c56544d423458445449324d5445774e5441774e4455784d466f5844544d7a4d5445774e5441774e4455780a4d466f77634445694d434147413155454177775a535735305a5777675530645949464244537942445a584a3061575a70593246305a5445614d426747413155450a43677752535735305a577767513239796347397959585270623234784644415342674e564241634d43314e68626e526849454e7359584a684d517377435159440a5651514944414a445154454c4d416b474131554542684d4356564d775754415442676371686b6a4f5051494242676771686b6a4f50514d4242774e43414153410a4a4b3067564e756a704d32616a547478626c464c46427359734a454b30722f2b304c384d792b61544e5065536b746162422b5953736b666344776d78557950490a714e526d712f366a746e4b2b544878372b6f6c416f3449444444434341776777487759445652306a42426777466f41556c5739647a62306234656c4153636e550a3944504f4156634c336c5177617759445652306642475177596a42676f46366758495a616148523063484d364c79396863476b7564484a316333526c5a484e6c0a636e5a705932567a4c6d6c75644756734c6d4e766253397a5a3367765932567964476c6d61574e6864476c76626939324e4339775932746a636d772f593245390a6347786864475a76636d306d5a57356a62325270626d63395a4756794d423047413155644467515742425447357832586a4875696638585a637073384a30636c0a36644558306a414f42674e56485138424166384542414d434273417744415944565230544151482f4241497741444343416a6b4743537147534962345451454e0a4151534341696f776767496d4d42344743697147534962345451454e41514545454d6d434f392f3448444a31716a76762b62745a366f6f776767466a42676f710a686b69472b453042445145434d494942557a415142677371686b69472b45304244514543415149424244415142677371686b69472b45304244514543416749420a4244415142677371686b69472b4530424451454341774942416a415142677371686b69472b4530424451454342414942416a415142677371686b69472b4530420a44514543425149424244415142677371686b69472b45304244514543426749424154415142677371686b69472b453042445145434277494241444151426773710a686b69472b45304244514543434149424254415142677371686b69472b45304244514543435149424144415142677371686b69472b45304244514543436749420a4144415142677371686b69472b45304244514543437749424144415142677371686b69472b45304244514543444149424144415142677371686b69472b4530420a44514543445149424144415142677371686b69472b45304244514543446749424144415142677371686b69472b453042445145434477494241444151426773710a686b69472b45304244514543454149424144415142677371686b69472b45304244514543455149424454416642677371686b69472b45304244514543456751510a42415143416751424141554141414141414141414144415142676f71686b69472b45304244514544424149414144415542676f71686b69472b453042445145450a4241615177473841414141774477594b4b6f5a496876684e4151304242516f424154416542676f71686b69472b453042445145474242442b38455159347441540a634a552b35374d50734f64434d45514743697147534962345451454e415163774e6a415142677371686b69472b45304244514548415145422f7a4151426773710a686b69472b45304244514548416745422f7a415142677371686b69472b45304244514548417745422f7a414b42676771686b6a4f5051514441674e49414442460a416941324d6a79694f4865616f302b71426d4d6f4d725470703354426e326d536f776e704f6e33414973682f3067496841504a34416b6c6d434a45444e6779590a6753697244434350583834526355686576395646524b7a466c7a4e670a2d2d2d2d2d454e442043455254494649434154452d2d2d2d2d0a2d2d2d2d2d424547494e2043455254494649434154452d2d2d2d2d0a4d4949436c6a4343416a32674177494241674956414a567658633239472b487051456e4a3150517a7a674658433935554d416f4743437147534d343942414d430a4d476778476a415942674e5642414d4d45556c756447567349464e48574342536232393049454e424d526f77474159445651514b4442464a626e526c624342440a62334a7762334a6864476c76626a45554d424947413155454277774c553246756447456751327868636d4578437a414a42674e564241674d416b4e424d5173770a435159445651514745774a56557a4165467730784f4441314d6a45784d4455774d5442614677307a4d7a41314d6a45784d4455774d5442614d484178496a41670a42674e5642414d4d47556c756447567349464e4857434251513073675547786864475a76636d306751304578476a415942674e5642416f4d45556c75644756730a49454e76636e4276636d4630615739754d5251774567594456515148444174545957353059534244624746795954454c4d416b474131554543417743513045780a437a414a42674e5642415954416c56544d466b77457759484b6f5a497a6a3043415159494b6f5a497a6a304441516344516741454e53422f377432316c58534f0a3243757a7078773734654a423732457944476757357258437478327456544c7136684b6b367a2b5569525a436e71523770734f766771466553786c6d546c4a6c0a65546d693257597a33714f42757a43427544416642674e5648534d4547444157674251695a517a575770303069664f44744a5653763141624f536347724442530a42674e5648523845537a424a4d45656752614244686b466f64485277637a6f764c324e6c636e52705a6d6c6a5958526c63793530636e567a6447566b633256790a646d6c6a5a584d75615735305a577775593239744c306c756447567355306459556d397664454e424c6d526c636a416442674e5648513445466751556c5739640a7a62306234656c4153636e553944504f4156634c336c517744675944565230504151482f42415144416745474d42494741315564457745422f7751494d4159420a4166384341514177436759494b6f5a497a6a30454177494452774177524149675873566b6930772b6936565947573355462f32327561586530594a446a3155650a6e412b546a44316169356343494359623153416d4435786b66545670766f34556f79695359787244574c6d5552344349394e4b7966504e2b0a2d2d2d2d2d454e442043455254494649434154452d2d2d2d2d0a2d2d2d2d2d424547494e2043455254494649434154452d2d2d2d2d0a4d4949436a7a4343416a53674177494241674955496d554d316c71644e496e7a6737535655723951477a6b6e42717777436759494b6f5a497a6a3045417749770a614445614d4267474131554541777752535735305a5777675530645949464a766233516751304578476a415942674e5642416f4d45556c756447567349454e760a636e4276636d4630615739754d5251774567594456515148444174545957353059534244624746795954454c4d416b47413155454341774351304578437a414a0a42674e5642415954416c56544d423458445445344d4455794d5445774e4455784d466f58445451354d54497a4d54497a4e546b314f566f77614445614d4267470a4131554541777752535735305a5777675530645949464a766233516751304578476a415942674e5642416f4d45556c756447567349454e76636e4276636d46300a615739754d5251774567594456515148444174545957353059534244624746795954454c4d416b47413155454341774351304578437a414a42674e56424159540a416c56544d466b77457759484b6f5a497a6a3043415159494b6f5a497a6a3044415163445167414543366e45774d4449595a4f6a2f69505773437a61454b69370a314f694f534c52466857476a626e42564a66566e6b59347533496a6b4459594c304d784f346d717379596a6c42616c54565978465032734a424b357a6c4b4f420a757a43427544416642674e5648534d4547444157674251695a517a575770303069664f44744a5653763141624f5363477244425342674e5648523845537a424a0a4d45656752614244686b466f64485277637a6f764c324e6c636e52705a6d6c6a5958526c63793530636e567a6447566b63325679646d6c6a5a584d75615735300a5a577775593239744c306c756447567355306459556d397664454e424c6d526c636a416442674e564851344546675155496d554d316c71644e496e7a673753560a55723951477a6b6e4271777744675944565230504151482f42415144416745474d42494741315564457745422f7751494d4159424166384341514577436759490a4b6f5a497a6a3045417749445351417752674968414f572f35516b522b533943695344634e6f6f774c7550524c735747662f59693747535839344267775477670a41694541344a306c72486f4d732b586f356f2f7358364f39515778485241765a55474f6452513763767152586171493d0a2d2d2d2d2d454e442043455254494649434154452d2d2d2d2d0a0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "request_nonce": "9e11f6c0ec1d59c5a3e14d2eb086d2b239bfb3103710cb0b9abec99cce567420"
+  }
+}

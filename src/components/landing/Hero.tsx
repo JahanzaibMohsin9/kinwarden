@@ -1,5 +1,7 @@
+import fs from "node:fs";
+import path from "node:path";
 import Link from "next/link";
-import { ArrowRight, Play, ShieldAlert, Smartphone } from "lucide-react";
+import { ArrowRight, CirclePlay, Play, ShieldAlert, Smartphone } from "lucide-react";
 import { SiteNav } from "../SiteNav";
 import { impactNumbers } from "../ImpactPanel";
 import { MoneyMap } from "./MoneyMap";
@@ -10,6 +12,10 @@ const CHOICES = [
   { href: "/app/new", icon: Smartphone, title: "Try it yourself", text: "Pick a case or upload any hospital or university bill. Your own private sandbox.", primary: false },
   { href: "/attack", icon: ShieldAlert, title: "Try to fool it", text: "Send fake bank details, hidden instructions, kickbacks. Watch them fail.", primary: false },
 ];
+
+/** The demo video, served from public/video/ when the deployment has it (it is too large for Git). */
+const VIDEO = "/video/kinwarden-demo.mp4";
+const hasVideo = () => fs.existsSync(path.join(/*turbopackIgnore: true*/ process.cwd(), "public", VIDEO));
 
 /** The first screen: what Kinwarden is, where money goes, and three clear ways in. */
 export function Hero() {
@@ -42,6 +48,12 @@ export function Hero() {
           <p className="mt-5 text-[17px] leading-relaxed text-[#c9d6d2]">
             Kinwarden pays a family&apos;s hospital and university bills abroad under their own country&apos;s rules. It deals with the institution, the bank and the forms, and catches fraud. The money waits in a NEAR vault that pays only the verified institution, and only after the family approves the exact payment in their own wallet.
           </p>
+          {hasVideo() && (
+            <a href={VIDEO} target="_blank" rel="noreferrer" className="mt-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-4 py-2 text-[14px] font-semibold text-white hover:bg-white/[0.1]">
+              <CirclePlay size={18} className="text-[#5ccdb4]" /> Watch the 2-minute video
+              <span className="font-normal text-[#9fb2ad]">· one live run on NEAR testnet</span>
+            </a>
+          )}
         </div>
         <div className="md:hidden">
           <MoneyMap className="mt-6 h-auto w-full" />

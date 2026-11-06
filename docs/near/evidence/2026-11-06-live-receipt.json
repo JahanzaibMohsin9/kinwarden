@@ -1,0 +1,85 @@
+{
+  "kind": "kinwarden.near.receipt.v1",
+  "network": "testnet",
+  "vault": "vault.kinwarden-demo.testnet",
+  "paid_to": {
+    "institution": "Siam Riverside International Hospital",
+    "account": "siam-riverside-hospital.kinwarden-demo.testnet"
+  },
+  "token": {
+    "contract": "tusdc.kinwarden-demo.testnet",
+    "symbol": "tUSDC",
+    "decimals": 6
+  },
+  "amount": {
+    "units": "7625450000",
+    "display": "7,625.45 tUSDC"
+  },
+  "invoice": {
+    "number": "SRH-DEP-0001",
+    "vault_invoice_id": "b3d61a-srh-dep-0001"
+  },
+  "outcome": {
+    "delivery": "delivered",
+    "vault_status": "Settled",
+    "status_reason": null,
+    "reserved_funds": "Paid from the case to the institution's account.",
+    "next_step": "Nothing. A NEAR transfer cannot be reversed; any refund would be a new transfer from the institution.",
+    "recorded_by_vault_at": "2026-11-06T16:39:28.079Z"
+  },
+  "approval": {
+    "by": "hart-family.kinwarden-demo.testnet",
+    "approved_at": "2026-11-06T16:39:27.040Z",
+    "tx": "De6rBZhjnqaborM2g6MNB6qaUEWrgTGkZkjh57kpSTt4",
+    "tx_url": "https://testnet.nearblocks.io/txns/De6rBZhjnqaborM2g6MNB6qaUEWrgTGkZkjh57kpSTt4",
+    "receipt_id": "AcRwBYiCwy78adUkxqKs1pKDRjtSuTipeqd9KRKSktkA"
+  },
+  "settlement": {
+    "token_transfer": {
+      "succeeded": true,
+      "observed_at": "2026-11-06T16:39:27.494Z",
+      "receipt_id": "AnmN4wv6aRwk45q5DkJXXmP4wTAtiy72dwEpXMZV85gd",
+      "from": "vault.kinwarden-demo.testnet",
+      "to": "siam-riverside-hospital.kinwarden-demo.testnet",
+      "amount_units": "7625450000",
+      "matches_proposal": true
+    },
+    "vault_callback": {
+      "result": "Settled",
+      "observed_at": "2026-11-06T16:39:28.079Z",
+      "receipt_id": "BoECduKjJ7xAbzugqq3eNUWXCVKNs9Lpwq8KEXryDTaF"
+    },
+    "tx_url": "https://testnet.nearblocks.io/txns/De6rBZhjnqaborM2g6MNB6qaUEWrgTGkZkjh57kpSTt4"
+  },
+  "institution_acknowledgement": {
+    "simulated": true,
+    "document_id": "doc_5",
+    "mail_id": "mail_3",
+    "sandbox_time": "2026-11-02T04:01:00.000Z",
+    "note": "Sent by the simulated hospital after the vault settled: a separate event from the on-chain transfer."
+  },
+  "proposal": {
+    "proposal_id": "2",
+    "case_id": "case-th-6aab",
+    "invoice_id": "b3d61a-srh-dep-0001",
+    "request_id": "b3d61a-pay-1",
+    "attempt": 1,
+    "payee_id": "srh",
+    "recipient": "siam-riverside-hospital.kinwarden-demo.testnet",
+    "token": "tusdc.kinwarden-demo.testnet",
+    "amount": "7625450000",
+    "purpose_group": "Hospital",
+    "ttl_seconds": 43200,
+    "created_at": "1793982465973589377",
+    "expires_at": "1794025665973589377",
+    "policy_version": 1,
+    "payee_version": 2,
+    "status": "Settled",
+    "status_reason": null,
+    "updated_at": "1793983168079308793"
+  },
+  "commitment_hash": "ca9a8f8cea858d85f3c1a830a31c2bb1f130b6648431451213223240a3e6ae0b",
+  "app_payment_status": "completed",
+  "note": "Test stablecoin on a test network. Delivery follows the vault's record: an approval or a submitted transaction alone does not confirm delivery. The hash shows this receipt was not edited; it does not prove the bill itself was genuine.",
+  "receipt_hash": "153d2cec228b846e4fa758e7f8a3f4174eb7e0da53c1ba19f4818ad4c383c8a7"
+}
