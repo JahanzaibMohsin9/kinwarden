@@ -1,8 +1,17 @@
 # Kinwarden
 
-**Live demo: [kinwarden.duckdns.org](https://kinwarden.duckdns.org)**: your own sandbox, replaying the recorded NEAR AI runs, with NEAR testnet data read live. The demo server holds no keys, so it cannot sign anything.
+**An AI agent that pays a family's hospital and university bills abroad, and cannot move their money on its own.** The money waits in a NEAR vault. The agent runs on NEAR AI Cloud and can only propose a payment. The family approves the exact payment in their own NEAR wallet, and anyone can check the result on chain without a key.
 
-**Demo video (1:56): [kinwarden.duckdns.org/video/kinwarden-demo.mp4](https://kinwarden.duckdns.org/video/kinwarden-demo.mp4)**: one live run on NEAR testnet, recorded 6 Nov 2026. The NEAR AI agent proposes the hospital deposit, the family approves it in a Meteor wallet, the vault pays the hospital, the agent flags a forged bank-details email, 13 attacks with the app's real NEAR key are refused, and both checks below pass on that run.
+[![CI](https://github.com/JahanzaibMohsin9/kinwarden/actions/workflows/ci.yml/badge.svg)](https://github.com/JahanzaibMohsin9/kinwarden/actions/workflows/ci.yml) [![Live testnet check](https://github.com/JahanzaibMohsin9/kinwarden/actions/workflows/live-check.yml/badge.svg)](https://github.com/JahanzaibMohsin9/kinwarden/actions/workflows/live-check.yml)
+
+**[Live demo](https://kinwarden.duckdns.org)** · **[2-minute video](https://kinwarden.duckdns.org/video/kinwarden-demo.mp4)** · **[Check it yourself](#check-it-in-four-steps-no-wallet-no-api-key)** · **[Claim → test map](docs/near/CLAIMS.md)** · **[Threat model](docs/near/THREAT_MODEL.md)** · **[Security](SECURITY.md)**
+
+![Kinwarden's landing page: an AI agent on NEAR for hospital and university bills abroad](docs/images/landing.png)
+
+- **Live demo** ([kinwarden.duckdns.org](https://kinwarden.duckdns.org)): your own sandbox, replaying the recorded NEAR AI runs, with NEAR testnet data read live. The demo server holds no keys, so it cannot sign anything.
+- **Demo video** (1:56, [kinwarden.duckdns.org/video/kinwarden-demo.mp4](https://kinwarden.duckdns.org/video/kinwarden-demo.mp4)): one live run on NEAR testnet, recorded 6 Nov 2026. The NEAR AI agent proposes the hospital deposit, the family approves it in a Meteor wallet, the vault pays the hospital, the agent flags a forged bank-details email, 13 attacks with the app's real NEAR key are refused, and both keyless checks pass on that run.
+
+## The problem
 
 A family from Pakistan has to pay a Bangkok hospital for their father's heart procedure before treatment can go ahead. An AI agent can read the bill, check the hospital and prepare the payment, but nobody should have to trust that agent, or the server it runs on, with the family's money.
 
@@ -12,7 +21,32 @@ Kinwarden is an assistant for families paying hospital and university bills abro
 
 **Testnet by design:** the institutions are fictional and no real hospital has agreed to receive funds, so a mainnet payment would only reach an account we control. The real parts are the family's wallet approval, the NEAR AI model, the on-chain enforcement and the keyless check below.
 
-Who can do what with the money:
+## See it
+
+All screenshots are from the live NEAR AI run on NEAR testnet of 6 Nov 2026 (the one in the video).
+
+**The family approves the exact payment in their own wallet.** The agent proposed 7,625.45 tUSDC against an invoice the verifier authorized. The phone reads the proposal from the vault and recomputes its approval fingerprint. The Meteor wallet connects without handing the app any key, and signs `approve_payment` with the exact recipient, token, amount and that same fingerprint ([approval transaction](https://testnet.nearblocks.io/txns/De6rBZhjnqaborM2g6MNB6qaUEWrgTGkZkjh57kpSTt4)). The app ran locally for this run, because it needs the agent's key; hence `localhost` in the wallet.
+
+![The family's phone shows the vault's proposal and fingerprint; Meteor connects with no key for the app; Meteor shows the approve_payment call with the exact recipient, token, amount and hash](docs/images/approval.png)
+
+**Paid, then a forged email caught.** The vault paid exactly 7,625.45 tUSDC to the account the verifier enrolled, and the receipt records each step on chain. Days later a look-alike address claimed the hospital's bank details had changed. The agent flagged it as payment-redirection fraud, warned the family and paid nothing.
+
+![Left: the vault receipt on the family's phone. Right: the Security Centre with the bank-details mismatch and the suspected fraud](docs/images/paid-and-flagged.png)
+
+**What the agent did, step by step.** The stage view shows the hospital's inbox, the family's phone and every tool call the agent made with the safety layer's verdict. Here the model reasons that the email is "a clear phishing / fraud attempt" and reports it; the log head is anchored on the vault at each milestone, including "fraud flagged".
+
+![The stage: hospital inbox, family phone, and the agent console with the fraud flag and NEAR testnet anchors](docs/images/stage.png)
+
+**Steal the server's NEAR key: 13 attacks, all refused.** An attacker who owns Kinwarden's server holds the app's real key and can skip the AI and the safety layer. NEAR refuses 11 of the attempts by the key's permissions and the vault refuses the other 2; balances before and after are equal. This run was sent live to testnet from the app's production build.
+
+![The attack lab: the agent key's permissions read from testnet, and 13 attacks each refused by NEAR key permissions or the vault](docs/images/attack.png)
+
+**Check it without a wallet or a key.** `verify.mjs` rechecks the payment, the agent key's permissions, the deployed code and the anchor against the public chain; `verify-model.mjs` checks that every agent decision was signed by NEAR AI's attested model.
+
+![Terminal: node scripts/near/verify.mjs on the live receipt prints six PASS lines and All 6 checks passed](docs/images/verify.png)
+
+## Who can do what with the money
+
 
 ```mermaid
 flowchart LR
