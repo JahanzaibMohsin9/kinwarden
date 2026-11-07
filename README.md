@@ -4,11 +4,12 @@
 
 [![CI](https://github.com/JahanzaibMohsin9/kinwarden/actions/workflows/ci.yml/badge.svg)](https://github.com/JahanzaibMohsin9/kinwarden/actions/workflows/ci.yml) [![Live testnet check](https://github.com/JahanzaibMohsin9/kinwarden/actions/workflows/live-check.yml/badge.svg)](https://github.com/JahanzaibMohsin9/kinwarden/actions/workflows/live-check.yml)
 
-**[Live demo](https://kinwarden.duckdns.org)** · **[2-minute video](https://kinwarden.duckdns.org/video/kinwarden-demo.mp4)** · **[Check it yourself](#check-it-in-four-steps-no-wallet-no-api-key)** · **[Claim → test map](docs/near/CLAIMS.md)** · **[Threat model](docs/near/THREAT_MODEL.md)** · **[Security](SECURITY.md)**
+**[Live demo](https://kinwarden.duckdns.org)** · **[2-minute video](https://kinwarden.duckdns.org/video/kinwarden-demo.mp4)** · **[Demo post on X](https://x.com/JahanzebM9/status/2119077574508957937)** · **[Check it yourself](#check-it-in-four-steps-no-wallet-no-api-key)** · **[Claim → test map](docs/near/CLAIMS.md)** · **[Threat model](docs/near/THREAT_MODEL.md)** · **[Security](SECURITY.md)**
 
 ![Kinwarden's landing page: an AI agent on NEAR for hospital and university bills abroad](docs/images/landing.png)
 
 - **Live demo** ([kinwarden.duckdns.org](https://kinwarden.duckdns.org)): your own sandbox, replaying the recorded NEAR AI runs, with NEAR testnet data read live. The demo server holds no keys, so it cannot sign anything.
+- **Demo post on X** ([x.com/JahanzebM9/status/2119077574508957937](https://x.com/JahanzebM9/status/2119077574508957937)): the hackathon demo post, with the video. The submitted version of this repository is tagged [`hackathon-submission`](https://github.com/JahanzaibMohsin9/kinwarden/tree/hackathon-submission).
 - **Demo video** (1:56, [kinwarden.duckdns.org/video/kinwarden-demo.mp4](https://kinwarden.duckdns.org/video/kinwarden-demo.mp4)): one live run on NEAR testnet, recorded 6 Nov 2026. The NEAR AI agent proposes the hospital deposit, the family approves it in a Meteor wallet, the vault pays the hospital, the agent flags a forged bank-details email, 13 attacks with the app's real NEAR key are refused, and both keyless checks pass on that run.
 
 ## The problem
