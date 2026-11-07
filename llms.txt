@@ -8,7 +8,7 @@ Repository baseline: the app existed before the hackathon (tag `pre-hackathon`);
 
 ## Verify (no wallet, no API key)
 
-- [Keyless testnet check](scripts/near/verify.mjs): `node scripts/near/verify.mjs` prints "All 6 checks passed." It rechecks the recorded payment receipt, the settled proposal in the vault, the family's `approve_payment` transaction and its token transfer, the agent key's permissions, the vault's code hash against the tested build, and the log anchor, all against the public chain.
+- [Keyless testnet check](scripts/near/verify.mjs): `node scripts/near/verify.mjs` prints "All 7 checks passed." It rechecks the recorded payment receipt, the settled proposal in the vault, the family's `approve_payment` transaction and its token transfer, the agent key's permissions, the vault's code hash against the tested build, and the log anchor, all against the public chain.
 - [On-chain red-team report](docs/redteam/ONCHAIN.md): the agent's real NEAR key with the app bypassed (13 attempts refused, balances unchanged, on a local node and on testnet), forged proposals signed by the family's wallet (refused by the vault), a failed transfer reconciled, mutation checks. Generated from test runs.
 - [One-command local run](scripts/near/check.sh): `npm ci && bash scripts/near/check.sh` (Linux x86_64 with glibc >= 2.39 or macOS ARM64; `--docker` elsewhere): 98 contract unit tests, 20 contract tests on a local node, the WASM build, and 8 app tests in 6 files on a local node.
 - [Recorded AI decisions are NEAR AI's](scripts/near/verify-model.mjs): `npm ci && node scripts/near/verify-model.mjs` checks every replayed decision against an answer NEAR AI's model signed, with the signing key attested by a verified Intel TDX quote.

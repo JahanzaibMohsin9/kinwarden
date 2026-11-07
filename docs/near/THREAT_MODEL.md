@@ -53,9 +53,11 @@ invoice, within the case's limits, after the family approves that exact payment.
 - **Verifier trust.** If the verifier enrolls an attacker's account, the vault
   will pay it. In the demo, verification is simulated with fictional
   institutions.
-- **Upgrade authority.** While the deployer key exists, whoever holds it can
-  change the contract (D-08). K11 deletes the vault's and token's full-access
-  keys before submission; after that, no one can change their code.
+- **Upgrade authority.** None for the vault and token code: their last
+  full-access keys were deleted on 7 Nov 2026 (D-08), and `verify.mjs` fails if
+  a key reappears. What remains: the verifier's key, and the agent account's one
+  full-access key, held offline by the team and used only to rotate or delete
+  the app's key.
 - **Wallet connector supply chain.** NEAR Connect loads each wallet's script in
   a sandboxed iframe at runtime. Trust in that script equals trust in the
   wallet.

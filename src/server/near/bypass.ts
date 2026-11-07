@@ -58,7 +58,7 @@ export async function permissionsReport(provider: JsonRpcProvider, d: NearDeploy
       return {
         publicKey: k.public_key,
         kind: "FullAccess",
-        note: "Setup key held by the deployment tooling (.near/keys.json), never by the app server. It can do anything this account can, including deleting the app's key.",
+        note: "Held offline by the team, never on the app server; used only to rotate or delete the app's key. It can do anything this account can, including deleting the app's key.",
       };
     }
     if (!("FunctionCall" in p)) {

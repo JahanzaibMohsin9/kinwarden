@@ -53,8 +53,12 @@ queries its own key with `view_access_key` at startup and refuses to start if
 the key is full-access, has another receiver or extra methods, or cannot be
 verified. A secret key string does not reveal its own permissions.
 
-The agent account's full-access key stays with setup tooling. The demo
-documents whether it is retained or deleted after setup.
+**Closed 7 Nov 2026:** the agent account keeps one full-access key, held offline
+by the team (not in the working copy, never on the app server or a VM). The
+vault's agent account is fixed at `new` with no setter, so this key is the only
+way to delete the app's key (the kill switch, C44), rotate it, or replace it when
+its gas allowance runs out. `verify.mjs` fails if a second full-access key
+appears.
 
 *Revisit if:* a single-account layout is needed for meta transactions (D-07).
 
@@ -184,10 +188,14 @@ authority. This is not designed further until G3 passes.
 
 ## D-08 Upgrade authority
 
-During development the vault account keeps a deployer full-access key, so the
-contract **is upgradeable** and is never described as immutable. Before the
-final testnet demo, we either remove that key and document the lock, or keep it
-and say who holds it.
+During development the vault account kept a deployer full-access key, so the
+contract was upgradeable. **Closed 7 Nov 2026 (K11):** the last full-access keys
+of `vault.kinwarden-demo.testnet` and `tusdc.kinwarden-demo.testnet` were
+deleted (transactions in `docs/near/evidence/2026-11-07-lock.json`). Both
+accounts now have no access key at all, so their code cannot change and their
+NEAR cannot be moved; `scripts/near/verify.mjs` checks `keys: []` for both. The
+tUSDC owner is the root account, so test minting still works. A later vault bug
+fix would need a new vault account and new evidence.
 
 ## D-10 How the app uses the vault (G3)
 

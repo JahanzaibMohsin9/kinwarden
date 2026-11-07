@@ -1,0 +1,20 @@
+{
+  "note": "K11: the vault's and token's full-access keys deleted; their code can no longer change.",
+  "at": "2026-11-07T14:12:44.343Z",
+  "accounts": {
+    "vault.kinwarden-demo.testnet": {
+      "deletedKey": "ed25519:DR5gEaZNyKkGd7T4jzZjehVk1wPa8LRAwyoG18aEdJ5r",
+      "tx": "5jNpm3nGj1wqwSA4YMhNJZqcD5Eh9jD719dj5sjNR3HF",
+      "keysAfter": [],
+      "codeHash": "8kdSQbhVeafAumSKocaCVLn66Hkx7SkkJvF1KjmMSxYB",
+      "checkedAtBlock": 276642071
+    },
+    "tusdc.kinwarden-demo.testnet": {
+      "deletedKey": "ed25519:7rApu7PgCEPUbWbisEnk2iPf685wUEW42vAK9Z11tR3M",
+      "tx": "F2MfRGpbYD2MfFDJYigA2G68nsZqWu1uDajVaoPuY74B",
+      "keysAfter": [],
+      "codeHash": "3SNr9ZyQNzb7qRKvYWvouTy7PLYHtWzMiShbxJ4ADEez",
+      "checkedAtBlock": 276642072
+    }
+  }
+}

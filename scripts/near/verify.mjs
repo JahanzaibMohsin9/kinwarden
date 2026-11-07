@@ -14,7 +14,8 @@
 //      those fields and that hash, and the token contract logged the transfer to the hospital;
 //   4. the agent account's keys today: the app's key can call only the vault's agent methods;
 //   5. the testnet vault runs the build the tests and mutation checks ran against;
-//   6. the activity-log anchor recorded in the evidence is stored on the vault.
+//   6. the activity-log anchor recorded in the evidence is stored on the vault;
+//   7. the vault and token code is locked: neither account has any access key (K11, 7 Nov 2026).
 // Exit code 0 when every check passes, 1 when a check fails, 2 when the network could not be reached
 // (every failure was an RPC/connection error), so a scheduled job can warn instead of failing.
 import crypto from "node:crypto";
@@ -225,7 +226,8 @@ await check(
     expect(app, `the app key from the recorded bypass run (${recorded.permissions.appKey.publicKey}) is no longer on ${config.agent}`);
     const fc = app.access_key.permission.FunctionCall;
     const allowance = (Number(BigInt(fc.allowance ?? 0) / 10n ** 21n) / 1000).toFixed(3);
-    const fullNote = full.length ? `; ${full.length} full-access setup key(s), held by the deployment tooling, not the app server: ${full.map((k) => k.public_key).join(", ")}` : "";
+    expect(full.length <= 1, `${config.agent} has ${full.length} full-access keys; the team holds exactly one, offline`);
+    const fullNote = full.length ? `; 1 full-access key, held offline by the team and used only to rotate or delete the app key, never on the app server: ${full[0].public_key}` : "";
     return `block ${list.block_height}: app key ${app.public_key.slice(0, 16)}… may call ${fc.method_names.join(", ")} on ${fc.receiver_id}, gas allowance ${allowance} NEAR${fullNote}. The recorded bypass run (${recorded.ranAt}) sent ${recorded.results.length} attacks with this key: ${refused} refused (${byProtocol} by NEAR key permissions, ${refused - byProtocol} by the vault), balances unchanged: ${recorded.held ? "yes" : "NO"}`;
   },
   "A function-call key cannot attach the 1 yoctoNEAR deposit that approval, enrollment, withdrawal and token transfers require (NEAR protocol). Replaying the attacks themselves needs the key: run them on a local node with `npm run test:near` (see README).",
@@ -244,6 +246,21 @@ await check("Testnet vault runs the build the tests and mutation checks ran agai
   }
   return `code hash ${account.code_hash} = sha256 ${recorded.testedWasmSha256.slice(0, 16)}… (tested build)${local}`;
 });
+
+await check(
+  "Vault and token code is locked: neither account has an access key",
+  async () => {
+    config ??= await view(vault, "get_config");
+    const out = [];
+    for (const id of [vault, config.token]) {
+      const list = await query({ request_type: "view_access_key_list", account_id: id });
+      expect(list.keys.length === 0, `${id} has ${list.keys.length} access key(s): ${list.keys.map((k) => `${k.public_key} (${typeof k.access_key.permission === "string" ? k.access_key.permission : "FunctionCall"})`).join(", ")}`);
+      out.push(`${id}: keys []`);
+    }
+    return `${out.join("; ")} (full-access keys deleted 7 Nov 2026: docs/near/evidence/2026-11-07-lock.json)`;
+  },
+  "With no key, nobody can deploy new code to these accounts or move their NEAR; the contracts' own methods still enforce every rule. A later bug fix needs a new vault account.",
+);
 
 await check(
   "Activity-log anchor from the evidence is stored on the vault",
