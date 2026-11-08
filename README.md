@@ -179,7 +179,9 @@ npm run test:near
 
 ## Hackathon baseline
 
-This repository starts from pre-existing, team-developed application code, imported with fresh Git history and renamed to Kinwarden. The `pre-hackathon` tag marks this baseline before NEAR implementation. The agent tools, the LLM agent and its DeepSeek, OpenAI and Anthropic providers, simulated payment rails, safety rules, passkey flow and optional Conflux testnet log anchoring belong to the baseline. Only changes after `pre-hackathon` are intended for the NEAR submission: inspect them with `git diff pre-hackathon..HEAD`. At submission, `hackathon-submission` will be tagged with a public compare link for `pre-hackathon...hackathon-submission`.
+This repository starts from pre-existing, team-developed application code, imported with fresh Git history and renamed to Kinwarden. The `pre-hackathon` tag marks this baseline before NEAR implementation. The agent tools, the LLM agent and its DeepSeek, OpenAI and Anthropic providers, simulated payment rails, safety rules, passkey flow and optional Conflux testnet log anchoring belong to the baseline. Only changes after `pre-hackathon` are intended for the NEAR submission: inspect them with `git diff pre-hackathon..HEAD`. The submitted version is tagged `hackathon-submission`: [compare `pre-hackathon...hackathon-submission`](https://github.com/JahanzaibMohsin9/kinwarden/compare/pre-hackathon...hackathon-submission).
+
+**Other project.** Jahanzeb Mohsin's other, independent hackathon project is [Lantern Caravan](https://github.com/JahanzaibMohsin9/lantern_caravan).
 
 ## Development
 
