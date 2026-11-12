@@ -25,7 +25,7 @@ export const BEHIND = [
   { href: "/bank", label: "Payment rails", hint: "The sandbox bank and card network moving the money" },
   { href: "/bank/officer", label: "Bank officer", hint: "The bank's view: a remittance package ready to approve" },
   { href: "/pack", label: "Case pack", hint: "Every bill, receipt and form, printable" },
-  { href: "https://github.com/JahanzaibMohsin9/kinwarden/blob/main/docs/redteam/ONCHAIN.md", label: "On-chain evidence & source", hint: "NEAR testnet transactions, the red-team report and the source code", external: true },
+  { href: "/#near", label: "On-chain evidence", hint: "NEAR testnet transactions: the approved payment, the vault and the refused attacks" },
 ];
 
 export function SiteNav({ tone = "light", className }: { tone?: "light" | "dark"; className?: string }) {
@@ -46,7 +46,7 @@ export function SiteNav({ tone = "light", className }: { tone?: "light" | "dark"
     <ul className="space-y-0.5">
       {BEHIND.map((b) => (
         <li key={b.href}>
-          <Link href={b.href} target={b.external ? "_blank" : undefined} rel={b.external ? "noreferrer" : undefined} className="block rounded-xl px-3 py-2 hover:bg-surface-3" onClick={() => setMenu(false)}>
+          <Link href={b.href} className="block rounded-xl px-3 py-2 hover:bg-surface-3" onClick={() => setMenu(false)}>
             <span className="block text-[13.5px] font-semibold text-ink">{b.label}</span>
             <span className="block text-[12px] leading-snug text-ink-3">{b.hint}</span>
           </Link>

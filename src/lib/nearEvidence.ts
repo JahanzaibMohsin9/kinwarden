@@ -7,9 +7,6 @@ import reconcile from "../../docs/redteam/near/reconcile-sandbox.json";
 import testnetVault from "../../docs/redteam/near/testnet-vault.json";
 import anchorTestnet from "../../docs/redteam/near/anchor-testnet.json";
 
-export const REPO = "https://github.com/JahanzaibMohsin9/kinwarden";
-export const ONCHAIN_REPORT = `${REPO}/blob/main/docs/redteam/ONCHAIN.md`;
-export const CLAIMS_MAP = `${REPO}/blob/main/docs/near/CLAIMS.md`;
 
 const explorerAccount = (account: string) => `https://testnet.nearblocks.io/address/${account}`;
 

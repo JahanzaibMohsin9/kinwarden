@@ -1,5 +1,5 @@
 import { ArrowUpRight, BadgeCheck, Bot, KeyRound, Landmark, Terminal, Wallet } from "lucide-react";
-import { CLAIMS_MAP, nearEvidence, ONCHAIN_REPORT } from "@/lib/nearEvidence";
+import { nearEvidence } from "@/lib/nearEvidence";
 
 const FLOW = [
   {
@@ -37,7 +37,7 @@ export function NearProof() {
   const e = nearEvidence();
   const stats = [
     { big: e.payment.amount, label: `paid to the hospital after the family approved it in their own wallet`, link: { href: e.payment.txUrl, text: "View the transaction" } },
-    { big: `${e.bypass.refused}/${e.bypass.total}`, label: "attacks with the agent's real NEAR key refused, balances unchanged", link: { href: ONCHAIN_REPORT, text: "Read the red-team report" } },
+    { big: `${e.bypass.refused}/${e.bypass.total}`, label: "attacks with the agent's real NEAR key refused, balances unchanged", link: { href: "/attack", text: "See the red-team results" } },
     { big: "Same build", label: "the testnet vault runs the exact code the tests and mutation checks ran against", link: { href: e.vault.url, text: "Open the vault" } },
   ];
   return (
@@ -100,11 +100,7 @@ export function NearProof() {
           <code className="overflow-x-auto whitespace-nowrap rounded-lg bg-white/5 px-3 py-2 font-mono text-[13px] text-[#9fd9cb]">node scripts/near/verify-model.mjs</code>
         </div>
         <p className="mt-4 text-[12.5px] text-ink-3">
-          NEAR testnet by design: tUSDC is a test token with no value, and the hospitals are fictional, so no real institution receives funds. Every claim and the test that checks it:{" "}
-          <a href={CLAIMS_MAP} target="_blank" rel="noreferrer" className="font-semibold text-brand hover:underline">
-            claim → test map
-          </a>
-          .
+          NEAR testnet by design: tUSDC is a test token with no value, and the hospitals are fictional, so no real institution receives funds. Every claim on this page has a test that checks it.
         </p>
       </div>
     </section>
